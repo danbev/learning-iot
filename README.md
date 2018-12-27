@@ -26,6 +26,13 @@ If these two charged objects come to close to one another the electrons jump
 the gap between them and create a spark. This is how lightning occurs for example.
 The earth is positively charged and the clouds negatively 
 
+### Electricity
+This is the flow of electrons. The electrons flowing from one place to another is
+called current flow. Voltage, the difference in the charge between to object is
+what causes the flow.
+Electronics is about controlling the electrons with special components and circuits.
+
+
 ### Electric charge
 This is movement of electrons. 
 
@@ -33,6 +40,8 @@ This is movement of electrons.
 (Spänning in Swedish) is the difference in charge between two points. This is 
 measured in volt (V) and the symbol used is `U` from the German word unterschied
 that means difference.
+Electrons flow from the netative terminal of a voltage source around the curcuit
+as they are attracted by the positive terminal.
 
 ### Current
 Is the rate at which charge is flowing. Is measured in ampere (A) and the symbol
