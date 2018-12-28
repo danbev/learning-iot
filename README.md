@@ -47,6 +47,13 @@ as they are attracted by the positive terminal.
 Is the rate at which charge is flowing. Is measured in ampere (A) and the symbol
 used is `I` which comes from the French word intensite de courant which means
 current strength.
+The number of electrons that move past a point in a conductor during a specific
+period of time is measured in coulombs (C). One coulomb of charge is equal to
+1 Coulomb = 6.242x10^18 electrons
+
+If 1 coulomb moves past a point in 1s, we say that the current is 1 ampere (A)
+1 Ampere = 1 coulomb/s
+
 
 ### Resistance
 Is a materials tendency to resist the flow of charge (current). Is measured in
@@ -69,3 +76,9 @@ electric circuit. The unit of power is watt which is one joule per second.
 
 ### Watt
 
+
+### General Purpose Input Output (GPIO)
+
+### Normally Open (NO)
+
+### Normally Closed (NC)
