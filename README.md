@@ -80,5 +80,11 @@ electric circuit. The unit of power is watt which is one joule per second.
 ### General Purpose Input Output (GPIO)
 
 ### Normally Open (NO)
+Is open (broken) by default so no current flows
 
 ### Normally Closed (NC)
+The opposite of normally open.
+
+### Batteries
+All batteries have a voltage of 1.5 V. 9V batteries are simply 6 such batteries
+that are connected in a series.
