@@ -27,16 +27,20 @@ the gap between them and create a spark. This is how lightning occurs for exampl
 The earth is positively charged and the clouds negatively 
 
 ### Electricity
-This is the flow of electrons. The electrons flowing from one place to another is
-called current flow. Voltage, the difference in the charge between to object is
-what causes the flow.
-Electronics is about controlling the electrons with special components and circuits.
+This is the flow of electrons. The electrons flowing from one place to another
+is called current flow. Voltage, the difference in the charge between to object
+is what causes the flow.
+Electronics is about controlling the electrons with special components and
+circuits.
 
 
 ### Electric charge
 This is movement of electrons. 
 
 ### Voltage
+Voltage is what pushes electrons arounda a circuit. Without Voltage the
+electrons will move randomly in any direction.
+
 (Spänning in Swedish) is the difference in charge between two points. This is 
 measured in volt (V) and the symbol used is `U` from the German word unterschied
 that means difference.
@@ -59,6 +63,34 @@ If 1 coulomb moves past a point in 1s, we say that the current is 1 ampere (A)
 Is a materials tendency to resist the flow of charge (current). Is measured in
 ohm using the symbol used is capital omega Ω and resistance uses the symbol R.
 
+### Gound
+In a ciruit with one battery we refer to the negative terminal as ground.
+And in schematics instread of drawing lines that should be connected to the
+negative terminal we simply use the ground symbol. For example:
+
+```
+  +----------/\/\/--------+
+  |                       |
++ |                       |
+-----                     |
+ ---                      |
+  |                       |
+  |                       |
+ ---                    ---
+  =                      -
+  .                      .
+```
+Which is the same as writing:
+```
+  +----------/\/\/--------+
+  |                       |
++ |                       |
+-----                     |
+ ---                      |
+  |                       |
+  |                       |
+  +-----------------------+
+```
 
 
 ### Ohm's Law
