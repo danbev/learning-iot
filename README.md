@@ -121,10 +121,31 @@ The opposite of normally open.
 All batteries have a voltage of 1.5 V. 9V batteries are simply 6 such batteries
 that are connected in a series.
 
+### Radio waves
+Are just another form of light (electro matnetic waves) just like light. 
+They travel at the speed of light 300 000 000 meters per second.
+
+Now, electrons in a wire flow with the help of atoms, in the conduction band.
+But radio waves/light waves or electro magnetic waves don't have a wire but
+Electromagnetic waves differ from mechanical waves in that they do not require
+a medium to propagate. 
+This means that electromagnetic waves can travel not only through air and solid
+materials, but also through the vacuum of space.
+
 ### LoRa
 Is short for "long range" and provides low power consumption and long range,
 a low data rate, and secure transmission.
-Has a greater range than celluar networks.
+Is used in small battery driven sensor devices that connect to a gateway which
+may be between 1km to 10km form them. These devices are expected to run on the
+same battery for about 2 years.
+
+Has a greater range than celluar networks which have a range from a few 100m to
+1km.
+
+In Europe the frequencies for LoRa are 433MHz and 868MHz. Be carful when
+configuring this as it could be illegal to use 915MHz which is allowed in other
+places in the world.
+
 
 ### Amplitude Modulation
 Lets take the example of sending a signal through a coppar wire:
@@ -142,9 +163,28 @@ modems in the good old days.
 First thing is that a byte will be broken down into separate bits and sent one
 after the other. After that the will be partity bits and perhaps sync bits but
 that is not important to this section.
+
 The problem is that the telefon line cannot transmit logic levels which might
 use 3.3V for High and 0V for low. We need to change these bits into something
-that can be trasmitted on the frequence of the telefon wire (300-4000Hz)
+that can be trasmitted on the frequence of the telefon wire (300-4000Hz) which
+is a periodic wave that oscilates.
+
+### Amplitude Modulation (AM)
+We start with an input signal which is what we want to send to the reciever.
+The reciever knows the frequency that this signal will be sent. The signal
+is then modulated into a carrier signal where the amplitude will proportional
+to the original signal. For example where the original signal has a higher
+value the amplitude of the carrier signal will be greater, and where the
+original signal value is lower the amplitude will be lower. On the receiving
+side the demodulator will interpret the amplitudes to transform the carrier
+signal into the original senders signal.
+
+
+### Frequency Modulation (FM)
+The goal here is similar to AM where we have a signal that we want to send and
+instead of changing the amplitude we change the frequency. For exampl 0 might be 
+represented by a higher frequency (shorter wave lengths), and a 1 by a lower
+frequency (longer frequency).
 
 ### Digial signals and frequency
 A digital signal is in a specific state as high or low, 1 or 0. This state is
@@ -167,22 +207,44 @@ Hertz this is per second.
 
 ![Frequancy image](./frequency.png "Frequency image")
 
-So the more waves that complete the higher the fequency. These waves are shorter
-and the lower frequency waves are longer.
+So the more waves that complete the higher the frequency. These waves are
+shorter and the lower frequency waves are longer.
 
-So if we have a wave of 200Hz, that means 200 completions per second can
+So if we have a wave of 200Hz, that means 200 cycle per second can
 calculate the wave lenght using the formula above:
 ```
      3 * 10⁸ m/s
 λ =  ----------- = 1.5 * 10⁶ m = 1500 km
         200Hz
 ```
+Now, a wave length is the length of one cycle, as in starting from zero going
+up to the amplitude, down to zero, down to the amplitude and back to zero. This
+distance is 1500km?  
+So would an antennna that is build to receive such a signal then have to be
+1500km long to receive the complete wave. This does not work and in reality we
+have small devices that have antennas which are much must shorter. What is
+needed is to take this low level fequency and transform it into a higher
+frequency but still retain the same information, and on the other side we take
+this high frequency and transform it back into the lower frequency.
+
+
 And lets take a higher frequency of 3000Hz:
 ```
      3 * 10⁸ m/s
 λ =  ----------- = 10⁵m = 100 km
         3000Hz
 ```
+
+
+There are three properties of a sine wave that we can manipulate:
+```
+y(t) = A(t)     * sin(2π f(t)     + ψ(t))
+     
+       amplitude         frequency  phase
+```
+So amplitude is the max distance of the trough/crest. And frequency is the
+number of cycles per second. Notice that the phase is added so this would be
+the hight of the y axis.
 
 ### LoRaWAN                                                                         
 + Is a Low power Wide Area Network (LPWAN)  
