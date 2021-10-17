@@ -120,3 +120,69 @@ The opposite of normally open.
 ### Batteries
 All batteries have a voltage of 1.5 V. 9V batteries are simply 6 such batteries
 that are connected in a series.
+
+### LoRa
+Is short for "long range" and provides low power consumption and long range,
+a low data rate, and secure transmission.
+Has a greater range than celluar networks.
+
+### Amplitude Modulation
+Lets take the example of sending a signal through a coppar wire:
+```
+        +---+       (wire)       +---+
+mic --->|amp|------------------->|amp|---> speaker
+        +---+                    +---+
+```
+So sending this over this wire can be done 
+
+
+### Modulated Signal
+This example is of a computer sending data over a telephone, like when we used
+modems in the good old days.
+First thing is that a byte will be broken down into separate bits and sent one
+after the other. After that the will be partity bits and perhaps sync bits but
+that is not important to this section.
+The problem is that the telefon line cannot transmit logic levels which might
+use 3.3V for High and 0V for low. We need to change these bits into something
+that can be trasmitted on the frequence of the telefon wire (300-4000Hz)
+
+### Digial signals and frequency
+A digital signal is in a specific state as high or low, 1 or 0. This state is
+represented by a constant non-changing voltage on the wire. Like 0V or 3.3V.
+
+If instead this voltate varies over time we have a signal.
+
+If the voltage is changing is a regular way, periodically way, over time we have
+a frequency.
+
+### Wave length                                                                 
+```                                                                             
+     c                c = speed of light                                        
+λ =  -                f = frequency                                             
+     f                                                                          
+```
+Lets say we have a signal that frequency of 200Hz. And recall that frequency
+is the number of waves that pass a fixed place in a given amount of time (in
+Hertz this is per second.
+
+![Frequancy image](./frequency.png "Frequency image")
+
+So the more waves that complete the higher the fequency. These waves are shorter
+and the lower frequency waves are longer.
+
+So if we have a wave of 200Hz, that means 200 completions per second can
+calculate the wave lenght using the formula above:
+```
+     3 * 10⁸ m/s
+λ =  ----------- = 1.5 * 10⁶ m = 1500 km
+        200Hz
+```
+And lets take a higher frequency of 3000Hz:
+```
+     3 * 10⁸ m/s
+λ =  ----------- = 10⁵m = 100 km
+        3000Hz
+```
+
+### LoRaWAN                                                                         
++ Is a Low power Wide Area Network (LPWAN)  
