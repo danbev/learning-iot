@@ -132,6 +132,62 @@ a medium to propagate.
 This means that electromagnetic waves can travel not only through air and solid
 materials, but also through the vacuum of space.
 
+### Radio bands
+```
+Name                             Frequency Range       Wavelength Range
+
+ELF (Extremely Low Frequency)    3–30 Hz               100,000–10,000 km
+SLF (Super Low Frequency)        30–300 Hz             10,000–1,000 km
+ULF (Ultra Low Frequency)        300–3000 Hz           1,000–100 km
+VLF (Very Low Frequency)         3–30 kHz              100–10 km
+LF (Low Frequency)               30–300 kHz            10–1 km
+MF (Medium Frequency)            300 kHz–3 MHz         1,000–100 m
+HF (High Frequency)              3–30 MHz              100–10 m
+VHF (Very High Frequency)        30 MHz–300 MHz        10–1 m
+UHF (Ultra High Frequency)       300 MHz–3 GHz         1–0.1 m
+SHF (Super High Frequency)       3 GHz–30 GHz          10–1 cm
+EHF (Extremely High Frequency)   30–300 GHz            10–1 mm
+THF (Tremendously High Frequency)0.3 THz–30 THz        1–0.1 mm
+```
+Radio waves with long wavelengths such as in the bands LF, MF, and HF can
+exploit interesting effects of the Earth’s atmosphere to travel extremely long
+distances. It is possible to reflect waves in these bands off various layers in
+the atmosphere and ionosphere, making intercontinental communications possible. 
+
+Notice that the lower frequency which also means longer wavelengths. When
+sending data this data needs to travel over a signal that oscilates over with
+a wave length. With the modulation techniques discussed later in this doc we
+will see that most of these, if not all, will use the frequency to interpret
+the original signal. If the wavelenght is longer less information is availaible
+for processing during the same time period compared to a higher frequency. So
+more information can be sent with higher frequencies in the same amount of time.
+
+The general line-of-sight propagation mode can be more thought of as allowing
+one to communicate with something that one could see in the absence of any
+obstacles, that is, something not blocked by the curvature of the Earth or large
+geographic features like mountains.
+
+### Diffraction
+Like light rays from the sun diffract in the atmosphere so can other types of
+EM waves. This enables them to when they hit the peak of a hill diffract
+(spread) out into the vallly. This can also happen with walls in ones home
+which happens for 2.4GHz and 5GHz radiation which is what our WiFi routes emit.
+
+### Reflection
+In general, good conductors (such as metal) reflect most of an electromagnetic
+wave’s energy. Other materials like rock reflect some energy, and many
+insulators such as plastics reflect little energy. Areas covered in metal are
+well shielded from electromagnetic radiation, because the metal will reflect
+much of the incoming energy back.
+
+### Absorption
+The energy not reflected by a medium will pass into the medium. Some materials
+allow electromagnetic radiation to pass through them without attenuation (
+gradual loss) better than others. 
+Many materials do not allow visible light to pass at all but do pass
+lower-frequency radio waves. Radio waves can travel through most nonconductive
+materials,
+
 ### LoRa
 Is short for "long range" and provides low power consumption and long range,
 a low data rate, and secure transmission.
@@ -155,7 +211,6 @@ mic --->|amp|------------------->|amp|---> speaker
         +---+                    +---+
 ```
 So sending this over this wire can be done 
-
 
 ### Modulated Signal
 This example is of a computer sending data over a telephone, like when we used
@@ -184,23 +239,6 @@ transported as a radio wave it has to be modulated into 30Hz-300GHz frequency
 without loosing the information that the orignal signal represents.
 
 
-### Radio bands
-```
-Name                             Frequency Range       Wavelength Range
-
-ELF (Extremely Low Frequency)    3–30 Hz               100,000–10,000 km
-SLF (Super Low Frequency)        30–300 Hz             10,000–1,000 km
-ULF (Ultra Low Frequency)        300–3000 Hz           1,000–100 km
-VLF (Very Low Frequency)         3–30 kHz              100–10 km
-LF (Low Frequency)               30–300 kHz            10–1 km
-MF (Medium Frequency)            300 kHz–3 MHz         1,000–100 m
-HF (High Frequency)              3–30 MHz              100–10 m
-VHF (Very High Frequency)        30 MHz–300 MHz        10–1 m
-UHF (Ultra High Frequency)       300 MHz–3 GHz         1–0.1 m
-SHF (Super High Frequency)       3 GHz–30 GHz          10–1 cm
-EHF (Extremely High Frequency)   30–300 GHz            10–1 mm
-THF (Tremendously High Frequency)0.3 THz–30 THz        1–0.1 mm
-```
 
 
 ### Frequency Modulation (FM)
