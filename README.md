@@ -203,15 +203,6 @@ configuring this as it could be illegal to use 915MHz which is allowed in other
 places in the world.
 
 
-### Amplitude Modulation
-Lets take the example of sending a signal through a coppar wire:
-```
-        +---+       (wire)       +---+
-mic --->|amp|------------------->|amp|---> speaker
-        +---+                    +---+
-```
-So sending this over this wire can be done 
-
 ### Modulated Signal
 This example is of a computer sending data over a telephone, like when we used
 modems in the good old days.
@@ -223,6 +214,16 @@ The problem is that the telefon line cannot transmit logic levels which might
 use 3.3V for High and 0V for low. We need to change these bits into something
 that can be trasmitted on the frequence of the telefon wire (300-4000Hz) which
 is a periodic wave that oscilates.
+
+There are three properties of a sine wave that we can manipulate:
+```
+y(t) = A(t)     * sin(2π f(t)     + ψ(t))
+     
+       amplitude         frequency  phase
+```
+So amplitude is the max distance of the trough/crest. And frequency is the
+number of cycles per second. Notice that the phase is added so this would be
+the hight of the y axis.
 
 ### Amplitude Modulation (AM)
 We start with an input signal which is what we want to send to the reciever.
@@ -239,13 +240,17 @@ transported as a radio wave it has to be modulated into 30Hz-300GHz frequency
 without loosing the information that the orignal signal represents.
 
 
-
-
 ### Frequency Modulation (FM)
 The goal here is similar to AM where we have a signal that we want to send and
 instead of changing the amplitude we change the frequency. For exampl 0 might be 
 represented by a higher frequency (shorter wave lengths), and a 1 by a lower
 frequency (longer frequency).
+
+
+### Phase Modulation
+This this case a change in phase could be used to indicate 1 and no change could
+be 0. Visually this would look like break in the curve and it starting over in
+the down instead of up or vice virca.
 
 ### Digial signals and frequency
 A digital signal is in a specific state as high or low, 1 or 0. This state is
@@ -296,16 +301,6 @@ And lets take a higher frequency of 3000Hz:
         3000Hz
 ```
 
-
-There are three properties of a sine wave that we can manipulate:
-```
-y(t) = A(t)     * sin(2π f(t)     + ψ(t))
-     
-       amplitude         frequency  phase
-```
-So amplitude is the max distance of the trough/crest. And frequency is the
-number of cycles per second. Notice that the phase is added so this would be
-the hight of the y axis.
 
 ### LoRaWAN                                                                         
 + Is a Low power Wide Area Network (LPWAN)  
