@@ -179,6 +179,29 @@ original signal value is lower the amplitude will be lower. On the receiving
 side the demodulator will interpret the amplitudes to transform the carrier
 signal into the original senders signal.
 
+Just remember that we start with some signal on a wire and for this to be
+transported as a radio wave it has to be modulated into 30Hz-300GHz frequency
+without loosing the information that the orignal signal represents.
+
+
+### Radio bands
+```
+Name                             Frequency Range       Wavelength Range
+
+ELF (Extremely Low Frequency)    3–30 Hz               100,000–10,000 km
+SLF (Super Low Frequency)        30–300 Hz             10,000–1,000 km
+ULF (Ultra Low Frequency)        300–3000 Hz           1,000–100 km
+VLF (Very Low Frequency)         3–30 kHz              100–10 km
+LF (Low Frequency)               30–300 kHz            10–1 km
+MF (Medium Frequency)            300 kHz–3 MHz         1,000–100 m
+HF (High Frequency)              3–30 MHz              100–10 m
+VHF (Very High Frequency)        30 MHz–300 MHz        10–1 m
+UHF (Ultra High Frequency)       300 MHz–3 GHz         1–0.1 m
+SHF (Super High Frequency)       3 GHz–30 GHz          10–1 cm
+EHF (Extremely High Frequency)   30–300 GHz            10–1 mm
+THF (Tremendously High Frequency)0.3 THz–30 THz        1–0.1 mm
+```
+
 
 ### Frequency Modulation (FM)
 The goal here is similar to AM where we have a signal that we want to send and
