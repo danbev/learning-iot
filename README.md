@@ -188,19 +188,6 @@ Many materials do not allow visible light to pass at all but do pass
 lower-frequency radio waves. Radio waves can travel through most nonconductive
 materials,
 
-### LoRa
-Is short for "long range" and provides low power consumption and long range,
-a low data rate, and secure transmission.
-Is used in small battery driven sensor devices that connect to a gateway which
-may be between 1km to 10km form them. These devices are expected to run on the
-same battery for about 2 years.
-
-Has a greater range than celluar networks which have a range from a few 100m to
-1km.
-
-In Europe the frequencies for LoRa are 433MHz and 868MHz. Be carful when
-configuring this as it could be illegal to use 915MHz which is allowed in other
-places in the world.
 
 
 ### Modulated Signal
@@ -301,6 +288,173 @@ And lets take a higher frequency of 3000Hz:
         3000Hz
 ```
 
+### Antennas
+Antennas are the interface between the world of electronics and the world of
+electromagnetic radiation. 
+An antenna can transform an alternating current (AC) into a radio wave and vice
+versa.
+
+https://www.youtube.com/watch?v=FWCN_uI5ygY
+
+
+The below notes were while watching https://www.youtube.com/watch?v=bwreHReBH2A.
+
+Lets say we have a positive charge (+) and a negative charge (-) and we are
+going to move them vertically (but I guess without them being attracted to
+each other):
+```
+     +               -               +
+     |   +       -   ↑   -       +   |
+E    |   |   +   ↑   |   ↑   -   |   |
+     |   ↓   -   |   |   |   +   ↓   |
+     ↓   -       +   |   +       -   ↓
+     -               +               -
+
+-------------------------------------------------------> time
+
+Electro field = vertial arrow
+```
+So the electric field is pointing from the positive to the negative. Notice how
+the electric field goes from negative to 0 to positive. So the value of the
+electricfield starts off negative, then goes up to zero, then changes direction
+and becomes positive instead, and then goes back down to zero etc.
+
+If you look at the diagram above and visualize a curve looking something like
+this:
+```
+                     -                
+                 -       -            
+              -              -        
+     ------------------------------------->
+         -                       -    
+     -                               -
+```
+```
+             Wire with electric current
+     +         +-+ 
+     |         |||
+E    |         |||
+     |         |||
+     ↓         |↓|
+     -         +-+
+```
+Recall that when we have a current there is also an magnetic field generated.
+Remember the right hand rule here, the current is flowing downards so your
+right thumb points in that direction, and you other fingers wrap around the wire
+and that is direction of the magnetic field. So the magnetic field goes around
+the wire in a circle from right to left above, coming out towards us and then
+back behing the wire. We can name this magnetic field B.
+
+Now, in the same way we moved the positive and negative charges up and down, we
+can change the direction of the current, and we can also stop the current flow:
+```
+             Wire with electric current
+               +-+       +-+
+               |||       |↑|
+               |||  +-+  |||
+               |||  +-+  |||
+               |↓|       |||
+               +-+       +-+
+```
+The middle box is supposed to represent zero current. 
+
+```
+                     
+                - -             - -
+              -     -         -     -
+     ------------------------------------->
+      -     -         -     -        -     -
+        - -             - -            - -
+    
+```
+So have the electric field which is doing up and down, and we have the magnetic
+field which is coming out towards us and back into the screen. So try to
+visualize this as the electric field going up and down and the magnetic field
+is on a plane orthogonal to it.
+
+Changing E generates B, and chaging B generates E. This makse the wave and
+causes the continuation of this intraction causing this "wave" to propagate.
+The speed it propagates is the speed of light, 3 * 10⁸m/s.
+
+```
+                                                Metal wire
+                                                  ↓  
+                                                  |  ↑
+                     -                         -  |  |
+                 -       -                  -     |  | I
+              -              -           -        |  |
+     ------------------------------------------>  |  |
+         -                       -     -          |  |
+     -                               -            |  
+```
+So the above is just showing when E is positive but it will soon go down to
+zero and then to negative:
+```
+                                                 Metal wire
+                                                   ↓  
+                                                   |  |
+                               -                   |  |
+       -                   -       -               |  | I
+          -             -              -           |  |
+      -------------------------------------------> |  |
+             -     -                       -       |  ↓
+               -  -                               -  
+```
+Notice that the current (I) switches direction. 
+
+```
+c = 3*10⁸m/s
+```
+But there is a relation ship between c and the frequence and the wavelenght:
+```
+c = frequence * wave length
+c = f * λ
+m   1
+- = - * m
+s   s
+```
+Since c is constant if we increase the frequence then the wave length must
+decrease. And if the wave length increases the frequence must decrease.
+
+The frequency of E is the same as the frequency of B.
+```
+E = cB
+```
+
+### EM Energy
+Do electro magnetic waves carry energy?  
+Yes, think about what happens when you sit in the sun, you get warm and if you
+are like me your skin will become red and burn. We absorb that energy from the
+sun.
+
+### LoRa
+Is short for "long range" and provides low power consumption and long range,
+a low data rate, and secure transmission.
+Is used in small battery driven sensor devices that connect to a gateway which
+may be between 1km to 10km form them. These devices are expected to run on the
+same battery for about 2 years.
+
+Has a greater range than celluar networks which have a range from a few 100m to
+1km.
+
+In Europe the frequencies for LoRa are 433MHz and 868MHz. Be carful when
+configuring this as it could be illegal to use 915MHz which is allowed in other
+places in the world.
+
+LoRa is the physical layer that enables a long-range communication link.
+LoRaWAN is the communication protocol and system architecture for the network.
 
 ### LoRaWAN                                                                         
-+ Is a Low power Wide Area Network (LPWAN)  
+Is a Low power Wide Area Network (LPWAN)  
+```
+Nodes:         Gateways           Network Server  Application servers
+*------------->+-------+           +-----+         +-----+
+  * *--+------>|       | --------> |     | ------> |     |
+       |       +-------+           |     |         +-----+
+*------+------>+-------+           |     | ------> +-----+
+               |       | --------> |     |         |     |
+               +-------+           +-----+         +-----+
+      (LoRa)             (TCP/IP, TLS)    (TCP/IP, TLS)
+                          
+```
+
