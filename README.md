@@ -288,6 +288,15 @@ And lets take a higher frequency of 3000Hz:
         3000Hz
 ```
 
+How does frequency and data rate relate to each other. The way I'm thinking
+about this at the moment is that we have a carrier wave that is of a certain
+frequency, but there is no change in the wave, like no change to the amplitude
+phase or anything like that so it does not really transport any information, or
+perhaps it transports the same information all the time. But if we can decide
+that a change in amplitute means a logical 1 and another change means logical 0
+then we can send on bit of information per cycle/period. So if we have a 10Hz
+communication channel that would mean 10 bits of information per second?
+
 ### Antennas
 Antennas are the interface between the world of electronics and the world of
 electromagnetic radiation. 
