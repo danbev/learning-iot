@@ -297,6 +297,29 @@ that a change in amplitute means a logical 1 and another change means logical 0
 then we can send on bit of information per cycle/period. So if we have a 10Hz
 communication channel that would mean 10 bits of information per second?
 
+### Frequency bands
+Take the FM band which is the range of frequencies from 88MHz to 108MHz:
+```
+88MHz         108MHz
+ |-------------|------
+ 
+
+FM broadcast band 88 MHz  (frequency of the electrical current)
+88 miljon cycles per second, 88 000 000Hz
+
+220V       -                -           60Hz (60 cycles per second) 
+         -   -            -   -
+       -      -         -       -
+0V    -------------------------------              
+                -      -          -
+                  -   -             -
+                    -
+```
+
+### What is bandwidth
+TODO:
+
+
 ### Antennas
 Antennas are the interface between the world of electronics and the world of
 electromagnetic radiation. 
@@ -466,4 +489,52 @@ Nodes:         Gateways           Network Server  Application servers
       (LoRa)             (TCP/IP, TLS)    (TCP/IP, TLS)
                           
 ```
+
+
+Protocol stack:
+```
+
+
+
++---------------------------------------------------------------+
+| Class A  Baseline | Class B baseline     | Class C baseline   | 
++---------------------------------------------------------------+
+|           LoRa Modulation
++---------------------------------------------------------------+
+|         Reginal ISM band                                      |
++---------------------------------------------------------------+
+| EU 868  | EU 433 | US 915 | AS 430 |                          |
++---------------------------------------------------------------+
+```
+
+### BlueTooth
+Peer-to-peer connection over relatively short ranges. These devices normally
+do not require much power so fairly low power consumption.
+
+### BlueTooth Low Energy (BLE)
+TODO:
+
+### WiFi Direct
+Is  a peer-to-peer connection and and does not need a wifi access point. It uses
+the same frequency and similar bandwidth and speed as normal WiFi.
+
+### Near-Field Communication (NFC)
+Other wireless devices emit radio signals but NFC communicate with an EM field
+(not a wave that is) between two coils. So these two coils need to be very
+close to each other for this to work.
+There can be passive tags don't have any power source of their own and instead
+get their power from the reader over the EM field.
+
+### Low-Power, Short-Range, Low-Data, Mesh technologies
+Mesh means many-to-many so with these technologies we can send a message to a
+destination device without being directly connected to that device:
+```
+ A ---> B --> C
+```
+In this case A want to send a message to device C but is only sending to B which
+migth be closer. A might be too far away to even be able to send to C. There
+can be many hops here and they can be spread out over fairly long distance and
+still have low power consuption for the devices.
+
+Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 
