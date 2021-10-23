@@ -799,28 +799,28 @@ with such an NPN transistor:
 For this example I used as button switch which is connected to the base of the
 transistor:
 
-![NPN transistor circuit with switch off](./npn-off.jpg "NPN Transistor with switch off")
+![NPN transistor circuit with switch off](./doc/npn-off.jpg "NPN Transistor with switch off")
 
 So with out a current flowing through the base and the emitter there is no
 current flowing though the transistor. Pressing the button will cause a current
 to flow:
 
-![NPN transistor circuit with switch on](./npn-on.jpg "NPN Transistor with switch on")
+![NPN transistor circuit with switch on](./doc/npn-on.jpg "NPN Transistor with switch on")
 
 
 So that is how a NPN Bipolar Junction transistor works and how we can hook it
 up physically. We can use two such transistors:
 
-![AND GATE both off](./npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
+![AND GATE both off](./doc/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
 
 Now, pressing just the left button no current will flow:
-![AND GATE left on](./npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
+![AND GATE left on](./doc/npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
 
 And, pressing just the right button no current will flow:
-![AND GATE left on](./npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
+![AND GATE left on](./doc/npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
 
 But pressing both and current will flow:
-![AND GATE right on](./npn-and-gate-on.jpg "NPN Transistors as AND gate on")
+![AND GATE right on](./doc/npn-and-gate-on.jpg "NPN Transistors as AND gate on")
 
 Notice that what we have created here is a AND gate:
 ```
