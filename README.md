@@ -3,7 +3,7 @@ The sole purpose of this repository is to store notes and code helping me
 learn things related to Internet of Things, but also basic electronics.
 
 ### Contents
-1. [ESP8266](./esp8266.md)
+1. [ESP8266](./doc/esp8266.md)
 
 
 ### Microcontroller Unit (MCU)
