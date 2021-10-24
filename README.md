@@ -4,6 +4,7 @@ learn things related to Internet of Things, but also basic electronics.
 
 ### Contents
 1. [ESP8266](./doc/esp8266.md)
+1. [Microbit v2.0](./doc/microbit.md)
 
 
 ### Microcontroller Unit (MCU)
