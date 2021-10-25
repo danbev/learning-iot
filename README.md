@@ -250,7 +250,8 @@ SS   = Slave Select (to select among mulitiple connected slaves like above)
 
 ### Universal Asynchonous Receiver/Transmitter (UART)
 UART is not a communications protocol like SPI and I2C but instead a physical
-component/circuit in a microcontroller or a standalone integrated circuit.
+component/circuit in a microcontroller or a standalone integrated circuit. The
+standard it implements is RS-232 protocol.
 It is main purpose is to send and receive serial data.
 
 An UART can look something like the following:
@@ -1825,8 +1826,8 @@ Is a protocol for inspecting microcontrollers.
 ```
    +---+
    |TMS |------------------+-----------+
-   |TCK |--------------    |           |
-   |TDI |-------------> +-----+     +-----+
+   |TCK |----------------+-|---------+ |
+   |TDI |-------------->+-----+     +-----+
    |TDO |<----+         |TMS  |     |TMS  |
    |TRST|     |         |TCK  |     |TSK  |
    +----+     |         |TDI  |---->|TDI  |-----+
@@ -1842,7 +1843,19 @@ TRST = Test Reset (optional)
 Notice that there can be multiple microprocessors connected and debugged.
 
 ### SWD (Serial Wire Debug)
-Is a protocol for inspecting microcontrollers.
+Is a protocol for inspecting microcontrollers and is propriatary to ARM.
+```
+   +-----+       +-----+
+   |SWDIO|<----->|SWDIO|
+   |SWCLK|       |SWCLK|
+   +-----+       +-----+
+```
+In this case we can only debug a single microcontroller.
+
+### Debug adapters
+Are small hardware modules which provide the right kind of signaling (JTAG
+and/or SWD like discussed above). So this would be connected to the device/board
+with a USB to the host computer doing the debugging.
 
 ### Debug probes
 
