@@ -1819,3 +1819,37 @@ Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 
 ### RS-232
 Recommended Standard 232.
+
+### JTAG (Joint Test Action Group)
+Is a protocol for inspecting microcontrollers.
+```
+   +---+
+   |TMS |------------------+-----------+
+   |TCK |--------------    |           |
+   |TDI |-------------> +-----+     +-----+
+   |TDO |<----+         |TMS  |     |TMS  |
+   |TRST|     |         |TCK  |     |TSK  |
+   +----+     |         |TDI  |---->|TDI  |-----+
+              |         +-----+     +-----+     |
+              +---------------------------------+
+
+TMS = Test Mode Select
+TCK = Test Clock
+TDI = Test Data Input
+TDO = Test Data Output
+TRST = Test Reset (optional)
+```
+Notice that there can be multiple microprocessors connected and debugged.
+
+### SWD (Serial Wire Debug)
+Is a protocol for inspecting microcontrollers.
+
+### Debug probes
+
+####  Common Microcontroller Software Interface Standard Debug Access Port (CMSIS-DAP)
+This is a protocol spec and an implemenation firmware that supports access to
+Debug Access Port.
+So you connect an USB to the board and can then use a debugger with the device.
+TODO:
+
+#### ST-Link
