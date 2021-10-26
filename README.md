@@ -1866,3 +1866,9 @@ So you connect an USB to the board and can then use a debugger with the device.
 TODO:
 
 #### ST-Link
+TODO:
+
+### Harward Architecture
+Is a computer arch where there are separate buses for data and instructions.
+This is in contrast to a Von Neumann arch which uses the same bus for both
+instruction and data.
