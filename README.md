@@ -1872,3 +1872,29 @@ TODO:
 Is a computer arch where there are separate buses for data and instructions.
 This is in contrast to a Von Neumann arch which uses the same bus for both
 instruction and data.
+
+
+### Clocks
+All microprocessors have clocks in them or use one that is outside of the
+microcontroller itself. The microprocessor needs the clock to execute our
+program, to the rythm of the clock. So the microprocessor could execute one
+instruction for every tick of the clock. We also have timers and counters in the
+system.
+
+A counter is a device that records the number of occurences of a particular
+event. A timer is used to generate a delay.
+
+But we know that the microprocessor is capable of a huge number of clock ticks
+per second, so if we have a counter based on that it would generate a very
+large number. For this reason the microcontrolller provides a feature called
+prescaling which is a way for the counter to skip a certain number of
+microcontroller clock ticks. So one could set the prescaler value to something
+like 256 and that could cause the counter to only count/increment every time
+the clock ticks 256 times. So if we have a clock that tick 1000000 times per
+second we would have 1000000/256 = 3906 counts of the counter per second. So if
+we used this counter in a program and checked that it was 3906 then we could
+perform an action every second.
+
+A timer most often has a control register, and a register for the count number
+itself.
+
