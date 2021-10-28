@@ -1336,9 +1336,12 @@ If 1 coulomb moves past a point in 1s, we say that the current is 1 ampere (A)
 Is a materials tendency to resist the flow of charge (current). Is measured in
 ohm using the symbol used is capital omega Ω and resistance uses the symbol R.
 
-### Gound
-In a ciruit with one battery we refer to the negative terminal as ground.
-And in schematics instread of drawing lines that should be connected to the
+### Ground
+In a ciruit with one battery we refer to the negative terminal as ground. It is
+the point that has the lowest potential in a circuit. Recall that the electrons
+flow from the negative terminal to the positive
+
+And in schematics instead of drawing lines that should be connected to the
 negative terminal we simply use the ground symbol. For example:
 
 ```
@@ -1364,6 +1367,36 @@ Which is the same as writing:
   |                       |
   +-----------------------+
 ```
+Ground is a place in a circuit that has 0V and is used as a reference point
+when talking about other voltages in the circuit.
+
+```
+  +--------------(A)
+  |
++ | 9V
+-----
+ ---
+  |
+  |
+  +--------------(B)
+  |
+  |
++ | 9V
+-----
+ ---
+  |
+  |
+  +--------------(C)
+```
+So anyone of the points A, B, or C could be selected to be ground, yes even A
+which I found strange at first as it not connected to the negative terminal but
+in this case if A is ground then B is -9V and C is -18V.
+And if we choose B to be ground the A will be 9V and C -9V. 
+And if we choose C to be ground the A will be 18V and B 9V. 
+
+Protective earth, on the other hand, is used in high-voltage AC circuits to
+provide a safe path for unexpected current, protecting people and property from
+electrocution, failure, and fire.
 
 
 ### Ohm's Law
