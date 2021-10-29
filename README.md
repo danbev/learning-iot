@@ -1338,8 +1338,19 @@ ohm using the symbol used is capital omega Ω and resistance uses the symbol R.
 
 ### Ground
 In a ciruit with one battery we refer to the negative terminal as ground. It is
-the point that has the lowest potential in a circuit. Recall that the electrons
-flow from the negative terminal to the positive
+the point that has the lowest potential in a circuit. This type of ground is
+sometimes called reference ground, common ground, or floating ground.
+
+Floating ground is a type of ground in which the ground doesn't have a physical
+connection to the earth; it simply serves as a type of 0V reference line that
+serves as a return path for current back to the negative side of the power
+supply.
+
+Floating ground really means a 0V reference line. 
+What is meant by a reference point is similar to when we measure our own hight,
+we measure from a certain point, most often the ground or floor. Same with
+voltage, we measure a voltage at a point in a circuit from the ground reference.
+
 
 And in schematics instead of drawing lines that should be connected to the
 negative terminal we simply use the ground symbol. For example:
@@ -1397,7 +1408,9 @@ And if we choose C to be ground the A will be 18V and B 9V.
 Protective earth, on the other hand, is used in high-voltage AC circuits to
 provide a safe path for unexpected current, protecting people and property from
 electrocution, failure, and fire.
-
+Earth ground is where there is a physical connection to the earth. This will
+cause electrons to pass through. Only devices that are connected to AC mains
+have an earth ground. 
 
 ### Ohm's Law
 voltage = Resistance * Current
