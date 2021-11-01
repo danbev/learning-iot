@@ -29,6 +29,82 @@ For example, this bus could connect to GPIO Ports A, B, C, D, and H but again
 you'll have to look at the block diagram for the microcontroller that you are
 working with.
 
+### Registers
+ARM7TDMI uses banked registers which means that the same register my have
+different values depending on the mode of the processor. For ARM7TDMI there
+are USER/SYSTEM, Supervisor, Abort, Undefined, Interrupt, and Fast Interrupt
+modes. In cortex-m there are only two modes, Handler mode and Thread mode.
+So for example in Supervisor mode the registers r13 and r14 will contain values
+different from the other modes if the mode is switched into Supervisor mode even
+though the registers are accessed with the same register name.
+
+Cortex-m has 17 general puprose registers, 1 status register, and 3 interrupt
+mask registers.
+```
+r13 is the stack pointer register (SP).
+r14 is the link register (LR)
+r15 is the program counter (PC)
+```
+
+
+Special registers:
+```
+APSR/EPSR/IPSR
+PRIMASK
+FAULTMASK
+BASEPRI
+CONTROL
+```
+These registers are accessed using two operations,  MRS, and MSR for reading
+and writing to these special registiers.
+
+#### APSR/EPSR/IPSR
+Application Program State Register, Execution Program State Regiser, and
+Interrupt Program State Register.
+```
+31                                                                  0
++-------------------------------------------------------------------+
+|N|Z|C|V|Q| | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
++-------------------------------------------------------------------+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
++-------------------------------------------------------------------+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
++-------------------------------------------------------------------+
+
+N = Negation flag
+Z = Zero flag
+C = Carry flag
+V = Overflog flag
+Q = Sticky flag
+```
+
+
+#### Current Process State Register
+TODO: move this to an arm7tdmi doc.
+```
+31                                                      0
++------------------------------------------------------------------+
+|N|Z|C|V| | | | | | | | | | | | | | | | | | | |I|F|T|M₄|M₃|M₂|M₁|M₀|
++------------------------------------------------------------------+
+
+N = Negation flag
+Z = Zero flag
+C = Carry flag
+V = Overflog flag
+
+I = Enable/Disable Interrupt
+F = Enable/Disable Fast Interrupt
+T = Status bit of the system, 1 = Thumb mode, 0 = Not Thumb (32 bit instructions)
+M = Mode:
+    10000 = User Mode
+    10001 = FIQ Mode (Fast Interrupt Mode)
+    10010 = IRQ Mode
+    10011 = Supervisor Mode
+    10111 = Abort Mode
+    11011 = Undefined Mode
+    11111 = System Mode
+```
+
 
 ###
 ```
