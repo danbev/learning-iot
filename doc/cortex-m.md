@@ -78,6 +78,23 @@ V = Overflog flag
 Q = Sticky flag
 ```
 
+### Vector table
+```
+Exception Type                  Exception No          Vector address
+Top of Stack                    -                     0x0000 0000
+Reset                           1                     0x0000 0004
+NMI                             2                     0x0000 0008
+Hard Fault                      3                     0x0000 000C
+Memory management fault         4                     0x0000 0010
+Bus fault                       5                     0x0000 0014
+Usage fault                     6                     0x0000 0018
+Svcall                          11                    0x0000 002C
+Debug monitor                   12                    0x0000 0030
+PendSV                          14                    0x0000 0038
+SysTick                         15                    0x0000 003C
+Interrups                       16                    0x0000 0040
+...                             ...                   ...
+
 
 #### Current Process State Register
 TODO: move this to an arm7tdmi doc.
@@ -244,6 +261,10 @@ CPIOA_ODR          equ CPIOA_BASE + CPIOA_ODR_OFFSET
 GPIOA_EN           equ 1<<0
 MODER5_OUT         equ 1 << 10
 LED_ON             equ 1 << 5
+
+.text
+
+
 ```
 Notice that `RCC_BASE + AHB1ENR_OFFSET` is really like writing something like
 `rcc_base->ahb1enr_offset` in C just that the compiler knows the size of the
