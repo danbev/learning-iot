@@ -1440,6 +1440,9 @@ The opposite of normally open.
 All batteries have a voltage of 1.5 V. 9V batteries are simply 6 such batteries
 that are connected in a series.
 
+### Pulse Width Modulation
+
+
 ### Radio waves
 Are just another form of light (electro matnetic waves) just like light. 
 They travel at the speed of light 300 000 000 meters per second.
