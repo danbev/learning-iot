@@ -1951,6 +1951,14 @@ Is a protocol for inspecting microcontrollers and is propriatary to ARM.
 ```
 In this case we can only debug a single microcontroller.
 
+Notice that SWD only requires two pins where as JTAG required 4 pins.
+Another difference is that while both support programming and debugging only
+JTAG supports Boundry scanning.
+SWD like I mentioned above is only for ARM, where as JTAG is supported for
+other devices as well. But also remember that ARM uses a licening model and
+there are a lot of implementations out there so it wil be available on a lot
+of devices.
+
 ### Debug adapters
 Are small hardware modules which provide the right kind of signaling (JTAG
 and/or SWD like discussed above). So this would be connected to the device/board
