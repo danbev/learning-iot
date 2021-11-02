@@ -1871,8 +1871,58 @@ Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 Recommended Standard 232.
 
 ### JTAG (Joint Test Action Group)
-Is a protocol for inspecting microcontrollers.
+Is a protocol for inspecting/testing microcontrollers. This is a standard that
+goes back to the 1980 where manufacturues ran into problems when components were
+becomming smaller and it was not as each to access pins on their devices for
+testing. What was used was a bed of nails test system which I think were pins
+that needed to be in contact with the CI for testing. This is the reason for
+the Test in the name JTAG, it was for testing pins on a chip that has JTAG built
+into it.
+
+There was also an issue with the higher performace of signals which I
+think lead to issues where having test test probes which disturbed the signals
+on the device. So these companies came together to come up with a standard piece
+of hardware embedded on the chips to enable this kind of testing. This is called
+the JTAG Port which is the test access port.
+
 ```
+   +---+                        +-----------------------------------------+
+   |TMS |----------------------→| [Boundry scan                       ]←+ |
+   |TCK |----------------------→|+----+                                [B |
+   |TDI |---------------------->||JTAG|         +----------------+      o |
+   |TDO |<----------------------||CTRL|←-------→|Flash Controller|      u |
+   |TRST|                       ||    |         +----------------+      n |
+   +----+                       ||    |←---+                            d |
+                                |+----+    |    +----------------+      r |
+                                ||         +---→|Debug Controller|      y |
+                                ||              +----------------+        |
+                                ||                                      s |
+                                ||                                      c |
+                                ||                                      a |
+                                ||                                      n |
+                                ||                                      n |
+                                ||                                       ]|     
+                                ||                                       ↑|     
+                                |+→[Boundry scan                       ]-+|
+                                +-----------------------------------------+
+```
+Notice that the JTAG can talk to the flash controller which enables writing
+to flash storage memory.
+The connection to the Debug Controller was not part of the original standard
+but something that was added afterwards. This enables us to monitor and debug
+the internals of the processor.
+
+#### Boundry scan
+This is additional circuitry that is in between the I/O pins and connects all
+the pins. By default these cells do nothing and just pass the signal on the pin
+through. 
+This allows the the pins to be read/written. So we can read all the values from
+the pins and send it out, or we can write a value to the pins. This can be used
+for checking the that the pins are connected(soldered?) properly.
+
+
+```
+
    +---+
    |TMS |------------------+-----------+
    |TCK |----------------+-|---------+ |
@@ -1947,3 +1997,28 @@ perform an action every second.
 A timer most often has a control register, and a register for the count number
 itself.
 
+
+### Register files
+Registers are temporary storage locations inside the CPU that hold data and
+and addresses and I know how they are used. But what is not clear to me is how
+they are actually implemented. This section attempts to explain this.
+
+Now, the registers are contains in what is called a register file which is
+something that always confused my, like what is mean by a file in this case?  
+
+Tri-state buffer:
+```
+                  a
+                  |
+                +\↓
+                | \
+[0 1 1 0 ]  --->|  > ----> y 
+                | /
+                +/
+
+a = 0 do nothing
+a = 1 pass through the vector of binary values
+y = binary values or the binary values will not flow through (unchanged)
+```
+
+Well what is meant is that an array of
