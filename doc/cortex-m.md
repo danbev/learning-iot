@@ -96,7 +96,7 @@ Interrups                       16                    0x0000 0040
 ...                             ...                   ...
 
 
-#### Current Process State Register
+#### Current Process State Register (CPSR)
 TODO: move this to an arm7tdmi doc.
 ```
 31                                                      0
@@ -122,6 +122,49 @@ M = Mode:
     11111 = System Mode
 ```
 
+### Data flow model
+```
+             Data
+             ↑| |          +-------------------+
+             || +--------->|Instruction Decoder|
+    +--------+|            +-------------------+
+    |         ↓
+    |      +-----------+
+    |      |Sign Extend|
+    |      +-----------+
+    |         ↓ Read
+  +----------------------------+  Rd
++-| Register File R0-R15       |←------+ 
+| +----------------------------+       |
+|    |A          |B          |         |
+|    |         Rm+----------+|         |
+|  Rn+-----------|------+   ||         |
+|    |           ↓      ↓   ↓↓         |
+|    | +----------+    +-------+       |
+|    | |Barrel    |    | MAC   |       |
+|    | |Shifter   |    +-------+       |
+|    | +----------+        |           |
+|    ↓    ↓ N              |           |
+|  ----------------        |           |
+|  \     ALU      /        |           |
+|   \            /         |           |
+|    ------------          |           |
+|          |               ↓           |
+|          +---------------------------+
+|          |
+|          ↓
+|  +------------------+
+|  | Address Register |←-------+
+|  +------------------+        |
+|R15       |    |       +-----------+
++-------+  |    +------>|Incrememter|
+        ↓  ↓            +-----------+
+        Address
+
+MAC = Multiply Accumulate Unit
+ALU = Arithmetic Login Unit
+```
+Sign extend converts 8 and 16 bit numbers to 32 bit numbers.
 
 ###
 ```
@@ -180,7 +223,7 @@ RCC_BASE + 0x30.
 AHB1ENR_OFFSET 0x30
 ```
 This register is 32 bits and is layout is described in the document. We are
-interested in enableing GPIO A and this is bit number 0 called GPIOAEN:
+interested in enabling GPIO A and this is bit number 0 called GPIOAEN:
 ```
 Bit 0 GPIOAEN: IO port A clock enable
 Set and cleared by software.
