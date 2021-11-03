@@ -21,11 +21,23 @@
 .equ GPIOC_ODR, GPIOC_BASE + GPIOC_ODR_OFFSET
 
 .equ RCC_AHBENR_MASK, 0x00080000
-.equ GPIOC_MODER_MASK, 0x00010000
-// currently the orange led, the value being 0x00000100 which is 256 decimal,
-// and 10000000 binary, which is bit 8 which is being set which corresponds to
-// PC8.
-.equ LED_MASK, 1 << 8
+
+// Enable writing for MODER9 which is the green LED.
+//.equ GPIOC_MODER_MASK, 1 << 18
+//.equ LED_MASK, 1 << 9
+
+// Enable writing for MODER8 which is the orange LED.
+//.equ GPIOC_MODER_MASK, 1 << 16
+//.equ LED_MASK, 1 << 8
+
+// Enable writing for MODER7 which is the blue LED.
+//.equ GPIOC_MODER_MASK, 1 << 14
+//.equ LED_MASK, 1 << 7
+
+// Enable writing for MODER6 which is the red LED.
+.equ GPIOC_MODER_MASK, 1 << 12
+.equ LED_MASK, 1 << 6
+
 .equ DELAY_LENGTH, 0x000fffff
 
 // Set up interrupt vector table: 
@@ -62,24 +74,20 @@ main_loop:
  
   b   main_loop
          
-// Delay subroutine.  Pass the length of the delay in R0
 delay:
   subs r0, r0, #1
   bne delay
   bx lr
  
-// on entry, R1 contains address where target address is stored
-// R2 contains address where mask bits are stored
 set_bits: 
-  ldr r0, [r1]         // read register contents
-  orrs r0, r0, r2       // combine with register contents
-  str r0, [r1]         // write back contents
-  bx LR               // return to caller
-// on entry, R1 contains address where target address is stored
-// R2 contains address where mask bits are stored
+  ldr r0, [r1]
+  orrs r0, r0, r2
+  str r0, [r1]
+  bx LR
+
 clear_bits: 
-  ldr r0, [r1]         // read register contents
-  bics r0, r0, r2       // combine with register contents
-  str r0, [r1]         // write back contents
-  bx LR               // return to caller
+  ldr r0, [r1]
+  bics r0, r0, r2
+  str r0, [r1]
+  bx LR
          
