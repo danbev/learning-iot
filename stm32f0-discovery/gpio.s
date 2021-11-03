@@ -11,6 +11,7 @@
 // Advanced High Performance Bus Enable Register
 .equ AHBENR_OFFSET, 0x14
 .equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
+// Mask to enable I/O PORT C clock
 .equ RCC_AHBENR_MASK, 1 << 19
 
 //.equ GPIOCMODER, 0x48000800
@@ -20,7 +21,6 @@
 // Output Data Register
 .equ GPIOC_ODR_OFFSET, 0x14
 .equ GPIOC_ODR, GPIOC_BASE + GPIOC_ODR_OFFSET
-
 
 .equ RED, 6
 .equ BLUE, 7
