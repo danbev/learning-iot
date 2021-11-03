@@ -8,14 +8,13 @@
 // Reset and Clock Control register base address
 .equ RCC_BASE, 0x40021000
 
-// Advanced High Performance Bus Enable Register
+// Advanced High Performance Bus Enable Register (RCC_AHBENR)
 .equ AHBENR_OFFSET, 0x14
 .equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
 // Mask to enable I/O PORT C clock
-.equ RCC_AHBENR_MASK, 1 << 19
+.equ GPIO_PORTC_ENABLE, 1 << 19
 
-//.equ GPIOCMODER, 0x48000800
-// Mode Register
+// MODER Register
 .equ GPIOC_MODER_OFFSET, 0x00
 .equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
 // Output Data Register
@@ -50,11 +49,12 @@
 Vector_Table:    
   .word     0x20002000
 
-ResetVector:    .word     start + 1
+ResetVector:
+  .word     start + 1
 
 start:
   ldr r1, =RCC_AHBENR
-  ldr r2, =RCC_AHBENR_MASK
+  ldr r2, =GPIO_PORTC_ENABLE
   bl  set_bits
 
   ldr r1, =GPIOC_MODER
