@@ -73,3 +73,5 @@ Open On-Chip Debugger
 > CTRL+]
 telnet> quit
 ```
+
+![Blue Led example](./blue-led.jpg "Example of blue led blinking")
