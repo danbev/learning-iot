@@ -22,21 +22,25 @@
 
 .equ RCC_AHBENR_MASK, 0x00080000
 
-// Enable writing for MODER9 which is the green LED.
-//.equ GPIOC_MODER_MASK, 1 << 18
-//.equ LED_MASK, 1 << 9
+.equ RED, 6
+.equ BLUE, 7
+.equ ORANGE, 8
+.equ GREEN, 9
+// Enable writing for MODER9 (Mode Register) which is the green LED.
+//.equ GPIOC_MODER_MASK, 1 << (GREEN * 2)
+//.equ LED_MASK, 1 << GREEN
 
-// Enable writing for MODER8 which is the orange LED.
-//.equ GPIOC_MODER_MASK, 1 << 16
-//.equ LED_MASK, 1 << 8
+// Enable writing for MODER8 (Mode Register) which is the orange LED.
+//.equ GPIOC_MODER_MASK, 1 << (ORANGE * 2)
+//.equ LED_MASK, 1 << ORANGE
 
-// Enable writing for MODER7 which is the blue LED.
-//.equ GPIOC_MODER_MASK, 1 << 14
-//.equ LED_MASK, 1 << 7
+// Enable writing for MODER7 (Mode Register) which is the blue LED.
+.equ GPIOC_MODER_MASK, 1 << (BLUE * 2)
+.equ LED_MASK, 1 << BLUE
 
-// Enable writing for MODER6 which is the red LED.
-.equ GPIOC_MODER_MASK, 1 << 12
-.equ LED_MASK, 1 << 6
+// Enable writing for MODER6 (Mode Register)  which is the red LED.
+//.equ GPIOC_MODER_MASK, 1 << (RED * 2)
+//.equ LED_MASK, 1 << RED
 
 .equ DELAY_LENGTH, 0x000fffff
 
