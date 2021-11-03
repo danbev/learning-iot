@@ -2,17 +2,17 @@ AS=arm-none-eabi-as
 LD=arm-none-eabi-ld
 ASFLAGS=-mcpu=cortex-m0 -mthumb -g 
 
-OBJS=blinky.o 
+OBJS=led.o 
 
-gpio.elf : gpio.o
+led.elf : led.o
 	$(LD) $< -T linker_script.ld --cref -Map gpio.map -nostartfiles -o main.elf
 	objcopy -O ihex main.elf main.hex
 
-gpio.o: gpio.s
-	$(AS) $(ASFLAGS) $< -asghl=gpio.lst -o $@
+led.o: led.s
+	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
 clean: 
-	${RM} $(OBJS) gpio.elf 
+	${RM} $(OBJS) led.elf 
 
 .PHONY openocd:
 openocd:

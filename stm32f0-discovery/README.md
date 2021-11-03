@@ -49,7 +49,7 @@ previously):
 
 ### Building
 ```console
-$ make gpio.elf
+$ make led.elf
 ```
 
 ### Flashing
