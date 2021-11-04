@@ -25,16 +25,19 @@
 .equ ORANGE, 8
 .equ GREEN, 9
 @ Enable writing for MODER9 (Mode Register) which is the green LED.
-@.equ GPIOC_MODER_MASK, 1 << (GREEN * 2)
-@.equ LED_MASK, 1 << GREEN
+.equ GPIOC_MODER_MASK_GREEN, 1 << (GREEN * 2)
+.equ LED_MASK_GREEN, 1 << GREEN
 
 @ Enable writing for MODER8 (Mode Register) which is the orange LED.
 @.equ GPIOC_MODER_MASK, 1 << (ORANGE * 2)
 @.equ LED_MASK, 1 << ORANGE
 
 @ Enable writing for MODER7 (Mode Register) which is the blue LED.
-.equ GPIOC_MODER_MASK, 1 << (BLUE * 2)
-.equ LED_MASK, 1 << BLUE
+.equ GPIOC_MODER_MASK_BLUE, 1 << (BLUE * 2)
+.equ LED_MASK_BLUE, 1 << BLUE
+
+.equ GPIOC_MODER_MASK, GPIOC_MODER_MASK_BLUE + GPIOC_MODER_MASK_GREEN
+.equ LED_MASK, LED_MASK_BLUE + LED_MASK_GREEN
 
 @ Enable writing for MODER6 (Mode Register)  which is the red LED.
 @.equ GPIOC_MODER_MASK, 1 << (RED * 2)
