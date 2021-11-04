@@ -65,32 +65,32 @@ main_loop:
   ldr r2,=LED_MASK
   bl  set_bits
 
-  ldr r0,=DELAY_LENGTH     
-  bl delay
+  ldr r0,=DELAY_LENGTH
+  bl  delay
  
   ldr r1,=GPIOC_ODR
   ldr r2,=LED_MASK
   bl  clear_bits
 
   ldr r0,=DELAY_LENGTH
-  bl delay
+  bl  delay
  
   b   main_loop
          
 delay:
   sub r0, r0, #1
   bne delay
-  bx lr
+  bx  lr
  
 set_bits: 
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-  bx lr
+  ldr r0, [r1]   // deref r1 and store in r0.
+  orr r0, r0, r2 // OR that with r2 saving back to r0.
+  str r0, [r1]   // store r0 into r1, updating that r1 points to.
+  bx  lr
 
 clear_bits: 
   ldr r0, [r1]
   bic r0, r0, r2
   str r0, [r1]
-  bx lr
+  bx  lr
          
