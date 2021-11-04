@@ -1,6 +1,5 @@
 .thumb
-.syntax unified
-             
+
 .text
 
 // General Purpose IO Port C base register
@@ -47,10 +46,10 @@
 // entry 0: initial stack pointer
 // entry 1: reset address
 Vector_Table:    
-  .word     0x20002000
+  .word     0x20002000 // stack pointer
 
 ResetVector:
-  .word     start + 1
+  .word     start + 1  // reset address
 
 start:
   ldr r1, =RCC_AHBENR
@@ -79,19 +78,19 @@ main_loop:
   b   main_loop
          
 delay:
-  subs r0, r0, #1
+  sub r0, r0, #1
   bne delay
   bx lr
  
 set_bits: 
   ldr r0, [r1]
-  orrs r0, r0, r2
+  orr r0, r0, r2
   str r0, [r1]
   bx LR
 
 clear_bits: 
   ldr r0, [r1]
-  bics r0, r0, r2
+  bic r0, r0, r2
   str r0, [r1]
   bx LR
          
