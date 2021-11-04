@@ -28,7 +28,6 @@ The steps we need to go through to write to one of these pins are the following:
 * Enable I/O PORT C clock
 * Set the Mode (the direction which is output in our case) (GPIOx_MODER)
 * Set the bit to be written (GPIOC_ODR)
-```
 
 #### AHB peripheral clock enable
 This register is at an offset from RCC (think of this as if rcc is a struct and
