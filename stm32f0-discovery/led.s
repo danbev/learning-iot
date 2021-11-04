@@ -86,11 +86,11 @@ set_bits:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-  bx LR
+  bx lr
 
 clear_bits: 
   ldr r0, [r1]
   bic r0, r0, r2
   str r0, [r1]
-  bx LR
+  bx lr
          
