@@ -126,3 +126,39 @@ telnet> quit
 ```
 
 ![Blue Led example](./blue-led.jpg "Example of blue led blinking")
+
+
+### Debugging
+If you don't have `arm-none-eabi-gdb` installed please follow the
+[instructions](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+to install it and setup the correct PATH.
+
+openocd need to be running:
+```console
+$ make openocd
+openocd -f board/stm32f0discovery.cfg
+Open On-Chip Debugger 0.11.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+srst_only separate srst_nogate srst_open_drain connect_deassert_srst
+
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : clock speed 1000 kHz
+Info : STLINK V2J36S0 (API v2) VID:PID 0483:3748
+Info : Target voltage: 2.931101
+Info : stm32f0x.cpu: hardware has 4 breakpoints, 2 watchpoints
+Info : starting gdb server for stm32f0x.cpu on 3333
+Info : Listening on port 3333 for gdb connections
+```
+And then in a new terminal run gdb:
+```console
+$ arm-none-eabi-gdb
+GNU gdb (GNU Arm Embedded Toolchain 10.3-2021.10) 10.2.90.20210621-git
+(gdb) target extended-remote 127.0.0.1:3333
+(gdb) monitor reset halt
+(gdb) symbol-file main.elf
+(gdb) b start
+```
