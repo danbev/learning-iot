@@ -73,21 +73,21 @@ main_loop:
   ldr r2,=LED_MASK
   bl  set_bits
 
-  ldr r0,=DELAY_LENGTH
   bl  delay
  
   ldr r1,=GPIOC_ODR
   ldr r2,=LED_MASK
   bl  clear_bits
 
-  ldr r0,=DELAY_LENGTH
   bl  delay
  
   b   main_loop
          
 delay:
+  ldr r0,=DELAY_LENGTH
+dloop:
   sub r0, r0, #1
-  bne delay      /* branch while the Z (zero) flag is not equal to zero */
+  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
   bx  lr
  
 set_bits: 
