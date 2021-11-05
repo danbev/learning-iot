@@ -87,7 +87,7 @@ main_loop:
          
 delay:
   sub r0, r0, #1
-  bne delay
+  bne delay      /* branch while the Z (zero) flag is not equal to zero */
   bx  lr
  
 set_bits: 
