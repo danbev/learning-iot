@@ -11,6 +11,13 @@ led.elf : led.o
 led.o: led.s
 	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
+led_bsrr.elf : led_bsrr.o
+	$(LD) $< -T linker_script.ld --cref -Map gpio.map -nostartfiles -o led_bsrr_main.elf
+	objcopy -O ihex led_bsrr_main.elf led_bsrr_main.hex
+
+led_bsrr.o: led_bsrr.s
+	$(AS) $(ASFLAGS) $< -asghl=led_bsrr.lst -o $@
+
 clean: 
 	${RM} $(OBJS) led.elf 
 
