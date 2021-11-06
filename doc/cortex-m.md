@@ -287,7 +287,7 @@ We are interested in ODR5 (pin number 5).
 ;                        of the "struct")
 ; MODER5_OUT 1 << 10    (set the output bit)
 
-; ODF_OFFSET 0x14
+; ODR_OFFSET 0x14
 ; LED_ON 1 << 5
 
 RCC_BASE           equ 0x40023800
