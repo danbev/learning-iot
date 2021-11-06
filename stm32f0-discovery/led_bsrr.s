@@ -13,10 +13,10 @@
 /* Mask to enable I/O PORT C clock */
 .equ GPIO_PORTC_ENABLE, 1 << 19
 
-/* BSRR Register */
 .equ GPIOC_MODER_OFFSET, 0x00
 .equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
-/* Output Data Register */
+
+/* BSRR Register */
 .equ GPIOC_BSRR_OFFSET, 0x18
 .equ GPIOC_BSRR, GPIOC_BASE + GPIOC_BSRR_OFFSET
 .equ BSRR_9_SET, 1 << 9
@@ -28,10 +28,6 @@
 
 .equ DELAY_LENGTH, 0x000fffff
 
-/* Set up interrupt vector table: 
- entry 0: initial stack pointer
- entry 1: reset address
-*/
 Vector_Table:    
   .word     0x20002000
 
