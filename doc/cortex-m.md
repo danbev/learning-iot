@@ -33,7 +33,9 @@ working with.
 ARM7TDMI uses banked registers which means that the same register my have
 different values depending on the mode of the processor. For ARM7TDMI there
 are USER/SYSTEM, Supervisor, Abort, Undefined, Interrupt, and Fast Interrupt
-modes. In cortex-m there are only two modes, Handler mode and Thread mode.
+modes (TDMI = Thumb, Debug Extension, Multiplier, Embedded ICE MacroCell).
+
+In cortex-m there are only two modes, Handler mode and Thread mode.
 So for example in Supervisor mode the registers r13 and r14 will contain values
 different from the other modes if the mode is switched into Supervisor mode even
 though the registers are accessed with the same register name.
