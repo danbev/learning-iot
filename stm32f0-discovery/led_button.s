@@ -64,6 +64,9 @@ start:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+
+  /* Notice that we are not enabling GPIOA_MODER because this would simply
+     be initializing it to 0x000000000 which it is by default */
          
 main_loop:
   bl get_input 
