@@ -1,4 +1,4 @@
-### Assembly GPIO example
+### Assembly stm32 examples
 So the goal of this example is to turn on a LED on the bord. The board I'm using
 is stm32f0-discovery:
 
@@ -8,6 +8,12 @@ is stm32f0-discovery:
 This board is based on a STM32F072RBT6 so we will need its 
 [reference manual](https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) as well.
 
+### Examples
+1. [Blinking LED](./led.s)
+1. [Blinking LED using BSRR](./led_bsrr.s)
+1. [User button](./led_button.s)
+
+### LED background info
 
 There are four LEDs on this board which we can turn on and we can choose one.
 There are details about these LEDs on page 14 of the above user manual:
@@ -96,6 +102,7 @@ that we are interested in writing, one of pin 6, 7, 8, or pin 9. Just note that
 if you want to change the led or enable more we also have to set the Mode for
 those or nothing will happen.
 
+An example of a led blinking with a delay can be found in [led.s](./led.s).
 
 ### Building
 ```console

@@ -36,6 +36,7 @@
 .equ GPIOA_IDR_OFFSET, 0x10
 /* Input Data Register */
 .equ GPIOA_IDR, GPIOA_BASE + GPIOA_IDR_OFFSET
+/* The B1 USER button is connected to I/O PA0 */
 .equ BTN_PIN, 0x00000001
 .equ BTN_ON,  0x00000001
 .equ BTN_OFF, 0x00000000
