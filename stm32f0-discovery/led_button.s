@@ -25,12 +25,11 @@
 /* BSRR Register */
 .equ GPIOC_BSRR_OFFSET, 0x18
 .equ GPIOC_BSRR, GPIOC_BASE + GPIOC_BSRR_OFFSET
-.equ BSRR_9_SET, 1 << 9
-.equ BSRR_9_RESET, 1 << 25
+.equ BSRR_9_SET, 1 << 7
+.equ BSRR_9_RESET, 1 << 23
 
 /* Enable writing for MODER9 (Mode Register) which is the green LED */
-.equ GPIOC_MODER_MASK, 1 << 18
-.equ LED_MASK_GREEN, 1 << 9
+.equ GPIOC_MODER_MASK, 1 << 14
 
 /* Input Data Register offset (from GPIOA_BASE) */
 .equ GPIOA_IDR_OFFSET, 0x10
