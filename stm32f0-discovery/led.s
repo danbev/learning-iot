@@ -101,7 +101,7 @@ set_bits:
 
 clear_bits: 
   ldr r0, [r1]
-  bic r0, r0, r2
+  bic r0, r0, r2 /* Bit Clear */
   str r0, [r1]
   bx  lr
          
