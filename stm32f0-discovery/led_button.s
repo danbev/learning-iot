@@ -8,7 +8,6 @@
 /* General Purpose IO Port C base register */
 .equ GPIOC_BASE, 0x48000800
 
-/* General Purpose IO Port A base register */
 .equ GPIOA_BASE, 0x48000000
 
 /* Advanced High Performace Bus Enable Register offset (from RCC) */
@@ -23,8 +22,6 @@
 .equ GPIOA_MODER_OFFSET, 0x00
 /* Mode Register for GPIO Port C */
 .equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
-/* Mode Register for GPIO Port A */
-.equ GPIOA_MODER, GPIOA_BASE + GPIOA_MODER_OFFSET
 
 /* BSRR Register */
 .equ GPIOC_BSRR_OFFSET, 0x18
@@ -40,9 +37,6 @@
 /* Enable writing for MODER9 (Mode Register) which is the green LED */
 .equ GPIOC_MODER_MASK, 1 << 18
 .equ LED_MASK_GREEN, 1 << 9
-
-/* Enable writing for MODER0 (Mode Register) which is the B1-USER PA0 */
-.equ GPIOA_MODER_MASK, 0x00000000
 
 /* Input Data Register offset (from GPIOA_BASE) */
 .equ GPIOA_IDR_OFFSET, 0x10
