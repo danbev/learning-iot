@@ -36,8 +36,6 @@
 .equ GPIOA_IDR_OFFSET, 0x10
 /* Input Data Register */
 .equ GPIOA_IDR, GPIOA_BASE + GPIOA_IDR_OFFSET
-/* When a button pressed the value will be 0, and then it is not being pressed
-   its value will be 1 */
 .equ BTN_PIN, 0x00000001
 .equ BTN_ON,  0x00000001
 .equ BTN_OFF, 0x00000000
@@ -68,13 +66,11 @@ start:
   str r0, [r1]
          
 main_loop:
-  //bl turn_led_on
   bl get_input 
   cmp r0, #BTN_ON
   BEQ turn_led_on
   cmp r0, #BTN_OFF
   BEQ turn_led_off
-  //bl turn_led_off
   b main_loop
 
 turn_led_on:
