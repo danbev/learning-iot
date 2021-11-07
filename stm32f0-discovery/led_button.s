@@ -42,15 +42,15 @@
 .equ LED_MASK_GREEN, 1 << 9
 
 /* Enable writing for MODER0 (Mode Register) which is the B1-USER PA0 */
-.equ GPIOA_MODER_MASK, 1 << 0
+.equ GPIOA_MODER_MASK, 0x00000000
 
-/* Input Data Register offset (from GPIO_BASE) */
+/* Input Data Register offset (from GPIOA_BASE) */
 .equ GPIOA_IDR_OFFSET, 0x10
 /* Input Data Register */
 .equ GPIOA_IDR, GPIOA_BASE + GPIOA_IDR_OFFSET
 /* When a button pressed the value will be 0, and then it is not being pressed
    its value will be 1 */
-.equ BTN_PIN, 0x00000000
+.equ BTN_PIN, 0x00000001
 .equ BTN_ON,  0x00000001
 .equ BTN_OFF, 0x00000000
 
@@ -73,8 +73,8 @@ start:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIOA_MODER
-  ldr r2, =GPIOA_MODER_MASK
+  ldr r1, =RCC_AHBENR
+  ldr r2, =GPIO_PORTA_ENABLE
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
