@@ -53,11 +53,11 @@
 .global _start
 
 _start:
-  bl init_uart
+  bl uart_init
 main_loop:
   b _start
 
-init_uart:
+uart_init:
   /* Clock enable GPIOA */
   ldr r0, =RCC_APB1ENR
   ldr r1, =GPIO_PORTA_ENABLE
@@ -98,5 +98,25 @@ init_uart:
   ldr r0, =USART2_CR3
   ldr r1, =CR3_CNF
   str r1, [r0]
+  /* Enable UART in the Control Register 1*/
+  ldr r0, =USART2_CR1
+  ldr r1, =USART2_CR1_EN
+  ldr r2, [r0]
+  orr r1, r1, r2
+  str r1, [r0]
 
+  bx lr
+
+/* The character to send is expected to be placed in r0 */
+uart_write_char:
+  ldr r1, =USART2_ISR
+output_loop:
+  ldr r2, [r1]
+  ldr r3, =TX_BUF_FLAG
+  and r2, r2
+  cmp r2, #0x00
+  beq output_loop
+  uxtb r1, r0   /* zero extend byte */
+  ldr r2, =USART2_DATAR
+  str r1, [r2]
   bx lr
