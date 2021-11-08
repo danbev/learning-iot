@@ -21,11 +21,7 @@
 .equ GPIOA_AFRL_OFFSET, 0x20
 .equ GPIOA_AFRL, GPIOA_BASE + GPIOA_AFRL_OFFSET
 
-.equ AFSEL0_AF1, 1 << 1   /* PA0 USART2_CTS */
-.equ AFSEL1_AF1, 1 << 4   /* PA1 USART2_RTS */
-.equ AFSEL2_AF1, 1 << 8   /* PA2 USART2_TX  */
 .equ AFSEL3_AF1, 1 << 12  /* PA3 USART2_RX */
-.equ AFSEL4_AF1, 1 << 16  /* PA3 USART2_CK */
 .equ USART2_CR1_OFFSET, 0x00
 .equ USART2_CR1, USART2_BASE + USART2_CR1_OFFSET
 .equ USART2_CR2_OFFSET, 0x04
@@ -44,7 +40,7 @@
 .equ AF1, 1 << 8      /* 0001 0000 0000 */
 
 .equ BRR_CNF, 0x683    /* 0110 1000 0011. 9600 */
-.equ CR1_CNF, 0x0008   /* 0000 0000 1000 = TE (Transmitter Enable)*/
+.equ CR1_CNF, 0x0008   /* 0000 0000 1000 = TE (Transmitter Enable) */
 .equ CR2_CNF, 0x0000   /* bits 13-12 are stop bits 00=1 stop bit */
 .equ CR3_CNF, 0x0000   /* No flow control */
 .equ USART2_CR1_EN, 0x2000 /* 0010 0000 0000 0000 */
