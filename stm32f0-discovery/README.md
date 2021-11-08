@@ -184,7 +184,9 @@ Address: 0x1C
   0: USART2 clock disabled
   1: USART2 clock enabled
 ```
-So we will need to set bit 17 to 1 to enable the UART2 clock.
+So we will need to set bit `17` (`USARTS_EN`) to 1 to enable the `USART2` clock.
+The clock needs to be activated or the peripheral may not be readable by
+software and the returned value will always be `0x0`.
 
 Now, the device I/O pins are connected through a multiplexer which allows a
 single alternate function (AF) to be connected to one pin at a time. So each pin
@@ -257,4 +259,72 @@ So `10` will need to be configured for PORT A.
 We can look at the memory map to get the base address of USART2:
 ```
 0x4000 4400 USART2
+```
+
+We also have to configure USART using the control register.
+```27.8.1 Control register 1 (USART_CR1)
+Address offset: 0x00
+
+Bit 3 TE: Transmitter enable
+This bit enables the transmitter. It is set and cleared by software.
+  0: Transmitter is disabled
+  1: Transmitter is enabled
+
+Bit 2 RE: Receiver enable
+This bit enables the receiver. It is set and cleared by software.
+  0: Receiver is disabled
+  1: Receiver is enabled and begins searching for a start bit
+
+Bit 0 UE: USART enable
+When this bit is cleared, the USART prescalers and outputs are stopped
+immediately, and current operations are discarded. The configuration of the
+USART is kept, but all the status flags, in the USART_ISR are set to their
+default values. This bit is set and cleared by software.
+  0: USART prescaler and outputs disabled, low-power mode
+  1: USART enabled
+```
+Setting `UE` will enable the UART module.
+
+```
+27.8.4 Baud rate register (USART_BRR)
+This register can only be written when the USART is disabled (UE=0). It may be
+automatically updated by hardware in auto baud rate detection mode.
+Address offset: 0x0C
+
+Bits 31:16 Reserved, must be kept at reset value.
+Bits 15:4 BRR[15:4]
+BRR[15:4] = USARTDIV[15:4]
+Bits 3:0 BRR[3:0]
+When OVER8 = 0, BRR[3:0] = USARTDIV[3:0].
+When OVER8 = 1:
+BRR[2:0] = USARTDIV[3:0] shifted 1 bit to the right.
+BRR[3] must be kept cleared
+```
+
+For sending data it needs to be placed in this register:
+```
+27.8.11 Transmit data register (USART_TDR)
+Address offset: 0x28
+
+```
+
+When receiving data that data will be in this register:
+```
+27.8.10 Receive data register (USART_RDR)
+Address offset: 0x24
+```
+
+```
+27.8.2 Control register 2 (USART_CR2)
+Address offset: 0x04
+```
+
+```
+27.8.3 Control register 3 (USART_CR3)
+Address offset: 0x08
+```
+
+```
+27.8.8 Interrupt and status register (USART_ISR)
+Address offset: 0x1C
 ```
