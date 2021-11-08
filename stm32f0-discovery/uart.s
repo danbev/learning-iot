@@ -54,8 +54,10 @@
 
 _start:
   bl uart_init
+  mov r0, #'A' /* hex: 0x41 */
 main_loop:
-  b _start
+  bl uart_write_char
+  b main_loop
 
 uart_init:
   /* Clock enable GPIOA */
