@@ -168,3 +168,93 @@ GNU gdb (GNU Arm Embedded Toolchain 10.3-2021.10) 10.2.90.20210621-git
 (gdb) symbol-file main.elf
 (gdb) b start
 ```
+
+### UART Example
+First thing we need to do is to take a look at the block diagram and see how
+UART is connected to the system. On this board we have `USART1`, `USART2`, and
+`USART6`. I think they all work in the same way and I'm going to use `USART2`
+for this example. It is connected to Advanced Peripheral Bus 1 (APB1) so we have to
+enable USART2 via APB1.
+```
+6.4.8 APB peripheral clock enable register 1 (RCC_APB1ENR)
+Address: 0x1C
+
+ Bit 17 USART2EN: USART2 clock enable
+ Set and cleared by software.
+  0: USART2 clock disabled
+  1: USART2 clock enabled
+```
+So we will need to set bit 17 to 1 to enable the UART2 clock.
+
+Now, the device I/O pins are connected through a multiplexer which allows a
+single alternate function (AF) to be connected to one pin at a time. So each pin
+can have have 16 alternate function inputs (remember that these are the inputs
+to the multiplexer and it outputs a single value). If we look in the data sheet
+we can find that Table 14 contains information about USART2 which is an
+alternative function, and the pins that it uses:
+```
+USART2_CTS   PA0
+USART2_RTS   PA1
+USART2_TX    PA2
+USART2_RX    PA3
+USART2_CK    PA4
+```
+The output is configured using `GPIOx_AFRL` (Alternate Function Register Low) for
+pins 0-7 and `GPIOx_AFRH` (Alternate Function Register High) for pins 8-15.
+
+```
+8.4.9 GPIO alternate function low register (GPIOx_AFRL) (x = A..F)
+Address offset: 0x20
+```
+This is a 32 bit register which is divided into 4 bit sections.
+`GPIOA_AFRL` which are specified as
+```
+Bits 31:0 AFSELy[3:0]: Alternate function selection for port x pin y (y = 0..7)
+These bits are written by software to configure alternate function I/Os
+AFSELy selection:
+  0000: AF0
+  0001: AF1
+  0010: AF2
+  0011: AF3
+  0100: AF4
+  0101: AF5
+  0110: AF6
+  0111: AF7
+```
+So I think we need to configure AFSEL0-AFSEL4 and specify which alternate
+function these pins should have. But how do I find which alternate function
+UART2 has?  
+I had to look in the data sheet for this and the following table contained
+this information:
+```
+Table 15. Alternate functions selected through GPIOA_AFR registers for port A
+
+PA0  USART2_CTS  AF1
+PA1  USART2_RTS  AF1
+PA2  USART2_TX   AF1
+PA3  USART2_RX   AF1
+PA4  USART2_CK   AF1
+```
+Alright, so we need to configure AFSEL0-AFLSE4 and specify AF1 (0001) for each
+of them which will enable them for USART2.
+
+So we will have to enable Port A and also GPIOA_AFRL
+
+So we will need to configure GPIOA_MODER to be in alternate function mode:
+```
+8.4.1 GPIO port mode register (GPIOx_MODER) (x =A..F)
+Address offset:0x00
+
+Bits 2y+1:2y MODERy[1:0]: Port x configuration bits (y = 0..15)
+These bits are written by software to configure the I/O mode.
+  00: Input mode (reset state)
+  01: General purpose output mode
+  10: Alternate function mode
+  11: Analog mode 
+```
+So `10` will need to be configured for PORT A.
+
+We can look at the memory map to get the base address of USART2:
+```
+0x4000 4400 USART2
+```

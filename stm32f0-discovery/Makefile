@@ -25,6 +25,13 @@ led_button.elf : led_button.o
 led_button.o: led_button.s
 	$(AS) $(ASFLAGS) $< -asghl=led_button.lst -o $@
 
+uart.elf : uart.o
+	$(LD) $< -T linker_script.ld --cref -Map gpio.map -nostartfiles -o uart_main.elf
+	objcopy -O ihex uart_main.elf uart_main.hex
+
+uart.o: uart.s
+	$(AS) $(ASFLAGS) $< -asghl=uart.lst -o $@
+
 clean: 
 	${RM} $(OBJS) led.elf 
 
