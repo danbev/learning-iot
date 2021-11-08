@@ -192,7 +192,7 @@ Now, the device I/O pins are connected through a multiplexer which allows a
 single alternate function (AF) to be connected to one pin at a time. So each pin
 can have have 16 alternate function inputs (remember that these are the inputs
 to the multiplexer and it outputs a single value). If we look in the data sheet
-we can find that Table 14 contains information about USART2 which is an
+we can find that `Table 14` contains information about `USART2` which is an
 alternative function, and the pins that it uses:
 ```
 USART2_CTS   PA0
@@ -202,8 +202,7 @@ USART2_RX    PA3
 USART2_CK    PA4
 ```
 The output is configured using `GPIOx_AFRL` (Alternate Function Register Low) for
-pins 0-7 and `GPIOx_AFRH` (Alternate Function Register High) for pins 8-15.
-
+pins 0-7:
 ```
 8.4.9 GPIO alternate function low register (GPIOx_AFRL) (x = A..F)
 Address offset: 0x20
@@ -254,7 +253,13 @@ These bits are written by software to configure the I/O mode.
   10: Alternate function mode
   11: Analog mode 
 ```
-So `10` will need to be configured for PORT A.
+So for the Port in question,  PA0, PA1, PA2, PA3, and PA4 we would need to set
+the bits for these to `10`, alternative function mode. I'm currently not sure
+if we need to do this for all of these pins. For example, if we only need to do
+this for PA2 for example that would be:
+```
+ 1 << 5
+```
 
 We can look at the memory map to get the base address of USART2:
 ```
@@ -327,4 +332,25 @@ Address offset: 0x08
 ```
 27.8.8 Interrupt and status register (USART_ISR)
 Address offset: 0x1C
+
+Bit 7 TXE: Transmit data register empty
+This bit is set by hardware when the content of the USART_TDR register has been
+transferred into the shift register. It is cleared by a write to the USART_TDR register.
+The TXE flag can also be cleared by writing 1 to the TXFRQ in the USART_RQR register, in
+order to discard the data (only in Smartcard T=0 mode, in case of transmission failure).
+An interrupt is generated if the TXEIE bit =1 in the USART_CR1 register.
+0: data is not transferred to the shift register
+1: data is transferred to the shift register)
+Note: This bit is used during single buffer transmission
+```
+
+Testing this example:
+1) Download the binary to the board.
+2) Disconnect openocd
+3) Connect with minicom:
+```console
+$ lsusb | grep ST-LINK
+Bus 001 Device 008: ID 0483:3748 STMicroelectronics ST-LINK/V2
+$ ls -l  /dev/bus/usb/001/008
+crw-rw----+ 1 root root 189, 7 Nov  8 17:17 /dev/bus/usb/001/008
 ```
