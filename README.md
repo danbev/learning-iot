@@ -40,36 +40,6 @@ Some additional information about Arm version can be found
 [here](https://github.com/danbev/learning-assembly/tree/master/arm#arm-versions).
 
 
-### Universal Synchronous and Asynchronous Receiver-Transmitter (USART)
-Is a serial communication protocol which as the name suggests can be used
-sync (using clocks) or async(using start/stop bits).
-```
-     Device 1               Device 2
-    +----------+           +----------+
-    |        TX|-----------|RX        |
-    |        RX|-----------|TX        |
-    |       GND|-----+-----|GND       |
-    +----------+     |     +----------+
-                     |
-                   -----
-                    ---
-                     -
-```
-The sender and reicever must agree on a data transfer rate, which is called the
-baud rate which is number of bits transferred per second.
-Simplex mode is when data is transferred in one direction only.
-Half-duplex is when data is transferred in both directions but not at the same
-time.
-Full-duplex is when data can be transferred simultainously in both directions at
-the same time.
-
-The wire protocol:
-```
-  +-----------+-------------+---------------+-------------+
-  |1 start bit|5-9 data bits|0-1 parity bits|1-2 stop bits|
-  +-----------+-------------+---------------+-------------+
-```
-
 ### Controller Area Network (CAN)
 TODO:
 
@@ -1973,7 +1943,12 @@ So you connect an USB to the board and can then use a debugger with the device.
 TODO:
 
 #### ST-Link
-TODO:
+```console
+$ git clone https://github.com/stlink-org/stlink
+$ cd stlink
+$ cmake .
+$ make
+```
 
 ### Harward Architecture
 Is a computer arch where there are separate buses for data and instructions.
