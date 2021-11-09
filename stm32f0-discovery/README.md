@@ -348,9 +348,45 @@ Testing this example:
 1) Download the binary to the board.
 2) Disconnect openocd
 3) Connect with minicom:
+Connect PA3 to a USB to Serial Adapter and then connect the USB to the
+computer:
 ```console
-$ lsusb | grep ST-LINK
-Bus 001 Device 008: ID 0483:3748 STMicroelectronics ST-LINK/V2
-$ ls -l  /dev/bus/usb/001/008
-crw-rw----+ 1 root root 189, 7 Nov  8 17:17 /dev/bus/usb/001/008
+[2152044.619853] usb 1-2: new full-speed USB device number 13 using xhci_hcd
+[2152044.752207] usb 1-2: New USB device found, idVendor=0403, idProduct=6001, bcdDevice= 6.00
+[2152044.752222] usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[2152044.752227] usb 1-2: Product: FT232R USB UART
+[2152044.752232] usb 1-2: Manufacturer: FTDI
+[2152044.752236] usb 1-2: SerialNumber: A50285BI
+[2152044.760686] ftdi_sio 1-2:1.0: FTDI USB Serial Device converter detected
+[2152044.760876] usb 1-2: Detected FT232RL
+[2152044.761956] usb 1-2: FTDI USB Serial Device converter now attached to ttyUSB0
 ```
+Next we should be able to use minicom to connect to this port and see the output
+from the program:
+```console
+$ minicom -D /dev/ttyUSB0 -b 115200 -8 
+```
+
+```console
+$ arm-none-eabi-gdb
+(gdb) file uart_main.elf
+(gdb) target remote localhost:3333
+(gdb) monitor reset halt
+(gdb) br start
+(gdb) c
+```
+
+We can check that the configuration of RCC_APB1ENR looks alright:
+```console
+(gdb) x/1w $r1
+0x4002101c:	0x00020000
+(gdb) x/1wt $r1
+0x4002101c:	00000000000000100000000000000000
+```
+Notice that the address 4002101c looks correct (RCC_BASE + 0x1c) and the value
+is also correct, bit 17 is set to 1:
+```
+                 17                   0
+0000 0000 0000 0010 0000 0000 0000 0000
+```
+
