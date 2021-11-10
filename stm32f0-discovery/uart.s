@@ -142,8 +142,9 @@ output_loop:
   uxtb r1, r0   /* zero extend byte */
   ldr r2, =USART2_DATAR
   str r1, [r2]
+  push {lr}
   bl turn_led_on
-  bx lr
+  pop {pc}
 
 .equ GPIO_PORTC_ENABLE, 1 << 19
 .equ GPIOC_MODER_MASK, 1 << 14
