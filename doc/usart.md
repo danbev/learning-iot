@@ -29,7 +29,9 @@ The wire protocol:
 ```
 
 ### Signaling
-
+Normally, the sender keeps the transmission (Tx) line high, say at 5V and this
+is polled/sampled by the reciever (Rx). When this goes low the receiver will
+start sampling/reading for data packets.
 ```
     idle   start
      |      bit
@@ -38,8 +40,40 @@ The wire protocol:
          |      |      |      |
          |      | d0   |  d1  |
 0V       +------+      +------+
+         |      |      |      |
 ```
 
+Both sides need to agree on things like if how many data bits the packet
+contains, if there is a parity bit or not (and if it is odd or even), and how
+many stop bits are in use (1-2 bits). In addition they also need the receiver
+needs know how many bits the sender sent per second. Both sides need to agree
+on this rate as well. The receiver needs to know how many bit are being sent
+per second so that it can determine how long a 5V pulse is determined to be
+a 1 bit, and how long a 0V pulse is considered to be a 0 bit value. This is
+configured by the sender and receiver specifying a bits per second for sending
+and receiving and is called the baud rate.
+```
+                                    Baud rate: 9600 (9600 bits/s)
+    idle   start
+     |      bit
+     ↓      ↓
+5V  -----+      +------+------+
+         |      |      |      |
+         |      | d0   |  d1  |
+0V       +------+
+                 1/9600  1/9600
+```
+Remember that the receiver reads one value at a time from the wire and in the
+above case the first two bits are 1s. If the receiver does not know the time
+to sample, or is does not use the same rate as the sender, the read values may
+become incorrect. What the receiver does is it knows how long a single bit
+should be and samples with that frequency so it will determine that there were
+two 1 bits as the wire was held high for 2/9600.
+
+### Baud (Bd)
+Is a common unit in symbols per second in electronic communication. The number
+of symbol changes, signaling events in the transmission medium. So if we take
+our image above where we have
 
 ### Oversampling
 The receiver constantly samples/reads/polls the data line and it does this more
