@@ -72,8 +72,48 @@ two 1 bits as the wire was held high for 2/9600.
 
 ### Baud (Bd)
 Is a common unit in symbols per second in electronic communication. The number
-of symbol changes, signaling events in the transmission medium. So if we take
-our image above where we have
+of symbol changes, signaling events in the transmission medium. 
+Baud is named after Emile Baudot, who invented the 5-bit teletype code.
+
+The difference between bit rate and baud rate is that bit rate is the number
+of bits sent per second, where as baud rate is the number of signal units per
+second. The bit rate is the number of bits to be transmitted per second, the
+are of two states, either 1 or 0. When this is converted into a signal and
+travels on a wire the signal can get distorted due to noise. So the 1s and 0s
+we send from the application might have a different representation on the wire
+and this is the reason for talking about symbols instread of bits.
+So we know already that the baud rate is the number of changes to the signal
+per second accross the wire. Now the baud rate can be higher or lower than the
+bit rate.
+
+Just to try to visualize what this means having a baud rate that can be higher
+or lower than the bit rate, consider sending `1011`could be sent using a baud
+rate:
+```
+                                    
+    idle   start
+     |      bit
+     ↓      ↓
+5V  -----+      +------+      +----------+
+         |      |      |      |          |
+         |      |   1  |   0  |  1   1   |
+0V       +------+      +------+          +
+```
+And also have higher baud rate:
+```
+                                    
+    idle   start
+     |      bit
+     ↓      ↓
+5V  -----+   +---+   +-----+
+         |   |   |   |     |
+         |   | 1 | 0 | 1 1 |
+0V       +---+   +---+     +
+```
+So the baud rate can be higher or lower than the bit rate.
+```
+bit rate = baud rate * bits per symbol
+```
 
 ### Oversampling
 The receiver constantly samples/reads/polls the data line and it does this more
