@@ -47,7 +47,7 @@
 .equ GPIOA_ALT_SLT, 2 << 4 /* Port A Pin 3 enable alternate function mode */
 
 .equ BRR_CNF, 0x683    /* 0x1A1 0x683  */  
-.equ CR1_CNF, 1 << 3   /* 0000 0000 0100 = TE (Transmitter Enable) */
+.equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */
 .equ CR2_CNF, 0x0000   /* bits 13-12 are stop bits 00=1 stop bit */
 .equ CR3_CNF, 0x0000   /* No flow control */
 .equ USART2_CR1_EN, 1 << 0
