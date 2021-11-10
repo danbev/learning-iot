@@ -114,7 +114,6 @@ So the baud rate can be higher or lower than the bit rate.
 ```
 bit rate = baud rate * bits per symbol
 ```
-
 ### Oversampling
 The receiver constantly samples/reads/polls the data line and it does this more
 often than the baud rate. An common setting is to sample 16 times the baud rate.
@@ -220,3 +219,98 @@ If the stop bit is configured to be 2 bits that we count to 32:
                    +-----------------+
                    0                 32
 ```
+
+### Calculating baud rate
+From the previous section about oversampling we can follow the following formula
+to calculate the baud rate for a system. 
+```
+OVER8 = 1, then 8 will be used as the oversampling value
+OVER8 = 0, then 16 will be used as the oversampling value
+
+                   f_ck
+Tx/Rx baud =  --------------------
+              8 * (2 - OVER8) * USARTDIV
+
+f_ck = peripheral clock
+USARTDIV = divide factor to generate different baud rates.
+```
+The peripheral clock should be specified in the reference manual:
+```
+6.2 Clocks
+...
+Several prescalers can be used to configure the frequency of the AHB and the APB
+domains. The AHB and the APB domains maximum frequency is 48 MHz.
+```
+So if we want to have a baud rate of 9600 we can plug these values into the
+forumla:
+```
+                 48Mhz       
+9600 =  -------------------------- =
+            (8 * 2 * USARTDIV)
+
+                                       48Mhz            (8 * 2 * USARTDIV)
+9600 (8 * 2 * USARTDIV) =  -------------------------- * ------------------
+                               (8 * 2 * USARTDIV)               1
+
+                                       
+9600 (8 * 2 * USARTDIV) = 48Mhz
+9600 * 16 * USARTDIV = 48Mhz
+153600 * USARTDIV  = 48Mhz
+
+153600 * USARTDIV    48Mhz
+----------------- = -------
+153600               153600
+
+            48Mhz
+USARTDIV = -------
+            153600
+
+            48000000
+USARTDIV = --------- = 312
+            153600
+```
+So this is the value that should be placed in UART_BRR:
+```
+27.8.4 Baud rate register (USART_BRR)
+This register can only be written when the USART is disabled (UE=0). 
+
+Bits 31:16 Reserved, must be kept at reset value
+
+  Bits 15:4 BRR[15:4]
+    BRR[15:4] = USARTDIV[15:4]
+
+  Bits 3:0 BRR[3:0]
+    When OVER8 = 0, BRR[3:0] = USARTDIV[3:0].
+    When OVER8 = 1:
+       BRR[2:0] = USARTDIV[3:0] shifted 1 bit to the right.
+       BRR[3] must be kept cleared.
+```
+So we have 15 bite available in this register for our usage. Notice that the
+bits 4-15 are specified as `USARTDIV[15:4]` which is like an array slice.
+If we take the value we calculated above, 312 and turn it into binary form we
+get:
+```
+USARTDIV = 0000 0001 0011 1000   (0x138)
+USARTDIV[15:4] = 0000 0001 0011  (0x13)
+
+OVER8 = 0:
+USARTDIV[3:0] = 1000 (0x8)
+BRR = 0x138
+
+OVER8 = 1:
+1000 << 1 = 0000
+USARTDIV[3:0] = 0000 (0x8)
+BRR = 0x130
+```
+So where is OVER8 specified?
+```
+27.8.1 Control register 1 (USART_CR1)
+...
+Bit 15 OVER8: Oversampling mode
+  0: Oversampling by 16
+  1: Oversampling by 8
+
+This bit can only be written when the USART is disabled (UE=0).
+
+
+
