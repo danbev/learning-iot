@@ -23,4 +23,25 @@ is still in the data register.
 
 ### Incorrect Baud Rate
 
+### PORT/Alternative Function
+From the data sheet I can read the following:
+```
+Table 15. Alternate functions selected through GPIOA_AFR registers for port A 
+
+                 AF1
+PA2             USART2_TX
+```
+I'm setting AF1 using:
+```assembly
+.equ AFSEL2_AF1, 1 << 8                      // checked
+
+  /* Set GPIO Port A Pin 2 to 0001 (AF1) */ 
+  ldr r1, =GPIOA_AFRL
+  ldr r2, =AFSEL2_AF1
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+```
+
+![Oscilloscope image of PA2](./uart-oscilloscope.jpg "Oscilloscope image of PA2")
 
