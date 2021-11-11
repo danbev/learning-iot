@@ -54,7 +54,7 @@
 
 .equ USART2_EN, 1 << 17                      // checked
 .equ GPIO_PORTA_ENABLE, 1 << 17              // checked
-.equ GPIOA_ALT_SLT, 2 << 4 /* Port A Pin 2 enable alternate function mode */
+.equ GPIOA_AF1, 2 << 4 /* Port A Pin 2 enable alternate function mode */
 .equ AFSEL2_AF1, 1 << 8                      // checked
 
 //.equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
@@ -118,19 +118,22 @@ uart_init:
   orr r0, r0, r2 
   str r0, [r1]
 
-  /* Set GPIO Port A Pin 2 to 0001 (AF1) */ 
+  /* Enable Alternative function mode for GPIO PA2 */
+  ldr r1, =GPIOA_MODER
+  ldr r2, =GPIOA_AF1
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* We specified that PA2 should be an alternate function but what function
+     should it have, this is set next.
+     Set GPIO Port A Pin 2 to 0001 (AF1) */
   ldr r1, =GPIOA_AFRL
   ldr r2, =AFSEL2_AF1
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Enable Alternative function mode for GPIO PA2 */
-  ldr r1, =GPIOA_MODER
-  ldr r2, =GPIOA_ALT_SLT
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
 
   /* Set the baud rate */
   ldr r1, =USART2_BRR
