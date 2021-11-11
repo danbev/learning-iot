@@ -45,3 +45,9 @@ I'm setting AF1 using:
 
 ![Oscilloscope image of PA2](./uart-oscilloscope.jpg "Oscilloscope image of PA2")
 
+I actually had the USB connected incorrectly in that picture but I changed it
+to USB User with the same result.
+So I'm thinking it would still be the pin that is incorrectly setup but I've
+checked this multiple times now. I'm leaning towards it being and issue with
+the UART configuration.
+
