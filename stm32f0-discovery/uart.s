@@ -44,7 +44,7 @@
 .equ USART2_ISR_OFFSET, 0x1C
 .equ USART2_ISR, USART2_BASE + USART2_ISR_OFFSET
 
-.equ GPIOA_ALT_SLT, 2 << 4 /* Port A Pin 3 enable alternate function mode */
+.equ GPIOA_ALT_SLT, 2 << 4 /* Port A Pin 2 enable alternate function mode */
 
 .equ BRR_CNF, 0x683    /* 0x1A1 0x683  */  
 .equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */
