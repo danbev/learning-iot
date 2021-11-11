@@ -128,7 +128,7 @@ high 1   |   |  |  |  |  |
 low  0----   ----  ----  ----  ...
 ```
 So it starts out at zero, changes to 1 for the same amount of time and then
-repeats like this. The clock tell us when the receiver should read from the
+repeats like this. The clock tells us when the receiver should read from the
 data line. We might say that it should receive when the clock is high but notice
 that the line can be hight for a certain period of time. Instead we say that it
 should read when transitioning from low to high, and this point is called an 
