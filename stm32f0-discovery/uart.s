@@ -12,6 +12,15 @@
 .equ RCC_APB1ENR_OFFSET, 0x1C              // checked
 .equ RCC_APB1ENR, RCC_BASE + RCC_APB1ENR_OFFSET
 
+.equ RCC_CR_OFFSET, 0x00
+.equ RCC_CR, RCC_BASE + RCC_CR_OFFSET
+
+.equ RCC_CFGR_OFFSET, 0x04
+.equ RCC_CFGR, RCC_BASE + RCC_CFGR_OFFSET
+
+.equ RCC_CFGR3_OFFSET, 0x30
+.equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
+
 /* Mode Register Offset for Port A (from GPIO_BASE) */
 .equ GPIOA_MODER_OFFSET, 0x00              // checked
 /* Mode Register for GPIO Port A */
@@ -49,12 +58,17 @@
 .equ AFSEL2_AF1, 1 << 8                      // checked
 
 //.equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
-.equ BRR_CNF, 0x0EA6    /* 0x1A1 0x683  */   // ?? what value should this be?
+.equ BRR_CNF, 0x34   /* x0EA6 0x1A1 0x683  */   // ?? what value should this be?
 .equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */ //checked
 .equ CR2_CNF, 0x0000   /* bits 13-12 are stop bits 00=1 stop bit */
 .equ CR3_CNF, 0x0000   /* No flow control */
 .equ USART2_CR1_EN, 1 << 0
 .equ TX_BUF_FLAG, 1 << 7
+
+.equ HSION, 1 << 0
+.equ SW_HSI, 0 << 0
+
+.equ USART2_SW, 3 << 16
 
 .global start
 
@@ -72,6 +86,23 @@ main_loop:
   b main_loop
 
 uart_init:
+  ldr r1, =RCC_CR
+  ldr r2, =HSION
+  ldr r0, [r1]
+  orr r0, r0, r2 
+  str r0, [r1]
+
+  ldr r1, =RCC_CFGR
+  ldr r2, =SW_HSI
+  ldr r0, [r1]
+  orr r0, r0, r2 
+  str r0, [r1]
+
+  ldr r1, =RCC_CFGR3
+  ldr r2, =USART2_SW
+  ldr r0, [r1]
+  orr r0, r0, r2 
+  str r0, [r1]
 
   /* Clock enable USART2 (pin 17 of RCC_APB1ENR) */
   ldr r1, =RCC_APB1ENR
@@ -151,7 +182,7 @@ output_loop:
   ldr r2, =USART2_DTR
   str r1, [r2]
   push {lr}
-  bl turn_led_on
+  //bl turn_led_on
   pop {pc}
 
 .equ GPIO_PORTC_ENABLE, 1 << 19
