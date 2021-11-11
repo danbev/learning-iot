@@ -58,7 +58,7 @@
 .equ AFSEL2_AF1, 1 << 8                      // checked
 
 //.equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
-.equ BRR_CNF, 0x34   /* x0EA6 0x1A1 0x683  */   // ?? what value should this be?
+.equ BRR_CNF, 0x341   /* x0EA6 0x1A1 0x683  */   // ?? what value should this be?
 .equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */ //checked
 .equ CR2_CNF, 0x0000   /* bits 13-12 are stop bits 00=1 stop bit */
 .equ CR3_CNF, 0x0000   /* No flow control */
