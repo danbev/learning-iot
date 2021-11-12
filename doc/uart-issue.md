@@ -5,7 +5,17 @@ the second time `uart_write_char` is called the old data is still in the USART2
 Transmit Data Registry (TDR). I'm assuming here that the data would be removed
 when it is copied to the shift register of the USART. Hmm, that might be an
 incorrect assumption, like think about a mov instruction, that will only copy
-the data and not remove it from the source register.
+the data and not remove it from the source register. I've check this and the
+reference manual states that:
+```
+Clearing the TXE bit is always performed by a write to the transmit data
+register. The TXE bit is set by hardware and it indicates:
+• The data has been moved from the USART_TDR register to the shift register and
+the data transmission has started.
+• The USART_TDR register is empty.
+• The next data can be written in the USART_TDR register without overwriting the
+previous data.
+```
 
 There is no indications either on the serial adapter of any transmission, the rx
 light is not blinking (I verfied that I could do a loop back using it by
