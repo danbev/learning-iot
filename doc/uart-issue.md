@@ -5,7 +5,7 @@ the second time `uart_write_char` is called the old data is still in the USART2
 Transmit Data Registry (TDR). I'm assuming here that the data would be removed
 when it is copied to the shift register of the USART. Hmm, that might be an
 incorrect assumption, like think about a mov instruction, that will only copy
-the data and not remove it from the source register. I've check this and the
+the data and not remove it from the source register. I've checked this and the
 reference manual states that:
 ```
 Clearing the TXE bit is always performed by a write to the transmit data
@@ -16,22 +16,32 @@ the data transmission has started.
 • The next data can be written in the USART_TDR register without overwriting the
 previous data.
 ```
+So it looks like the TDR should be cleared if UART was working propertly.
 
 There is no indications either on the serial adapter of any transmission, the rx
 light is not blinking (I verfied that I could do a loop back using it by
 shorting rx/tx and can see them working).
 
-What would possible causes be?  
-* TE is not enabled perhaps
-* Incorrect baud rate (but I would have thought data would be able to be sent
-but perhaps not recieved correctly. But when I step through the code the data
-is still in the data register.
-* Is there something wrong with the PORT and/or the AF number.
-
-### Transmitter Enable (TE)
-
-
-### Incorrect Baud Rate
+### Trouble shooting
+Lets take a closer look at the RCC_CR (Clock Control) register:
+```console
+uart_init () at uart.s:89
+89	  ldr r1, =RCC_CR
+(gdb) si
+(gdb) x/wt $r1
+0x40021000:	00000000000000000101001010000011
+```
+So this is showing the default settings.
+Bit 0 (1) is saying that HSI clock is enabled.
+Bit 1 (1) is saying that the HSI oscillator is stable.
+Bit 2 (0) is reserved
+Bit 3-7 (10000) is for HSI clock trimming and used in combination with (HSICAL,
+the next 8 bits). These 4 bits provide a user programmable trimming value to
+adjust to variations in temparature and voltage. The default value is 16
+(10000b) and when this value is added to the value in HSICAL it should trim the
+HSI to 8 MHz 
+Bit 8-15 (1010010) HSI clock callibration (HSICAL).
+The rest of the bits are zero so the HSE clock is not enabled.
 
 ### PORT/Alternative Function
 From the data sheet I can read the following:
@@ -57,7 +67,9 @@ I'm setting AF1 using:
 
 I actually had the USB connected incorrectly in that picture but I changed it
 to USB User with the same result.
-So I'm thinking it would still be the pin that is incorrectly setup but I've
+So I'm thinking it could still be the pin that is incorrectly setup but I've
 checked this multiple times now. I'm leaning towards it being and issue with
 the UART configuration.
 
+### Incorrect UART configuration
+TODO:
