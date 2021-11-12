@@ -81,6 +81,7 @@ Since I'm using USART2 the only relevant value I think is bit 16-17:
 ```
 Bit 16-17 (00) USART2 clock source selection (USART2SW). 00 = PCKL selected as
 USART2 clock source (default).
+```
 
 `FCKL` is the clock signal provided to the CPU core.  
 `HCKL` is the clock signal provided to the high-speed bus (AHB).  
