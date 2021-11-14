@@ -2,73 +2,63 @@
 .text
 
 /* Reset Clock and Counter register base address */
-.equ RCC_BASE, 0x40021000                  // checked
+.equ RCC_BASE, 0x40021000
 /* Univeral Serial Asynchronous Receiver Transmitter Base address */
-.equ USART2_BASE, 0x40004400               // checked
+.equ USART_BASE, 0x40013800
 /* General Purpose IO Port A base register */
-.equ GPIOA_BASE, 0x48000000                // checked
+.equ GPIOA_BASE, 0x48000000
 
 /* Advanced Peripheral Bus 1 Enable Register Offset (from RCC_BASE) */
-.equ RCC_APB1ENR_OFFSET, 0x1C              // checked
+.equ RCC_APB1ENR_OFFSET, 0x1C
 .equ RCC_APB1ENR, RCC_BASE + RCC_APB1ENR_OFFSET
 
-.equ RCC_CR_OFFSET, 0x00
-.equ RCC_CR, RCC_BASE + RCC_CR_OFFSET
-
-.equ RCC_CFGR_OFFSET, 0x04
-.equ RCC_CFGR, RCC_BASE + RCC_CFGR_OFFSET
-
-.equ RCC_CFGR3_OFFSET, 0x30
-.equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
-
 /* Mode Register Offset for Port A (from GPIO_BASE) */
-.equ GPIOA_MODER_OFFSET, 0x00              // checked
+.equ GPIOA_MODER_OFFSET, 0x00
 /* Mode Register for GPIO Port A */
 .equ GPIOA_MODER, GPIOA_BASE + GPIOA_MODER_OFFSET
 
-/* Alternate Function Register Low */
-.equ GPIOA_AFRL_OFFSET, 0x20               // checked
-.equ GPIOA_AFRL, GPIOA_BASE + GPIOA_AFRL_OFFSET
+/* Alternate Function Register High */
+.equ GPIOA_AFRH_OFFSET, 0x24
+.equ GPIOA_AFRH, GPIOA_BASE + GPIOA_AFRH_OFFSET
 
 /* Advanced High Performace Bus Enable Register offset (from RCC) */
-.equ AHBENR_OFFSET, 0x14                   // checked
+.equ AHBENR_OFFSET, 0x14
 .equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
 
-.equ USART2_CR1_OFFSET, 0x00               // checked
-.equ USART2_CR1, USART2_BASE + USART2_CR1_OFFSET
+.equ USART_CR1_OFFSET, 0x00
+.equ USART_CR1, USART_BASE + USART_CR1_OFFSET
 
-.equ USART2_CR2_OFFSET, 0x04               // checked
-.equ USART2_CR2, USART2_BASE + USART2_CR2_OFFSET
+.equ USART_CR2_OFFSET, 0x04
+.equ USART_CR2, USART_BASE + USART_CR2_OFFSET
 
-.equ USART2_CR3_OFFSET, 0x08               // checked
-.equ USART2_CR3, USART2_BASE + USART2_CR3_OFFSET
+.equ USART_CR3_OFFSET, 0x08
+.equ USART_CR3, USART_BASE + USART_CR3_OFFSET
 
-.equ USART2_BRR_OFFSET, 0x0C               // checked
-.equ USART2_BRR, USART2_BASE + USART2_BRR_OFFSET
+.equ USART_BRR_OFFSET, 0x0C
+.equ USART_BRR, USART_BASE + USART_BRR_OFFSET
 
-.equ USART2_DTR_OFFSET, 0x28               // checked
-.equ USART2_DTR, USART2_BASE + USART2_DTR_OFFSET
+.equ USART_DTR_OFFSET, 0x28
+.equ USART_DTR, USART_BASE + USART_DTR_OFFSET
 
-.equ USART2_ISR_OFFSET, 0x1C               // checked
-.equ USART2_ISR, USART2_BASE + USART2_ISR_OFFSET
+.equ USART_ISR_OFFSET, 0x1C
+.equ USART_ISR, USART_BASE + USART_ISR_OFFSET
 
-.equ USART2_EN, 1 << 17                      // checked
-.equ GPIO_PORTA_ENABLE, 1 << 17              // checked
-.equ GPIOA_AF1, 2 << 4 /* Port A Pin 2 enable alternate function mode */
-.equ AFSEL2_AF1, 1 << 8                      // checked
+.equ USART_ICR_OFFSET, 0x20
+.equ USART_ICR, USART_BASE + USART_ICR_OFFSET
 
-//.equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
-.equ BRR_CNF, 0x341   /* x0EA6 0x1A1 0x683  */   // ?? what value should this be?
-.equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */ //checked
+.equ USART_EN, 1 << 17
+.equ GPIO_PORTA_ENABLE, 1 << 17
+.equ GPIOA_AF1, 2 << 18
+.equ AFSEL2_AF1, 1 << 0
+
+.equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
+//.equ BRR_CNF, 0x341   /* x0EA6 0x1A1 0x683  */
+//.equ BRR_CNF, 0x0034   /* x0EA6 0x1A1 0x683  */
+.equ CR1_CNF, 1 << 3   /* 0000 0000 1000 = TE (Transmitter Enable) */
 .equ CR2_CNF, 0x0000   /* bits 13-12 are stop bits 00=1 stop bit */
 .equ CR3_CNF, 0x0000   /* No flow control */
-.equ USART2_CR1_EN, 1 << 0
+.equ USART_CR1_EN, 1 << 0
 .equ TX_BUF_FLAG, 1 << 7
-
-.equ HSION, 1 << 0
-.equ SW_HSI, 0 << 0
-
-.equ USART2_SW, 3 << 16
 
 .global start
 
@@ -86,30 +76,48 @@ main_loop:
   b main_loop
 
 uart_init:
-  ldr r1, =RCC_CR
-  ldr r2, =HSION
+  /* Set the baud rate */
+  ldr r1, =USART_BRR
+  ldr r2, =BRR_CNF /* Can only be written when USART is disabled UE=0 */
   ldr r0, [r1]
-  orr r0, r0, r2 
+  orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =RCC_CFGR
-  ldr r2, =SW_HSI
-  ldr r0, [r1]
-  orr r0, r0, r2 
-  str r0, [r1]
-
-  ldr r1, =RCC_CFGR3
-  ldr r2, =USART2_SW
-  ldr r0, [r1]
-  orr r0, r0, r2 
-  str r0, [r1]
-
-  /* Clock enable USART2 (pin 17 of RCC_APB1ENR) */
+  /* Clock enable USART (pin 17 of RCC_APB1ENR) */
   ldr r1, =RCC_APB1ENR
-  ldr r2, =USART2_EN
+  ldr r2, =USART_EN
   ldr r0, [r1]
   orr r0, r0, r2 
   str r0, [r1]
+
+  /* Enable UART in Control Register 1 */
+  ldr r1, =USART_CR1
+  ldr r2, =USART_CR1_EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Configure USART Control Register 1 to enable TE (Transmitter Enable) */
+  ldr r1, =USART_CR1
+  ldr r2, =CR1_CNF
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Configure USART Control Register 2 to specify the stop bits */
+  ldr r1, =USART_CR2
+  ldr r2, =CR2_CNF
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Configure USART Control Register 3, to specify no flow control */
+  ldr r1, =USART_CR3
+  ldr r2, =CR3_CNF
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
 
   /* Clock enable GPIOA */
   ldr r1, =RCC_AHBENR
@@ -128,44 +136,8 @@ uart_init:
   /* We specified that PA2 should be an alternate function but what function
      should it have, this is set next.
      Set GPIO Port A Pin 2 to 0001 (AF1) */
-  ldr r1, =GPIOA_AFRL
+  ldr r1, =GPIOA_AFRH
   ldr r2, =AFSEL2_AF1
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-
-  /* Set the baud rate */
-  ldr r1, =USART2_BRR
-  ldr r2, =BRR_CNF /* Can only be written when USART is disabled UE=0 */
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Configure USART2 Control Register 1 to enable TE (Transmitter Enable) */
-  ldr r1, =USART2_CR1
-  mov r2, #CR1_CNF
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Configure USART2 Control Register 2 to specify the stop bits */
-  ldr r1, =USART2_CR2
-  mov r2, #CR2_CNF
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Configure USART2 Control Register 3, to specify no flow control */
-  ldr r1, =USART2_CR3
-  ldr r2, =CR3_CNF
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Enable UART in Control Register 1 */
-  ldr r1, =USART2_CR1
-  ldr r2, =USART2_CR1_EN
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -174,15 +146,16 @@ uart_init:
 
 /* The character to send is expected to be placed in r0 */
 uart_write_char:
-  ldr r1, =USART2_ISR
+  ldr r1, =USART_ISR
 output_loop:
+  ldr r3, =USART_DTR
   ldr r2, [r1]
   ldr r3, =TX_BUF_FLAG
   and r2, r3
   cmp r2, #0x00
   beq output_loop
   uxtb r1, r0   /* zero extend byte */
-  ldr r2, =USART2_DTR
+  ldr r2, =USART_DTR
   str r1, [r2]
   push {lr}
   //bl turn_led_on
