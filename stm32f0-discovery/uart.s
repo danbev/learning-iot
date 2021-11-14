@@ -46,7 +46,7 @@
 .equ USART_EN, 1 << 17
 .equ GPIO_PORTA_ENABLE, 1 << 17
 .equ GPIOA_AF1, 2 << 18
-.equ AFSEL2_AF1, 1 << 0
+.equ AFSEL2_AF1, 1 << 9
 
 .equ BRR_CNF, 0x0341    /* 0x1A1 0x683  */  
 //.equ BRR_CNF, 0x341   /* x0EA6 0x1A1 0x683  */
