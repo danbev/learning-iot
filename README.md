@@ -2008,9 +2008,9 @@ y = binary values or the binary values will not flow through (unchanged)
 This is used in many circuites where so that the same output line can be shared.
 
 A GPIO pin can assume one of three values:
-* Logical 0 (connected to ground (0 volatage))
-* Logical 1 (connected to VCC (positive voltage)) 
-* High-impedance (floating, Hi-Z, or 'tri-stated'
+* Logical 0 (connected to ground (0 volatage, on))
+* Logical 1 (connected to VCC (positive voltage, off)) 
+* High-impedance (floating, Hi-Z, or 'tri-stated' (disconnected)
 
 
 ```
@@ -2027,6 +2027,46 @@ is not affecting the output so this removes this input from the output. If we
 mave multiple inputs connected to the same output we can have it such that only
 one of the inputs affects the output at a time.
 
+### Floating signal
 When a signal floats is means that it is neither connected to ground or to VCC,
-and the signals volatage 
+and the signals volatage is indeterminate. For example, say we have a pin on a
+microcontroller which we hook up with a button. When we press the button lets
+say we have set things up so that the pin will go low (0V). So when we press it
+will be 0V and we can read the voltage from our program and act when the pin
+is 0V. But what is the value when we are not pressing. It is actually going to
+be random 0 or 1. This is a bad thing.
 
+
+### Pull-up resistor
+Is really just a resistor but it is the way it is used that give it its name:
+```
+     5V
+     |
+     \ 
+     / R
+     \
+     |           +------+
+     |           |  MCU |
++- \------------*|      |
+|                +------+
+Gnd
+```
+So when is circuit is open the pin will be read as 5V (on). When it is closed
+it will be read as Gnd (off). But it will not be random on/off.
+
+### Pull-down resistor
+Is pretty much the inverse of a pull-up resistor:
+```
+                 +-------+
+                 |  MCU  |                
+5V -----/ ---*---|       |
+             |   +-------+
+             \
+             /
+             \
+             /
+             ↓
+             Gnd
+```
+In this case when the ciruit is open the pin will be read as Gnd (off) and when
+it is closed it will be read as 5V(on).  So again it wil not be random on/off.
