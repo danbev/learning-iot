@@ -2004,4 +2004,29 @@ a = 1 pass through the vector of binary values
 y = binary values or the binary values will not flow through (unchanged)
 ```
 
-Well what is meant is that an array of
+### Tristate logic
+This is used in many circuites where so that the same output line can be shared.
+
+A GPIO pin can assume one of three values:
+* Logical 0 (connected to ground (0 volatage))
+* Logical 1 (connected to VCC (positive voltage)) 
+* High-impedance (floating, Hi-Z, or 'tri-stated'
+
+
+```
+          * (enable)
+        |\↓   
+        | \
+   *----| /------* (output)
+(input) |/
+
+```
+This acts as a switch where is "enable" is on then the switch is closed, and if
+"enable" is off it is open. Notice that when the switch is closed the input
+is not affecting the output so this removes this input from the output. If we
+mave multiple inputs connected to the same output we can have it such that only
+one of the inputs affects the output at a time.
+
+When a signal floats is means that it is neither connected to ground or to VCC,
+and the signals volatage 
+
