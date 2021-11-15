@@ -2004,6 +2004,21 @@ a = 1 pass through the vector of binary values
 y = binary values or the binary values will not flow through (unchanged)
 ```
 
+### GPIO Pin
+A GPIO pin looks something like this:
+``
+enable line
+-----------------+--------+
+                 |      |\↓(inverter)
+Output buffer    |      | \              +------+
+-----------------|------| /-------+------| pin  |
+                 ↓/|    |/        |      +------+
+input buffer     / |              |
+-----------------\ |--------------+
+                  \|
+```
+The enable line controlls if this pin will acts as an output of input buffer.
+
 ### Tristate logic
 This is used in many circuites where so that the same output line can be shared.
 
@@ -2070,3 +2085,26 @@ Is pretty much the inverse of a pull-up resistor:
 ```
 In this case when the ciruit is open the pin will be read as Gnd (off) and when
 it is closed it will be read as 5V(on).  So again it wil not be random on/off.
+
+Pull-up and pull-down are mostly used in interfaces that have unidirectional
+lines like SPI and UART (there is a one-to-one connection, compare this with
+I²C which can one controller can be connected to multiple peripherals).
+
+
+### Open Drain
+In this case we the pin only has two states GND or floating which does not sound
+very useful, but it can be compined with a pull-resistor. So I think this allows
+for multiple components connected to the same line, like in I²C.
+TODO: explain this properly.
+
+In the stm32 we have the GPIOx_OTYPER register which allow us to configure pins:
+```
+Bits 31:16 Reserved, must be kept at reset value.
+Bits 15:0 OTy: Port x configuration bits (y = 0..15)
+These bits are written by software to configure the I/O output type.
+  0: Output push-pull (reset state)
+  1: Output open-drain
+```
+So by default the pins will be in push-pull state and perhaps we will need to
+set it to open-drain when using I²C.
+
