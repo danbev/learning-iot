@@ -101,6 +101,19 @@ uart_init:
   orr r0, r0, r2 
   str r0, [r1]
 
+  ldr r1, =RCC_AHBENR
+  ldr r2, =GPIO_PORTC_ENABLE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  ldr r1, =GPIOC_MODER
+  ldr r2, =GPIOC_MODER_MASK
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+
   /* Enable Alternative function mode for GPIO PA2 */
   ldr r1, =GPIOA_MODER
   ldr r2, =GPIOA_AF1
@@ -176,22 +189,27 @@ uart_init:
   orr r0, r0, r2
   str r0, [r1]
 */
-
-  bx lr
+  push {lr}
+  bl delay
+  bl turn_led_on
+  bl delay
+  bl turn_led_off
+  pop {pc}
 
 /* The character to send is expected to be placed in r0 */
 uart_write_char:
-  ldr r1, =USART_ISR
 output_loop:
   push {lr}
+  bl delay
   bl turn_led_off
+  bl delay
   ldr r1, =USART_ISR
   ldr r2, [r1]
   ldr r3, =TX_BUF_FLAG
   and r2, r3
   cmp r2, #0x00
   beq output_loop
-  uxtb r1, r0   /* zero extend byte */
+  uxtb r1, r0 
   ldr r2, =USART_DTR
   str r1, [r2]
   bl turn_led_on
@@ -208,18 +226,6 @@ output_loop:
 .equ BSRR_9_RESET, 1 << 23
 
 turn_led_on:
-  ldr r1, =RCC_AHBENR
-  ldr r2, =GPIO_PORTC_ENABLE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =GPIOC_MODER
-  ldr r2, =GPIOC_MODER_MASK
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   ldr r1,=GPIOC_BSRR
   ldr r2,=BSRR_9_SET
   ldr r0, [r1]
@@ -234,3 +240,11 @@ turn_led_off:
   orr r0, r0, r2
   str r0, [r1]
   bx lr
+
+.equ DELAY_LENGTH, 0x000fffff
+delay:
+  ldr r0,=DELAY_LENGTH
+dloop:
+  sub r0, r0, #1
+  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
+  bx  lr
