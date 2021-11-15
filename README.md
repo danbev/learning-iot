@@ -2090,6 +2090,9 @@ Pull-up and pull-down are mostly used in interfaces that have unidirectional
 lines like SPI and UART (there is a one-to-one connection, compare this with
 I²C which can one controller can be connected to multiple peripherals).
 
+### pull-push
+When the output goes low, the signal is actively `pulled` to ground, and when
+the output goes high it is actively `pushed` to VCC.
 
 ### Open Drain
 In this case we the pin only has two states GND or floating which does not sound
@@ -2107,4 +2110,29 @@ These bits are written by software to configure the I/O output type.
 ```
 So by default the pins will be in push-pull state and perhaps we will need to
 set it to open-drain when using I²C.
+
+If we chose `push-pull` the pin can be further configured using GPIOx_PUPDR:
+```
+Bits 2y+1:2y PUPDRy[1:0]: Port x configuration bits (y = 0..15)
+These bits are written by software to configure the I/O pull-up or pull-down
+  00: No pull-up, pull-down
+  01: Pull-up
+  10: Pull-down
+  11: Reserved
+```
+Does this mean that if we don't configure our pin in GPIOx-OTYPER and don't
+configure it in GPIOx-PUPDR that it will floating?
+
+
+### GPIO speed
+This is the rate at which a signal can change between high and low.
+In the stm32 we have GPIOx_OSPEEDR which has the following configuration
+options:
+```
+Bits 2y+1:2y OSPEEDRy[1:0]: Port x configuration bits (y = 0..15)
+These bits are written by software to configure the I/O output speed.
+x0: Low speed
+01: Medium speed
+11: High speed
+```
 
