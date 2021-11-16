@@ -13,8 +13,10 @@ sync (using clocks) or async(using start/stop bits).
                     ---
                      -
 ```
-The sender and reicever must agree on a data transfer rate, which is called the
-baud rate which is number of bits transferred per second.
+For asynchronous communicationn the sender and reicever must agree on a data
+transfer rate, which is called the baud rate which is number of bits transferred
+per second.
+
 Simplex mode is when data is transferred in one direction only.
 Half-duplex is when data is transferred in both directions but not at the same
 time.
@@ -77,11 +79,12 @@ Baud is named after Emile Baudot, who invented the 5-bit teletype code.
 
 The difference between bit rate and baud rate is that bit rate is the number
 of bits sent per second, where as baud rate is the number of signal units per
-second. The bit rate is the number of bits to be transmitted per second, the
+second. The bit rate is the number of bits to be transmitted per second, they
 are of two states, either 1 or 0. When this is converted into a signal and
 travels on a wire the signal can get distorted due to noise. So the 1s and 0s
 we send from the application might have a different representation on the wire
-and this is the reason for talking about symbols instread of bits.
+and this is the reason for talking about symbols instead of bits.
+
 So we know already that the baud rate is the number of changes to the signal
 per second accross the wire. Now the baud rate can be higher or lower than the
 bit rate.
@@ -114,6 +117,7 @@ So the baud rate can be higher or lower than the bit rate.
 ```
 bit rate = baud rate * bits per symbol
 ```
+
 ### Oversampling
 The receiver constantly samples/reads/polls the data line and it does this more
 often than the baud rate. An common setting is to sample 16 times the baud rate.
@@ -148,7 +152,7 @@ tick counter and the counter restarts:
             ↑
          7 ticks
 ```
-This is done to estimate the middle of each bit. So when can then count from
+This is done to estimate the middle of each bit. So it can then count from
 0 to 15 and then we know that is the first data bit (data bit 0) and that value
 can be read into a register:
 ```
@@ -311,6 +315,4 @@ Bit 15 OVER8: Oversampling mode
   1: Oversampling by 8
 
 This bit can only be written when the USART is disabled (UE=0).
-
-
 
