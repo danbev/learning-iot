@@ -76,6 +76,9 @@ divided by 1.
 Bit 31 (0) PLL clock not divided (PLLNODIV). 0 = PLL is not divided by 2 for
 MCO.
 ```
+So if `HSI` is used and there are no prescalars that would mean we have a clock
+with a frequency of 8 MHz
+
 Next we have `RCC_CFGR3`:
 ```console
 (gdb) x/wt $r1
@@ -157,3 +160,46 @@ This bit is set and cleared by software.
   0: Interrupt is inhibited
   1: A USART interrupt is generated whenever IDLE=1 in the USART_ISR register
 ```
+
+After spending an embarrasing amount of time trying to get USART to work I
+need to find out if there was something else wrong (like an issue with cables,
+pins, serial board etc). So I tried using `libopencm3` (open cortex-m I think
+it stands for). Trying the example that ships with libopencm3 I was able to
+verify that USART does work which was good news. I've been looking at that
+as a reference and using the same port and pins which I know work. But after
+going through this over and over I still get the same behavior.
+
+I checked the baud rate in `libopencm3/lib/stm32/common/usart_common_all.c`
+which contains the function usart_set_baudrate which is of interest to me as
+I've been struggling getting usart to work in assembly and I suspect that the
+baud rate is wrong.
+```c
+void usart_set_baudrate(uint32_t usart, uint32_t baud)
+{
+        ...
+	USART_BRR(usart) = (clock + baud / 2) / baud;
+}
+```
+In this case I can check the value of the clock and the passed in baud:
+```console
+(gdb) info locals
+clock = 8000000
+
+(gdb) info args 
+baud = 115200
+```
+So that should give us:
+```console
+(gdb) p/x (clock + baud / 2) / baud
+$3 = 0x45
+```
+That might not be enough though. I also noticed that in usart.c there is a
+delay
+```c
+		for (i = 0; i < 100000; i++) {	/* Wait a bit. */
+			__asm__("NOP");
+		}
+```
+With that baud rate it still does not work. So I started to look at what
+happens before the main function is called.
+__work in progress__
