@@ -6,6 +6,29 @@ ARM cortex microcontrollers.
 [libopencm3](https://github.com/libopencm3/libopencm3) is an open source
 firmware library for ARM Cortex-M microcontrollers.
 
+#### libopencm3 examples
+There are [examples](https://github.com/libopencm3/libopencm3-examples) for 
+various microcontrollers which can be useful references. Just clone that repo
+and then run:
+```console
+$ git submodule init
+$ git submodule update
+$ make
+```
+To run an example change to the example directory and run the following command:
+```console
+$ cd libopencm3-examples/examples/stm32/f0/stm32f0-discovery/miniblink
+$ openocd -f board/stm32f0discovery.cfg
+```
+The from another terminal we can use telnet to connect and flash the
+microcontroller:
+```
+$ telnet localhost 4444
+> reset halt
+> flash write_image erase miniblink.elf
+```
+This will flash the orange LED on my device.
+
 #### Building libopencm3
 I ran into thie following issue when trying to compile:
 ```console
