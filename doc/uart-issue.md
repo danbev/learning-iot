@@ -537,16 +537,3 @@ Press CTRL-A Z for help on special keys
 
 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 ```
-
-
-__work in progress__
-
-```c
-void usart1_isr(void) __attribute__((weak, alias("blocking_handler")));
-```
-
-```console
-(gdb) p/t $xPSR & (1 << 29)
-$8 = 0
-```
-
