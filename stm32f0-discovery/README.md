@@ -12,6 +12,7 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [Blinking LED](./led.s)
 1. [Blinking LED using BSRR](./led_bsrr.s)
 1. [User button](./led_button.s)
+1. [UART Transmit](./uart.s)
 
 ### LED background info
 
