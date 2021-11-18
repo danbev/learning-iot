@@ -98,7 +98,7 @@ Info : Listening on port 3333 for gdb connections
 ```
 
 ### Creating an application for the micorbit
-The following command was used to create [microrust-start](./microrust-start):
+The following command was used to create [microrust-start](../microrust-start):
 ```console
 $ cargo new microrust-start
 $ cd microrust
@@ -109,7 +109,7 @@ To build this project the following command can be used:
 $ cargo build --target thumbv6m-none-eabi
 ```
 
-Notice that [main.rs](./microrust-start/src/main.rs) has been updated to include
+Notice that [main.rs](../microrust-start/src/main.rs) has been updated to include
 the attribute `no_std` and `no_main`, and depencenies to `panic-halt` and
 `microbit` have been added. Also the default main function has been replaced.
 
