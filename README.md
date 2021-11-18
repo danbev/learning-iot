@@ -3,6 +3,7 @@ The sole purpose of this repository is to store notes and code helping me
 learn things related to Internet of Things, but also basic electronics.
 
 ### Contents
+1. [STM32F0-Discovery](./stm32f0-discovery/README.md)
 1. [ESP8266](./doc/esp8266.md)
 1. [Microbit v2.0](./doc/microbit.md)
 
