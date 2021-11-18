@@ -471,23 +471,58 @@ same behavior as I'm seeing in my code. And if I manually set the value of
 clock to `8000000` in `usart_set_baudrate` in
 `libopencm3/lib/stm32/common/usart_common_all.c` it works. So it still seems to
 point to an invalid value for UART1_BRR.
+```c
+void usart_set_baudrate(uint32_t usart, uint32_t baud)                             
+{
+    ...
+    USART_BRR(usart) = (clock + baud / 2) / baud;
+```
+So in this case usart will be in r0, an baud in r1:
+```console
+(gdb) i r $r0
+r0             0x40013800          1073821696
+(gdb) i r $r1
+r1             0x1c200             115200
+(gdb) p/d $r1
+$2 = 115200
 
+(gdb) x/t 0x40013800
+0x40013800:	00000000000000000000000000000000
+```
+Notice that `usart` matches our USART1_BASE register.
+```assembly
+.equ USART1_BASE, 0x40013800
+```
+And we can see that it is cleared/zero upon entering this function.
 ```console
 (gdb) disassemble 
 Dump of assembler code for function usart_set_baudrate:
 => 0x08000270 <+0>:	ldr	r3, [pc, #16]	; (0x8000284 <usart_set_baudrate+20>)
    0x08000272 <+2>:	push	{r4, lr}
    0x08000274 <+4>:	ldr	r3, [r3, #0]
-   0x08000276 <+6>:	movs	r4, r0
-   0x08000278 <+8>:	lsrs	r0, r1, #1
+   0x08000276 <+6>:	movs	r4, r0          ; move r0 into r4
+   0x08000278 <+8>:	lsrs	r0, r1, #1      ; logical shift right (update conditions flags register)
    0x0800027a <+10>:	adds	r0, r0, r3
    0x0800027c <+12>:	bl	0x800039c <__udivsi3>
-   0x08000280 <+16>:	str	r0, [r4, #12]
+   0x08000280 <+16>:	str	r0, [r4, #12]   ;r0 = usart base, plus 12 (0xC) is the BRR registr
    0x08000282 <+18>:	pop	{r4, pc}
    0x08000284 <+20>:	movs	r0, r0
    0x08000286 <+22>:	movs	r0, #0
+
+(gdb) x/d 0x08000284
+0x8000284 <usart_set_baudrate+20>:	8000000
+
+(gdb) x/x $r4 + 12
+0x4001380c:	0x00000045
+(gdb) x/d $r4 + 12
+0x4001380c:	69
 ```
-USART_BRR(usart) = (clock + baud / 2) / baud;
+Alright, so this turned out to be an combination of the baud rate being
+incorrect and me changing code around too much. What was happening is that
+the character that I wanted to send was in $r0 which was is passed as the
+first argument to uart_write_char, but after I added code for the LED and also
+to have a delay. These functions use r0 so it was getting overwritten and
+indeed was zero, hence 0x0 was being sent. 
 
 
 __work in progress__
