@@ -54,3 +54,25 @@ This issue can be worked around by installing the following library:
 ```console
 $ sudo dnf install -v arm-none-eabi-newlib
 ```
+
+#### libopencm3 source code
+If we take a look at the `miniblink.c` program we used in above we can see that
+it include two files:
+```c
+#include <libopencm3/stm32/rcc.h>                                               
+#include <libopencm3/stm32/gpio.h>
+```
+In the case of the examples libopencm3 is a submodule so the souces will be in
+libopencm3 in the root directory. Setting up ctags helps with quick navigation.
+For example. rcc.h can be found in
+libopencm3-examples/libopencm3/include/libopencm3/stm32/rcc.h. If we take a look
+in this header we can see that it include headers specific to the version of
+the microprocessor being used:
+```c
+#if defined(STM32F0)                                                            
+#       include <libopencm3/stm32/f0/rcc.h> 
+```
+And we a look at that `rcc.h` header we can see definitions that look familiar
+from the assembly examples we worked on. Now, this can be useful as a reference
+if one is unsure of the values taken from the reference manual.
+
