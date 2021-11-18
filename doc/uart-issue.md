@@ -523,6 +523,20 @@ the character that I wanted to send was in $r0 which was is passed as the
 first argument to uart_write_char, but after I added code for the LED and also
 to have a delay. These functions use r0 so it was getting overwritten and
 indeed was zero, hence 0x0 was being sent. 
+Hardcoding the value to be sent just before sending verified this:
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0
+
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 13:15:05
+
+Press CTRL-A Z for help on special keys
+
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+```
 
 
 __work in progress__
