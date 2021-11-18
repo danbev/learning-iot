@@ -168,6 +168,53 @@ ALU = Arithmetic Login Unit
 ```
 Sign extend converts 8 and 16 bit numbers to 32 bit numbers.
 
+
+
+
+
+#### High Speed External (HSE)
+This is a crystal oscillator, resonator, clock generating circuits. Usually
+4-25MHx (this might be old figures).
+
+#### Low Speed External (LSE)
+Similar to HSE but usually very accurate. 32.768 kHz clock crystals are used to
+feed the LSE. The Real Time Clock (RTC) modules uses this clock.
+
+#### High Speed Internal (HSI)
+Is an internal 8MHz clock source. RC oscillator.
+
+#### Low Speed Internal (LSI)
+Simlar to HSI but no very accurate. RC oscillator with a frequency of 40 kHz.
+
+#### Phase Locked Loop (PLL)
+Is the frequency doubling output of PLL.
+TODO: explain how this works.
+
+### Clock prescalars
+TODO: explain how this works.
+
+### System clock (SYSCLK) selection
+The following can be sources for this clock:
+* HSI 8 MHz RC oscillator clock
+* HSE oscillator clock
+* PPL clock
+* HSI48 48 MHz RC oscillator clock
+
+After a system reset, the HSI oscillator is selected as system clock. So in that
+case it is a 8 MHz clock.
+
+"Several prescalers can be used to configure the frequency of the AHB and the
+APB domains. The AHB and the APB domains maximum frequency is 48 MHz."
+All the peripheral clocks are derived from their bus clock which is HCLK for AHB
+or PCLK for APB.
+
+The USART1 clock, USART2 clock are selected by software from one of the four
+following sources:
+* system clock
+* HSI clock
+* LSE clock
+* APB clock (PCLK)
+
 ###
 ```
 1) Enable Clock to Peripheral
