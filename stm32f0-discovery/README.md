@@ -12,7 +12,7 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [Blinking LED](./led.s)
 1. [Blinking LED using BSRR](./led_bsrr.s)
 1. [User button](./led_button.s)
-1. [UART Transmit](./uart.s)
+1. [UART Transmit](./uart-tx-sync.s)
 
 ### LED background info
 
@@ -302,7 +302,7 @@ Note: This bit is used during single buffer transmission
 #### Testing this example
 1) compile:
 ```console
-$ make uart.elf
+$ make uart-tx-sync.elf
 ```
 
 2) Flash the binary to the board.
@@ -310,7 +310,7 @@ $ make uart.elf
 $ make openocd
 $ telnet localhost 4444
 > reset halt
-> flash write_image erase uart.elf.hex
+> flash write_image erase uart-tx-sync.elf.hex
 ```
 3) Connect with minicom:
 Connect PA9 to a USB to Serial Adapter and then connect the USB to the
