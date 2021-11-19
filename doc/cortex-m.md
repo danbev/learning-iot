@@ -364,3 +364,38 @@ members of a struct and can do this calculation for us.
 
 3) Write to the pin
 
+### System Timer (SysTick)
+Can be used to schedule something to happen on a regular basis using an internal
+clock. So any Cortex-M microcontroller will provide this. This also means that
+information about this timer can be found in the
+[Cortex-M User Guide](https://developer.arm.com/documentation/dui0553/latest/)
+and not in the board manufactures documentation.
+
+This is a 24 bit count-down timer that counts down from value specified in the
+SYST_RVR (SysTick Reload Value Register) and once it reached zero will start
+over from the value in SYST_RVR.
+
+#### SysTick Control and Status Register (SYST_CSR)
+Address: `0xE000E010`  
+This 32 bit register is used to enable the SysTick features.
+```
+Bit 16 Count Flag 1 = timer counted to 0 since last time it was read.
+Bit  2 CLKSource 1 = processor clock, 0 external clock.
+Bit  0 Enable 1 = enable
+```
+
+#### SysTick Reload Value Register (SYST_RVR)
+Address: `0xE000E014`  
+This register specified the start value for the counter and is loaded into the
+SYST_CVR register and the counter reaches zero.
+```
+Bit 0-23 Reload The value to be loaded into the SYST_CVR registry.
+```
+
+#### SysTick Current Value Register (SYST_CVR)
+Address: `0xE000E018`
+Returns the current value of the SysTick counter.
+```
+Bit 0-23 Current value.
+```
+
