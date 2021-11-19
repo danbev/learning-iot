@@ -12,7 +12,8 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [Blinking LED](./led.s)
 1. [Blinking LED using BSRR](./led_bsrr.s)
 1. [User button](./led_button.s)
-1. [UART Transmit](./uart-tx-sync.s)
+1. [UART Transmit](#uart_transmit_example)
+1. [UART Receive](#uart_receive_example)
 
 ### LED background info
 
@@ -170,7 +171,7 @@ GNU gdb (GNU Arm Embedded Toolchain 10.3-2021.10) 10.2.90.20210621-git
 (gdb) b start
 ```
 
-### UART Example
+### UART Transmit Example
 First thing we need to do is to take a look at the block diagram and see how
 UART is connected to the system. On this board we have `USART1`, `USART2`, and
 `USART6`. I think they all work in the same way and I'm going to use `USART1`
@@ -337,3 +338,40 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
 
 ![UART Transmit example image](./uart-example.jpg "Example of running UART Transmit example")
+
+### UART Receive Example
+This example is similar to the previous one but instead of syncrhonously
+transmitting we will be receiving data. 
+
+The pin for receiving is called USART1_RX and if we look in the datasheet we
+find:
+```
+USART1_RX    PA10 AF1
+```
+[UART Recieve example](./uart-rx-sync.s)
+
+1) compile:
+```console
+$ make uart-rx-sync.elf
+```
+
+2) Flash the binary to the board.
+```console
+$ make openocd
+$ telnet localhost 4444
+> reset halt
+> flash write_image erase uart-rx-sync.elf.hex
+```
+3) Connect with minicom:
+Connect PA9 to a USB to Serial Adapter and then connect the USB to the
+computer:
+```console
+$ minicom -D /dev/ttyUSB0 -b 115200 -8 
+```
+4) Run the executable
+```console
+> reset run
+```
+If you type a character in the terminal it will be echoed back, and the blue
+led on the board will light up, plus the rx led on the serial board will also
+indicate the transmission (and the sending too).
