@@ -27,7 +27,7 @@ into to digital values (descrete) to be processed.
 ARM holding is the company behind Arm based chips do not manufacture chips
 but instread they design parts of the chip and they license these designs to
 hardware manufactures that use them in their products (sometimes enhancing
-them). In contrast Intel both design chips and manufacture them.
+them). In contrast to Intel both design chips and manufacture them.
 
 Arm has a number of families of chip designs. For example there is the Cortex-M
 family which are mostly used in microcontrollers.
@@ -49,7 +49,7 @@ TODO:
 TODO:
 
 ### Serial communication
-Is the process of transmitting one bit of data at a time. Thing of this as being
+Is the process of transmitting one bit of data at a time. Think of this as being
 one wire and the bits flow through it.
 Only requires one wire which is one reason at it is used often in
 microcontroller system design.
@@ -82,13 +82,13 @@ Crosstalk is an issue and it is susceptible to clock skew.
   |     OUT5|-------------b5--------------|IN5      |
   |     OUT6|-------------b6--------------|IN6      |
   |     OUT7|-------------b7--------------|IN7      |
-            |             p1              |
+  |         |             p1              |         |
   |      CLK|-----------------------------|CLK      |
   +---------+                             +---------+
 
-p = puls of the clock
+p = pulse of the clock
 ```
-So this would send 8 bit per plus of the clock.
+So this would send 8 bit per pluse of the clock.
 
 ### Synchronous transmission
 It's called synchronous because the sender and reciever are synchronized. They
