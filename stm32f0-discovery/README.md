@@ -173,19 +173,19 @@ GNU gdb (GNU Arm Embedded Toolchain 10.3-2021.10) 10.2.90.20210621-git
 ### UART Example
 First thing we need to do is to take a look at the block diagram and see how
 UART is connected to the system. On this board we have `USART1`, `USART2`, and
-`USART6`. I think they all work in the same way and I'm going to use `USART2`
-for this example. It is connected to Advanced Peripheral Bus 1 (APB1) so we have to
-enable USART2 via APB1.
+`USART6`. I think they all work in the same way and I'm going to use `USART1`
+for this example. It is connected to Advanced Peripheral Bus 2 (APB2) so we have
+to enable USART1 via the APB2 register.
 ```
-6.4.8 APB peripheral clock enable register 1 (RCC_APB1ENR)
-Address: 0x1C
+6.4.8 APB peripheral clock enable register 2 (RCC_APB2ENR)
+Address: 0x18
 
- Bit 17 USART2EN: USART2 clock enable
- Set and cleared by software.
-  0: USART2 clock disabled
-  1: USART2 clock enabled
+Bit 14 USART1EN: USART1 clock enable
+Set and cleared by software.
+  0: USART1clock disabled
+  1: USART1clock enabled
 ```
-So we will need to set bit `17` (`USARTS_EN`) to 1 to enable the `USART2` clock.
+So we will need to set bit `14` (`USART1_EN`) to 1 to enable the `USART1` clock.
 The clock needs to be activated or the peripheral may not be readable by
 software and the returned value will always be `0x0`.
 
@@ -193,25 +193,20 @@ Now, the device I/O pins are connected through a multiplexer which allows a
 single alternate function (AF) to be connected to one pin at a time. So each pin
 can have have 16 alternate function inputs (remember that these are the inputs
 to the multiplexer and it outputs a single value). If we look in the data sheet
-we can find that `Table 14` contains information about `USART2` which is an
+we can find that `Table 14` contains information about `USART1` which is an
 alternative function, and the pins that it uses:
 ```
-USART2_CTS   PA0
-USART2_RTS   PA1
-USART2_TX    PA2
-USART2_RX    PA3
-USART2_CK    PA4
+USART1_TX    PA9 AF1
 ```
-The output is configured using `GPIOx_AFRL` (Alternate Function Register Low) for
-pins 0-7:
+The output is configured using `GPIOx_AFRH` (Alternate Function Register High)
+for pins 8-15:
 ```
-8.4.9 GPIO alternate function low register (GPIOx_AFRL) (x = A..F)
-Address offset: 0x20
+8.4.9 GPIO alternate function high register (GPIOx_AFRH) (x = A..F)
+Address offset: 0x24
 ```
 This is a 32 bit register which is divided into 4 bit sections.
-`GPIOA_AFRL` which are specified as
 ```
-Bits 31:0 AFSELy[3:0]: Alternate function selection for port x pin y (y = 0..7)
+Bits 31:0 AFSELy[3:0]: Alternate function selection for port x pin y (y = 8..15)
 These bits are written by software to configure alternate function I/Os
 AFSELy selection:
   0000: AF0
@@ -223,24 +218,10 @@ AFSELy selection:
   0110: AF6
   0111: AF7
 ```
-So I think we need to configure AFSEL0-AFSEL4 and specify which alternate
-function these pins should have. But how do I find which alternate function
-UART2 has?  
-I had to look in the data sheet for this and the following table contained
-this information:
-```
-Table 15. Alternate functions selected through GPIOA_AFR registers for port A
+So I think we need to configure AFSEL9 and specify which alternate 
+function this pin should have which in this case is 0001 for AF1.
 
-PA0  USART2_CTS  AF1
-PA1  USART2_RTS  AF1
-PA2  USART2_TX   AF1
-PA3  USART2_RX   AF1
-PA4  USART2_CK   AF1
-```
-Alright, so we need to configure AFSEL0-AFLSE4 and specify AF1 (0001) for each
-of them which will enable them for USART2.
-
-So we will have to enable Port A and also GPIOA_AFRL
+So we will have to enable Port A and also GPIOA_AFRH
 
 So we will need to configure GPIOA_MODER to be in alternate function mode:
 ```
@@ -254,17 +235,12 @@ These bits are written by software to configure the I/O mode.
   10: Alternate function mode
   11: Analog mode 
 ```
-So for the Port in question,  PA0, PA1, PA2, PA3, and PA4 we would need to set
-the bits for these to `10`, alternative function mode. I'm currently not sure
-if we need to do this for all of these pins. For example, if we only need to do
-this for PA2 for example that would be:
-```
- 1 << 5
-```
+So for the Port in question,  PA9 we would need to set the bit for this to `10`,
+alternative function mode. 
 
-We can look at the memory map to get the base address of USART2:
+We can look at the memory map to get the base address of USART1:
 ```
-0x4000 4400 USART2
+.equ USART1_BASE, 0x40013800
 ```
 
 We also have to configure USART using the control register.
@@ -275,11 +251,6 @@ Bit 3 TE: Transmitter enable
 This bit enables the transmitter. It is set and cleared by software.
   0: Transmitter is disabled
   1: Transmitter is enabled
-
-Bit 2 RE: Receiver enable
-This bit enables the receiver. It is set and cleared by software.
-  0: Receiver is disabled
-  1: Receiver is enabled and begins searching for a start bit
 
 Bit 0 UE: USART enable
 When this bit is cleared, the USART prescalers and outputs are stopped
@@ -311,23 +282,6 @@ For sending data it needs to be placed in this register:
 ```
 27.8.11 Transmit data register (USART_TDR)
 Address offset: 0x28
-
-```
-
-When receiving data that data will be in this register:
-```
-27.8.10 Receive data register (USART_RDR)
-Address offset: 0x24
-```
-
-```
-27.8.2 Control register 2 (USART_CR2)
-Address offset: 0x04
-```
-
-```
-27.8.3 Control register 3 (USART_CR3)
-Address offset: 0x08
 ```
 
 ```
@@ -344,50 +298,41 @@ An interrupt is generated if the TXEIE bit =1 in the USART_CR1 register.
 1: data is transferred to the shift register)
 Note: This bit is used during single buffer transmission
 ```
+```
 
 Testing this example:
-1) Download the binary to the board.
-2) Disconnect openocd
-3) Connect with minicom:
-Connect PA3 to a USB to Serial Adapter and then connect the USB to the
-computer:
+1) compile:
 ```console
-[2152044.619853] usb 1-2: new full-speed USB device number 13 using xhci_hcd
-[2152044.752207] usb 1-2: New USB device found, idVendor=0403, idProduct=6001, bcdDevice= 6.00
-[2152044.752222] usb 1-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[2152044.752227] usb 1-2: Product: FT232R USB UART
-[2152044.752232] usb 1-2: Manufacturer: FTDI
-[2152044.752236] usb 1-2: SerialNumber: A50285BI
-[2152044.760686] ftdi_sio 1-2:1.0: FTDI USB Serial Device converter detected
-[2152044.760876] usb 1-2: Detected FT232RL
-[2152044.761956] usb 1-2: FTDI USB Serial Device converter now attached to ttyUSB0
+$ make uart.elf
 ```
-Next we should be able to use minicom to connect to this port and see the output
-from the program:
+
+2) Flash the binary to the board.
+```console
+$ make openocd
+$ telnet localhost 4444
+> reset halt
+> flash write_image erase uart.elf.hex
+```
+3) Connect with minicom:
+Connect PA9 to a USB to Serial Adapter and then connect the USB to the
+computer:
 ```console
 $ minicom -D /dev/ttyUSB0 -b 115200 -8 
 ```
-
+4) Run the executable
 ```console
-$ arm-none-eabi-gdb
-(gdb) file uart_main.elf
-(gdb) target remote localhost:3333
-(gdb) monitor reset halt
-(gdb) br start
-(gdb) c
+> reset run
 ```
 
-We can check that the configuration of RCC_APB1ENR looks alright:
+This should now output a number of `A`s in the minicom terminal window:
 ```console
-(gdb) x/1w $r1
-0x4002101c:	0x00020000
-(gdb) x/1wt $r1
-0x4002101c:	00000000000000100000000000000000
-```
-Notice that the address 4002101c looks correct (RCC_BASE + 0x1c) and the value
-is also correct, bit 17 is set to 1:
-```
-                 17                   0
-0000 0000 0000 0010 0000 0000 0000 0000
-```
+Welcome to minicom 2.7.1
 
+OPTIONS: I18n
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 05:25:03
+
+Press CTRL-A Z for help on special keys
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
