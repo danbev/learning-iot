@@ -298,7 +298,6 @@ An interrupt is generated if the TXEIE bit =1 in the USART_CR1 register.
 1: data is transferred to the shift register)
 Note: This bit is used during single buffer transmission
 ```
-```
 
 #### Testing this example
 1) compile:
