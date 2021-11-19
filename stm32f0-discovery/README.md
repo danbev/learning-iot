@@ -335,3 +335,5 @@ Press CTRL-A Z for help on special keys
 
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
+
+![UART Transmit example](./uart-example.mov "Example of running UART Transmit example")
