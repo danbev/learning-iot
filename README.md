@@ -2007,7 +2007,7 @@ y = binary values or the binary values will not flow through (unchanged)
 
 ### GPIO Pin
 A GPIO pin looks something like this:
-``
+```
 enable line
 -----------------+--------+
                  |      |\↓(inverter)
