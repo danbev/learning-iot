@@ -300,7 +300,7 @@ Note: This bit is used during single buffer transmission
 ```
 ```
 
-Testing this example:
+#### Testing this example
 1) compile:
 ```console
 $ make uart.elf
