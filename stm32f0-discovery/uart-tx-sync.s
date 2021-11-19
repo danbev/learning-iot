@@ -36,9 +36,9 @@
 .equ USART_BRR_OFFSET, 0x0C
 .equ USART_BRR, USART1_BASE + USART_BRR_OFFSET
 
-/* USART Data Transmit Register */
-.equ USART_DTR_OFFSET, 0x28
-.equ USART_DTR, USART1_BASE + USART_DTR_OFFSET
+/* USART Transmit Data Register */
+.equ USART_TDR_OFFSET, 0x28
+.equ USART_TDR, USART1_BASE + USART_TDR_OFFSET
 
 /* USART Interrupt and Status Register */
 .equ USART_ISR_OFFSET, 0x1C
@@ -156,7 +156,7 @@ output_loop:
   cmp r2, #0x00
   beq output_loop
   uxtb r3, r6 
-  ldr r2, =USART_DTR
+  ldr r2, =USART_TDR
   str r3, [r2]
   bl delay
   bl turn_led_off
