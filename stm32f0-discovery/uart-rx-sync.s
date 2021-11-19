@@ -90,8 +90,7 @@ ResetVector:
 start:
   bl uart_init
 main_loop:
-  bl uart_read_char
-  b main_loop
+  b uart_read_char
 
 uart_init:
   /* Enable Port A clock */
@@ -166,21 +165,39 @@ uart_init:
   pop {pc}
 
 uart_read_char:
-output_loop:
-  push {lr}
+rx_output_loop:
+  bl delay
   ldr r1, =USART_ISR
   ldr r2, [r1]
   ldr r3, =USART_ISR_RXNE
   and r2, r2, r3
   cmp r2, #0x0
-  beq output_loop
+  beq rx_output_loop
   bl turn_led_on
+  bl delay
   ldr r2, =USART_RDR
   ldr r3, [r2]
   ldr r4, =#0xFF
   and r3, r3, r4
+  mov r0, r3
+  bl uart_write_char
   bl delay
   bl turn_led_off
+  b uart_read_char
+
+uart_write_char:
+  mov r6, r0
+tx_output_loop:
+  push {lr}
+  ldr r1, =USART_ISR
+  ldr r2, [r1]
+  ldr r3, =USART_ISR_TXE
+  and r2, r2, r3
+  cmp r2, #0x00
+  beq tx_output_loop
+  uxtb r3, r6 
+  ldr r2, =USART_TDR
+  str r3, [r2]
   pop {pc}
 
 .equ GPIO_PORTC_ENABLE, 1 << 19
