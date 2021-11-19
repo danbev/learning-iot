@@ -1,18 +1,16 @@
 MEMORY
 {
-    flash : org = 0x08000000, len = 64k
-    ram : org = 0x20000000, len = 8k
+    flash : ORIGIN = 0x08000000, LENGTH = 64k
+    ram   : ORIGIN = 0x20000000, LENGTH = 8k
 }
    
 SECTIONS
 {
-         
-    . = ORIGIN(flash);
-        .text : {
-         
-        } > flash
-    . = ORIGIN(ram);
-        .data : {
-                     
-        } > ram
+  /* set the location counter to the address (ORIGIN property) of flash  */
+  . = ORIGIN(flash);
+  /* the output .text section will be located in the flash */
+  .text : { *(.text) } > flash
+  /* set the location counter to the address (ORIGIN property) of ram  */
+  . = ORIGIN(ram);
+  .data : { *(.data) } > ram
 }
