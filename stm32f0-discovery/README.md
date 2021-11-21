@@ -339,6 +339,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 ![UART Transmit example image](./uart-example.jpg "Example of running UART Transmit example")
 
+Using an oscillooscope I've been able to capture the square way for this
+transmission:
+![UART Transmit oscilloscope image](./uart-tx-osc.jpg "UART TX oscilloscope image")
+
+Notice that the signal is at 5V to start with when there is no trasmission and
+these is then a start bit. This is followed by the first bit of the data which
+is high which represents a 1, this is then followed by 5 low signals, and
+finally another high signal which produces `1000001` which is 41h, 65d, and
+1000001b.
+
 ### UART Receive Example
 This example is similar to the previous one but instead of syncrhonously
 transmitting we will be receiving data. 
