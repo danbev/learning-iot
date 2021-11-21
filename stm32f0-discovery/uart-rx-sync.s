@@ -183,7 +183,7 @@ rx_output_loop:
   bl uart_write_char
   bl delay
   bl turn_led_off
-  b uart_read_char
+  bal uart_read_char
 
 uart_write_char:
   mov r6, r0
