@@ -1290,11 +1290,14 @@ measured in volt (V) and the symbol used is `U` from the German word unterschied
 that means difference.
 Electrons flow from the netative terminal of a voltage source around the curcuit
 as they are attracted by the positive terminal.
+In the beginning voltage was known as Electromotive Force (EMF) and is the
+reason for using the Ohm's lay uses `E` as the symbol for voltage.
 
 ### Current
 Is the rate at which charge is flowing. Is measured in ampere (A) and the symbol
 used is `I` which comes from the French word intensite de courant which means
 current strength.
+
 The number of electrons that move past a point in a conductor during a specific
 period of time is measured in coulombs (C). One coulomb of charge is equal to
 1 Coulomb = 6.242x10^18 electrons
@@ -1302,10 +1305,50 @@ period of time is measured in coulombs (C). One coulomb of charge is equal to
 If 1 coulomb moves past a point in 1s, we say that the current is 1 ampere (A)
 1 Ampere = 1 coulomb/s
 
-
 ### Resistance
 Is a materials tendency to resist the flow of charge (current). Is measured in
 ohm using the symbol used is capital omega Ω and resistance uses the symbol R.
+
+### Electron flow misconception
+One thing that I got wrong initially was that if we look at the following
+circuit:
+```
+        (Resistor)
+   +------/\/\/\\-------+
+   |                    |
++  |                    |
+ -----                 ---
+-  --                  \ /      (LED)
+   |                   _v_
+   |                    |
+   +--------------------+
+```
+Now, my understanding was that electrons flow out of the negative terminal of
+the voltage source through the LED where they cause the LED to shine. So the
+resistor would not be of any use in that case, it would have to be placed before
+the LED in my way of thinking. This is not how electricity works. Instead what
+happens is it is the voltage difference that pushed the electrons through the
+LED. To find out the current (I) that flows through this circuit we use
+current = voltage/resistence. So the pressure, the pushing of electrons,
+through the circuit will be limited by the resistor. Think of this like a pipe
+that is narrower than the pipe of the circuit, this causes the flow of water
+to slow down. It does not matter if the resistor comes before or after the LED.
+
+Ohm's lay is more important that I initially thought when thinking about
+current.
+```
+              voltage
+current    = ----------
+             resistance
+
+voltage    = current x resistance
+
+              voltage
+resistance =  -------
+              current
+```
+Notice that current is the voltage difference diviced by the resistance of the
+circuit. TODO: expand on this a little more.
 
 ### Ground
 In a ciruit with one battery we refer to the negative terminal as ground. It is
