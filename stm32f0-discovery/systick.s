@@ -3,8 +3,6 @@
 
 /* Reset Clock and Counter register base address */
 .equ RCC_BASE, 0x40021000
-/* General Purpose IO Port A base register */
-.equ GPIOA_BASE, 0x48000000
 
 /* SysTick Control and Status Register */
 .equ SYST_CSR, 0xE000E010
