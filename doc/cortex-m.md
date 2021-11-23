@@ -372,11 +372,31 @@ information about this timer can be found in the
 and not in the board manufactures documentation.
 
 This is a 24 bit count-down timer that counts down from value specified in the
-SYST_RVR (SysTick Reload Value Register) and once it reached zero will start
-over from the value in SYST_RVR.
+SYST_RVR (SysTick Reload Value Register). The value in that register is copied
+into the Current Value Register (CVR). It is the value in CVR that is counted
+down and once it reaches zero the value from the RVR registr will be copied
+again:
+```
+                +------------------------+
+                | Reload Value Register  |
+                +------------------------+
+                            ↓ (reload value copied when counter is zero)
+  _   _   _     +------------------------+
+_| |_| |_| |_-->| Current Value Register |
+     ↑          +------------------------+
+     |
+(clock cycles)
+Each cycle will decrement the value in the current value register.
+```
+So the clock source will play an important role here. The internal clock on my
+board is 8MHz, that is 8000000 cycles per second. One clock cycle would the be
+1/8000000 which is 12.5nsec.
+So if we want to have a timer every second we could use 8000000-1 (starts
+counting from zero). And half a second would be 4000000-1. So the unit here is
+clock cycles that we are dealing with.
 
-This timer can be configured to cause an exception to be raised when it
-reaches zero.
+When the counter reaches zero it may raise an exception if that has been enabled
+, using `TICKINT` in the CSR, and the `COUNTFLAG` bit in CSR will be set to 1.
 
 #### SysTick Control and Status Register (SYST_CSR)
 Address: `0xE000E010`  
@@ -388,6 +408,7 @@ Bit  1 TICKINT (Tick interrupt/exception) 0 = when 0 is reached then an
        exception/interrupt will not be raised.
 Bit  0 Enable 1 = enable
 ```
+
 
 In systick.s there SYST_CSR registry is read into R1 and then we try to clear
 it
@@ -426,11 +447,12 @@ With that setting I'm able to see that the register is cleared:
 
 #### SysTick Reload Value Register (SYST_RVR)
 Address: `0xE000E014`  
-This register specified the start value for the counter and is loaded into the
+This register specifies the start value for the counter and is loaded into the
 SYST_CVR register and the counter reaches zero.
 ```
 Bit 0-23 Reload The value to be loaded into the SYST_CVR registry.
 ```
+
 
 #### SysTick Current Value Register (SYST_CVR)
 Address: `0xE000E018`
