@@ -203,6 +203,12 @@ The following can be sources for this clock:
 After a system reset, the HSI oscillator is selected as system clock. So in that
 case it is a 8 MHz clock.
 
+This is an example in [stm32f0-discovery/mco.s](../stm32f0-discovery/mco.s)
+which allow an oscilloscope to be connected to PA8 and see the frequency:
+
+![MCO image1](./mco1.jpg "MCO example image 1")
+![MCO image2](./mco2.jpg "MCO example image 2")
+
 "Several prescalers can be used to configure the frequency of the AHB and the
 APB domains. The AHB and the APB domains maximum frequency is 48 MHz."
 All the peripheral clocks are derived from their bus clock which is HCLK for AHB
