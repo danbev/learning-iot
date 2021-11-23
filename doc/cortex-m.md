@@ -399,3 +399,55 @@ Returns the current value of the SysTick counter.
 Bit 0-23 Current value.
 ```
 
+#### SysTick Calibration Value Register (SYST_CVR)
+Address: `0xE000E01C`
+
+
+The default frequency of the clock on my board is 8MHz, so it can complete
+8000000 (miljon) clock cycles per second.
+So each clock cycle takes 1/8000000.
+
+8000000 / 8 / (1000 * ms)); 
+
+
+### Interrupt Vector
+In the first programs I've written I've included the following:
+```assembly
+Vector_Table:    
+  .word     0x20002000
+ResetVector:
+  .word     start + 1
+```
+The first entry is for the stack pointer:
+```console
+(gdb) i r sp
+sp             0x20002000          0x20002000
+```
+So the first entry is stack pointer value to be loaded in to the SP register.
+The second entry in the vector table, which is a table of function pointers,
+is the ResetVector. Vector seems to mean address in this context. I think this
+label can be named anything, for example ResetHandler might be clearer. So in
+our case we have only setup two entries in this table of function pointers.
+
+```
+Stack Pointer value                    0x0000 0000
+Reset                                  0x0000 0004
+NMI (Non maskable Interrupt)           0x0000 0008
+Hard Fault                             0x0000 000C
+SVCall                                 0x0000 002C
+PendSV                                 0x0000 0038
+SysTick                                0x0000 003C
+```
+
+### Access levels
+There are two different execution levels called Privileged and Unprivileged
+where the latter does not have access to some system registers.
+The `control` register bit 0 `nPRIV` will be 0 if in privileged mode and 1 if
+in unprivileged mode.
+
+In a Reset handler this will be zero so we are running in privileged mode:
+```console
+(gdb) p/t $control
+$2 = 0
+```
+
