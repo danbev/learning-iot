@@ -96,6 +96,7 @@ PendSV                          14                    0x0000 0038
 SysTick                         15                    0x0000 003C
 Interrups                       16                    0x0000 0040
 ...                             ...                   ...
+```
 
 
 #### Current Process State Register (CPSR)
@@ -167,10 +168,6 @@ MAC = Multiply Accumulate Unit
 ALU = Arithmetic Login Unit
 ```
 Sign extend converts 8 and 16 bit numbers to 32 bit numbers.
-
-
-
-
 
 #### High Speed External (HSE)
 This is a crystal oscillator, resonator, clock generating circuits. Usually
