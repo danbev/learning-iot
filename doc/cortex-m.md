@@ -375,13 +375,53 @@ This is a 24 bit count-down timer that counts down from value specified in the
 SYST_RVR (SysTick Reload Value Register) and once it reached zero will start
 over from the value in SYST_RVR.
 
+This timer can be configured to cause an exception to be raised when it
+reaches zero.
+
 #### SysTick Control and Status Register (SYST_CSR)
 Address: `0xE000E010`  
 This 32 bit register is used to enable the SysTick features.
 ```
 Bit 16 Count Flag 1 = timer counted to 0 since last time it was read.
 Bit  2 CLKSource 1 = processor clock, 0 external clock.
+Bit  1 TICKINT (Tick interrupt/exception) 0 = when 0 is reached then an
+       exception/interrupt will not be raised.
 Bit  0 Enable 1 = enable
+```
+
+In systick.s there SYST_CSR registry is read into R1 and then we try to clear
+it
+```console
+(gdb) l
+173	systick_init:
+174	  /* Clear the SysTick Control Register */
+175	  ldr r1, =SYST_CSR
+176	  mov r2, #0
+177	  str r2, [r1]
+
+(gdb) p/t $r1
+$1 = 11100000000000001110000000010000
+(gdb) si
+(gdb) si
+(gdb) si
+$3 = 0
+(gdb) p/t $r1
+$4 = 11100000000000001110000000010000
+```
+But this register is never wrtten to.
+If I try to access this memory I get:
+```console
+(gdb) x/t $r1
+0xe000e010:	Cannot access memory at address 0xe000e010
+```
+So this seems to be an issue with GDB and there is a work around for it:
+```console
+(gdb) set mem inaccessible-by-default off
+```
+With that setting I'm able to see that the register is cleared:
+```console
+(gdb) x/t $r1
+0xe000e010:	00000000000000000000000000000000
 ```
 
 #### SysTick Reload Value Register (SYST_RVR)
