@@ -2180,3 +2180,41 @@ x0: Low speed
 11: High speed
 ```
 
+### Open collector circuit
+Is really just a switch:
+```
+    VCC                Voltage Collector Collector
+    ___
+     |
+     \
+     \                 Resistor
+     /
+     |
+     *-----------------> Binary output signal
+     |
+    /
+   /
+     |
+     |
+     ↓
+```
+When the switch is open the output signal will be binary 1. And when the switch
+is closed it will be zero. 
+
+### Comparators
+These are circuits that take two voltages as input and compare them, and output
+
+```
+         |\
+ Vin     |+\
+ --------|  \
+         |  / --------> output
+ --------|-/
+ Vref    |/
+```
+The comparator will compare Vin against the Vref:
+```
+Vin > Vref = output 1
+Vin < Vref = output 0
+```
+The output is the same as the output of the open collector switch.
