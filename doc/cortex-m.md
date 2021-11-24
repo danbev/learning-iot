@@ -214,6 +214,27 @@ a clock.
 Both are used to create delays, count events, and for measuring time between
 events.
 
+### Timer sizes (bits)
+Timers are sometimes give in bit sizes. Like the SysTick timer for example which
+can have a maximum value of 2²⁴:
+```
+2²⁴ = 16777216
+```
+Now, if our clock has a frequency of 8MHz the we have the following:
+```
+                1
+  16777216 * --------- = 2,097sec
+             8000000
+(max value)  (one cycle) (timer size in second)
+```
+So what does "timer size in seconds" mean?  
+Well it means that if will take 2,097 seconds to count down from 16777216 to
+zero. So we can't create a delay greater than 2,097seconds. So if we wanted to
+have a delay of 5 seconds just using this setup would not work (one would have
+to call the timer multiple times but it would not be possible to have a delay
+of 5 seconds with just one count of the timer).
+
+
 ###
 ```
 1) Enable Clock to Peripheral
