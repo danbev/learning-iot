@@ -204,19 +204,15 @@ This is an example in [stm32f0-discovery/mco.s](../stm32f0-discovery/mco.s)
 which allow an oscilloscope to be connected to PA8 and see the frequency:
 
 ![MCO image1](./mco1.jpg "MCO example image 1")
+Here we can see that we are running at 8Mhz:
 ![MCO image2](./mco2.jpg "MCO example image 2")
 
-"Several prescalers can be used to configure the frequency of the AHB and the
-APB domains. The AHB and the APB domains maximum frequency is 48 MHz."
-All the peripheral clocks are derived from their bus clock which is HCLK for AHB
-or PCLK for APB.
-
-The USART1 clock, USART2 clock are selected by software from one of the four
-following sources:
-* system clock
-* HSI clock
-* LSE clock
-* APB clock (PCLK)
+### Timer vs Clock
+If the source of the clock is internal, like RC or PLL that this is called a
+timer. If the clock source is externally provided to the CPU this is called
+a clock.
+Both are used to create delays, count events, and for measuring time between
+events.
 
 ###
 ```
