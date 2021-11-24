@@ -2218,3 +2218,9 @@ Vin > Vref = output 1
 Vin < Vref = output 0
 ```
 The output is the same as the output of the open collector switch.
+
+### Voltage Collector Collector/Voltage Drain Drain
+Vcc and Vdd are the positive supply voltage to an IC or circuit.
+
+### Voltage Source Source/Voltage Emitter Emitter
+Vss and Vee are the negative supply voltage to an IC or electronic circuit.
