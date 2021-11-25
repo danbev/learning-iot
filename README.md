@@ -2219,6 +2219,146 @@ Vin < Vref = output 0
 ```
 The output is the same as the output of the open collector switch.
 
+### Sample & Hold circuit
+This input to this circuit is an analog signal which is constantly changing.
+```
+analog signal       +--------------+ fixed analog value
+------------------->| Sample/Hold  |--------------------->
+                    +--------------+
+```
+The output is what would be read by another component, for example an analog
+to digtial converter which needs to be able to sample the analog signal and that
+signal needs to be fixed for that time period.
+
+
+### Analog to Digital Converter (ADC)
+So this is about converting an analog signal, which remember is a continuos
+signal into a digital signal (two states off/on/high/low).
+
+```
+analog   +-----------+     +-----------+     +----------+ digital
+-------->|Sample&Hold|---->|Quantize   |---->| Encoder  |----------->
+signal   +-----------+     +-----------+     +----------+ signal
+```
+The sample stage is about sampling the analog signal at a specific time
+interval. So this would be reading the amplitude of the wave at a specific time
+and storing it.
+
+The hold block just stores the value read in the sample stage. So the sample
+stage has read an amplitude, a voltage level, and this has been stored. This is
+now passed/read to the quantize stage.
+
+ADCs are of specific bit sizes which has an impact on the resolution of the
+converter. 
+If we only have one bit to describe the analog signal as a digital signal
+then we would only have two states. Imagine we have a sine wave that has a
+maxium amplitude of say 5V and minimum 0V. With just one bit we would get
+something like:
+```
+  |
+  |
+  |
+  |
+1 |______     ______
+  |     |_____|
+0 +------------------
+```
+We can see the ups and downs but this if we wanted to turn this back into the
+analog signal it would not represent it very well.
+If we have 2-bits instead then:
+```
+4 |     _
+3 |   _| |_
+2 | _|     |_
+1 |_|        |
+  | 
+0 +------------------
+```
+The above diagrams are note really to scale but I they help me to visualize
+how more bits help to represent the analog wave more closely. Just with two
+bits the digital representation of the wave looks more like the original. Adding
+more bits will improve this even further.
+``
+       Resolution
+2¹ =   0-1
+2² =   0-3
+2³ =   0-7
+...
+2⁸ =   0-255
+```
+
+This is called the resolution of the ADC.
+
+Lets say that we have sampled and stored a value is 2.5V, and that we have
+a 3-bit resolution:
+```
+  2.5V
+----------------------+  |\ C₇
+                      +--| \
+ Vref--------  3.5V   |  | /------------------+
+ 4.0V       |------------|/                   |
+         R₁ \         |                       |
+            /         +--|\ C₆                |   +-----------+
+            \  3.0V   |  | \                  +---|           |
+            |------------| /----------------------|  Encoder  |
+            |         |  |/                   +---|           |
+         R₁ \         |                       |   |           |
+            /         +--|\ C₅                |   |           |
+            \  2.5V   |  | \                  |   |           |
+            |------------| /------------------+   |           |---------b₂
+            |         |  |/                   +---|           |
+            \         |                       |   |           |
+         R₁ /         +--|\ C₄                |   |           |
+            \  2.0V   |  | \                  |   |           |---------b₁
+            |------------| /------------------+   |           |
+            |         |  |/                   +---|           |
+            \         |                       |   |           |
+         R₁ /         +--|\ C₃                |   |           |---------b₀
+            \  1.5V   |  | \                  |   |           |
+            |------------| /------------------+   |           |
+            |         |  |/                   +---|           |
+            \         |                       |   |           |
+         R₁ /         +--|\ C₂                |   |           |
+            \  1.0V   |  | \                  |   |           |
+            |------------| /------------------+   |           |
+            |         |  |/                   +---|           |
+            \         |                       | +-|           |
+         R₁ /         +--|\ C₁                | | |           |
+            \  0.5V   |  | \                  | | +-----------+
+            |------------| /------------------+ |       |
+            |         |  |/                     +-------+
+            \                                           |
+            /                                           |
+            \                                         ------ GND
+            |                                          --
+      GND -----
+           --
+```
+So our 2.5V analog is read or passed in and we have a reference voltage of
+4.0V for ciruit. This is the voltage used for the comparators and it is
+divided among the 7 comparators in this circuit. Recall that this is a 3-bit
+ADC so we have 0-7 values that can be represented.
+The comparators work in this way:
+```
+Vin > Vref = output 1
+Vin < Vref = output 0
+C₇ = 2.5 > 3.5 = 0
+C₆ = 2.5 > 3.0 = 0
+C₅ = 2.5 > 2.5 = 0
+C₄ = 2.5 > 2.0 = 1
+C₃ = 2.5 > 1.5 = 1
+C₂ = 2.5 > 1.0 = 1
+C₁ = 2.5 > 0.5 = 1
+
+C₇ C₆ C₅ C₄ C₃ C₂ C₁ 0 (From GND on the Encoder)
+0  0  0  1  1  1  1  0
+```
+I think the encoder will look at the inputs and search for the highest 1 value
+and that position will be the output binary number. So above we have C₄ that
+contains the first/hightest 1, 4 in binary is 100 so that would be what the
+endoder would output for 2.5V.
+
+
 ### Voltage Collector Collector/Voltage Drain Drain
 Vcc and Vdd are the positive supply voltage to an IC or circuit.
 
