@@ -2278,7 +2278,7 @@ The above diagrams are note really to scale but I they help me to visualize
 how more bits help to represent the analog wave more closely. Just with two
 bits the digital representation of the wave looks more like the original. Adding
 more bits will improve this even further.
-``
+```
        Resolution
 2¹ =   0-1
 2² =   0-3
