@@ -153,9 +153,16 @@ tsc_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Enable the TSC Channel */
+  /* Enable TSC Channel 3 (PA2) */
   ldr r1, =TSC_IOCCR
   ldr r2, =TSC_IOCCR_TSC_G1_IO3
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable TSC Channel 4 (PA3) */
+  ldr r1, =TSC_IOCCR
+  ldr r2, =TSC_IOCCR_TSC_G1_IO4
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
