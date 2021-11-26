@@ -2359,13 +2359,17 @@ contains the first/hightest 1, 4 in binary is 100 so that would be what the
 endoder would output for 2.5V.
 The above type of ADC is called a Flash ADC.
 
-#### Successive Approximation ADC
-This type of  ADC is not as fast as the Flash ADC but is a lot cheaper.
+#### Successive Approximation ADC (SAR)
+This type of  ADC is not as fast as the Flash ADC but is a lot cheaper. This is
+like a binary search used to approximate the target value.
+
+In this case we also have a comparator but only one. Vin is the sampled and
+held analog signal to be converted: 
 ```
   2.5V
 ----------------------+  |\ 
-                      +->| \
-                         | /------------+
+  CLK                 +->| \
+    ↓                    | /------------+
   +------+   +------+ +->|/             |
   |Logic |   | DAC  | |                 |
 +>|      |-->|      |-+                 |
@@ -2375,55 +2379,29 @@ This type of  ADC is not as fast as the Flash ADC but is a lot cheaper.
 |                                       |
 +---------------------------------------+
 ```
-In this case we also have a comparator but only one. Vin is the sampled and
-held analog signal to be converted. 
-The output of the DAC will initially be
+The digital to analog converter will create an analog signal that can be
+used as Vref for the comparator. This will be compared with Vin and the output
+will be passed by to the logic unit to modify the value of the next output
+input value to the DAC. Being a binary search it will either increase of
+decrease the value to be checked by half. 
+
+The output of the DAC will initially be 100:
 ```
+                              
+                    Vref < Vin = 111
+                   /
+   Vref < Vin = 110 
+   /               \
+  /                 Vref > Vin = 101
 100
+   \                  Vref < Vin = 011
+    \                /
+     Vref > Vin = 010
+                     \
+                      Vref > Vin = 001
 ```
-Lets say this if 2.0V.
-```
-Vin > Vref  = output
-2.5V > 2.0V = 1 
-```
-So we keep the first bit as 1:
-```
-110
+This will take 3 clock pulses to complete and more with more bits. 
 
-2.5V > 2.5V = 0 
-```
-101
-2.5V > 2.5V = 0 
-```
-
-
-
-This is compared against Vref which is
-provided via the Digital to Analog Converter circuit. This gets a binary digit
-from the logic component and converts it to an analog signal which becomes Vref.
-We have 3 bits and therefor 0-7 values
-```
-7 111
-6 110
-5 101
-
-4 100
-
-3 011
-2 010
-1 001
-0 000
-```
-If we start with 4 (100) and pass that to the DAC it may output 4V and compare
-that to 2.5 and since Vref is less than Vin output a 0. That zero will be sent
-as input to the logic cicuit which will tell it that the compared voltage as
-less than the Vref voltage. So it can half Vref, so 010 will be sent to the
-DAC, which will output 2.0V. This will be compared to Vin and since Vin is
-greater the output will be 1. Next 011 will be passed to the DAC which will
-ouput 3.0 for Vref which is greater than Vin so the output will be 0
-```
-0 1 0
-```
 
 ### Voltage Collector Collector/Voltage Drain Drain
 Vcc and Vdd are the positive supply voltage to an IC or circuit.
