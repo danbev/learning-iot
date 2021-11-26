@@ -214,6 +214,89 @@ a clock.
 Both are used to create delays, count events, and for measuring time between
 events.
 
+### General purpose timers
+Take a look in the data sheet for the timers available, section 3.14 for the
+board I'm working on.
+```
+General purpose:
+TIM2   32-bit Up/down
+TIM3   16-bit Up/down
+TIM14  16-bit Up
+TIM15  16-bit Up
+TIM16  16-bit Up
+TIM17  16-bit Up
+```
+So if we choose TIM2 we can look that up in the memory map section of the
+reference manual:
+```
+0x40000000 TIM2  Bus: APB1
+```
+So that will be the base register for TIM2 and we can see in the data sheet that
+this peripheral is connect to APB1
+
+```
+RCC_APB1ENR      0x1C
+
+Bit 0 TIM2EN: TIM2 timer clock enable
+Set and cleared by software.
+  0: TIM2 clock disabled
+  1: TIM2 clock enabled
+```
+Then we can find the registers in chapter 18 which cover TIM2 and TIM3.
+
+
+#### TIM2 Status Register (TIM2_SR)
+Address offset:  0x10
+```
+Bit 0 UIF: Update interrupt flag
+This bit is set by hardware on an update event. It is cleared by software.
+  0: No update occurred.
+  1: Update interrupt pending. 
+```
+
+#### TIM2 Control Register 1 (TIM2_CR)
+Address offset: 0x00
+```
+Bit 4 DIR: Direction
+  0: Counter used as upcounter
+  1: Counter used as downcounter
+
+Bit 0 CEN: Counter enable
+  0: Counter disabled
+  1: Counter enabled
+```
+
+#### TIM2 Counter Register (TIM2_CNT)
+Address offset: 0x24
+
+#### TIM2 Prescalar (TIM2_PSC)
+Address offset: 0x28
+```
+The prescalare is used to divide the clock source. For example, with the default
+8MHz clock on my board we would get a 8 000 000 counts per second. That is a
+large number of counts and we might not require that. We can therefor divide
+the clock with a number to bring the number of counts down. For example, we
+could divide the clock to bring the number of counts before the under/overflow
+of the counter occurs and we either poll or an interrupt is triggered:
+```
+8000000/8     = 1000000
+8000000/80    = 10000 
+8000000/800   = 10000
+8000000/8000  = 1000
+8000000/80000 = 100
+```
+This value is that is placed in the prescalare register and can be though of as
+the clock source frequence for this timer. This value will then be used with the
+auto-reload value.
+
+#### TIM2 Auto-Reload Register (TIM2_ARR)
+Address offset: 0x2C
+This value is used to calculate the value to be placed in the CNT register when
+a counter under/over flows:
+```
+prescaled_clock_source / auto-reload value
+```
+
 ### Timer sizes (bits)
 Timers are sometimes give in bit sizes. Like the SysTick timer for example which
 can have a maximum value of 2²⁴:
