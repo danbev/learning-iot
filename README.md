@@ -2357,10 +2357,88 @@ I think the encoder will look at the inputs and search for the highest 1 value
 and that position will be the output binary number. So above we have C₄ that
 contains the first/hightest 1, 4 in binary is 100 so that would be what the
 endoder would output for 2.5V.
+The above type of ADC is called a Flash ADC.
 
+#### Successive Approximation ADC
+This type of  ADC is not as fast as the Flash ADC but is a lot cheaper.
+```
+  2.5V
+----------------------+  |\ 
+                      +->| \
+                         | /------------+
+  +------+   +------+ +->|/             |
+  |Logic |   | DAC  | |                 |
++>|      |-->|      |-+                 |
+| |      |-->|      |                   |
+| |      |-->|      |                   |
+| +------+   +------+                   |
+|                                       |
++---------------------------------------+
+```
+In this case we also have a comparator but only one. Vin is the sampled and
+held analog signal to be converted. 
+The output of the DAC will initially be
+```
+100
+```
+Lets say this if 2.0V.
+```
+Vin > Vref  = output
+2.5V > 2.0V = 1 
+```
+So we keep the first bit as 1:
+```
+110
+
+2.5V > 2.5V = 0 
+```
+101
+2.5V > 2.5V = 0 
+```
+
+
+
+This is compared against Vref which is
+provided via the Digital to Analog Converter circuit. This gets a binary digit
+from the logic component and converts it to an analog signal which becomes Vref.
+We have 3 bits and therefor 0-7 values
+```
+7 111
+6 110
+5 101
+
+4 100
+
+3 011
+2 010
+1 001
+0 000
+```
+If we start with 4 (100) and pass that to the DAC it may output 4V and compare
+that to 2.5 and since Vref is less than Vin output a 0. That zero will be sent
+as input to the logic cicuit which will tell it that the compared voltage as
+less than the Vref voltage. So it can half Vref, so 010 will be sent to the
+DAC, which will output 2.0V. This will be compared to Vin and since Vin is
+greater the output will be 1. Next 011 will be passed to the DAC which will
+ouput 3.0 for Vref which is greater than Vin so the output will be 0
+```
+0 1 0
+```
 
 ### Voltage Collector Collector/Voltage Drain Drain
 Vcc and Vdd are the positive supply voltage to an IC or circuit.
 
 ### Voltage Source Source/Voltage Emitter Emitter
 Vss and Vee are the negative supply voltage to an IC or electronic circuit.
+
+
+### Transducer
+Is a circuit that converts from one form of enery into an electrical signal. The
+engery may be heat, light, motion, position, or sound (and perhaps other sources
+as well).
+
+A sensor is a transducer that recieves and responds to a signal from a physical
+system.
+
+An actuator is a divice responsible for controlling something.
+
