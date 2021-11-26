@@ -616,3 +616,63 @@ In a Reset handler this will be zero so we are running in privileged mode:
 $2 = 0
 ```
 
+### Analog to Digital Converter (ADC)
+So this is about converting an analog signal, which remember can be continuos
+into a descrete signal.
+The ADC samples the analog input whenever one triggers it to start conversion.
+It performs a process called quantization so as to decide on the voltage level
+and its binary code that gets pushed in the output register.
+
+There are 16 pins available for ADC which are called channels:
+```
+PA0  ADC_IN0
+PA1  ADC_IN1
+PA2  ADC_IN2
+...
+```
+
+So we need to select a channel, and probably enable it.
+The type of scanning can be a single scan or a continuous scan.
+
+
+
+If we look at the data sheet we can find that there is one 12-bit ADC which is
+connected to the APB (Advanced Peripheral Bus).
+We can then look at the memory map in the reference manual to find the address:
+```
+0x40012400  ADC      APB
+```
+```
+RCC_APB2ENR
+Bit 9 ADCEN: ADC interface clock enable
+Set and cleared by software.
+  0: ADC interface disabled
+  1: ADC interface clock enabled
+```
+
+#### Interrupt and Status Register (ADC_ISR_OFFSET)
+Address offset: 0x00
+```
+Bit 2 EOC: End of conversion flag
+This bit is set by hardware at the end of each conversion of a channel when a
+new data result is available in the ADC_DR register. It is cleared by software
+writing 1 to it or by reading the ADC_DR register.
+  0: Channel conversion not complete (or the flag event was already acknowledged
+     and cleared by
+software)
+  1: Channel conversion complete
+```
+
+#### Data Register (ADC_DR)
+Address offset:  0x40
+
+### Touch Sensor Controller (TSC)
+Address: 0x40024000
+
+Is enabled by setting TSCEN in RCC_AHBENR
+```
+Bit 24 TSCEN: Touch sensing controller clock enable
+Set and cleared by software.
+  0: TSC clock disabled
+  1: TSC clock enabled
+```
