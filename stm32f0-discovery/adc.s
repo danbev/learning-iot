@@ -6,6 +6,8 @@
 
 .equ ADC_BASE, 0x40012400
 
+.equ TSC_BASE, 0x40024000
+
 /* Advanced Peripheral clock enable register 2, bus that ADC is connected to */
 .equ APB2ENR_OFFSET, 0x18
 .equ RCC_APB2ENR, RCC_BASE + APB2ENR_OFFSET
@@ -37,7 +39,28 @@
 .equ ADC_CHSELR_OFFSET, 0x28
 .equ ADC_CHSELR, ADC_BASE + ADC_CHSELR_OFFSET
 
+/* TSC Control Register */
+.equ TSC_CR_OFFSET, 0x00
+.equ TSC_CR, TSC_BASE + TSC_CR_OFFSET
+
+/* TSC Interupt Status Register */
+.equ TSC_ISR_OFFSET, 0x0C
+.equ TSC_ISR, TSC_BASE + TSC_ISR_OFFSET
+
+/* TSC I/O Channel Control Register */
+.equ TSC_IOCCR_OFFSET, 0x28
+.equ TSC_IOCCR, TSC_BASE + TSC_IOCCR_OFFSET
+
+/* TSC IO Group Control Status Register */
+.equ TSC_IOGCSR_OFFSET, 0x28
+.equ TSC_IOGCSR, TSC_BASE + TSC_IOGCSR_OFFSET
+
+/* TSC IO Sampling Control Register */
+.equ TSC_IOSCR_OFFSET, 0x20
+.equ TSC_IOSCR, TSC_BASE + TSC_IOSCR_OFFSET
+
 .equ RCC_ADC_ENABLE, 1 << 9
+.equ RCC_TSC_ENABLE, 1 << 24
 .equ ISR_EOC_FLAG, 1 << 2           /* End of conversion flag   */
 .equ ISR_ADRDY_CLEAR, 0 << 0        /* Clear ADC Ready          */
 .equ ISR_ADRDY, 1 << 0              /* ADC Ready bit            */
@@ -47,6 +70,13 @@
 .equ CR_ADSTART, 1 << 2             /* Start a conversion       */
 .equ CCR_TEN, 1 << 23               /* Enable temerature sensor */
 .equ CFGR1_CONT, 1 << 13            /* Continuous conversion mode. 0=single  */
+.equ TSC_CR_ENABLE, 1 << 0
+.equ TSC_CR_START, 1 << 1
+.equ TSC_ISR_EOAF, 1 << 0           /* End of Aquisition flag      */
+.equ TSC_IOCCR_TSC_G1_IO3, 1 << 2   /* Use Group 1, IO3 as channel */
+.equ TSC_IOCCR_TSC_G1_IO4, 1 << 3   /* Use Group 1, IO4 as channel */
+.equ TSC_IOGCSR_G1_ENABLE, 1 << 0   /* Enable IO Group 1           */
+.equ TSC_IOSCR_IO3, 1 << 2          /* Enable sampling for IO3     */
 
 .equ GPIOA_BASE, 0x48000000
 .equ GPIOA_MODER_OFFSET, 0x00
@@ -71,9 +101,17 @@ ResetHandler:              /* Reset                                   1 */
 
 start:
   bl gpio_init
+  bl tsc_init
   bl adc_init
 
 main_loop:
+  /* Start the TSC */
+  ldr r1, =TSC_CR
+  ldr r2, =TSC_CR_START
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Start a single ADC conversion. Will start immediatly as EXTEN=00 */
   ldr r1, =ADC_CR
   ldr r2, =CR_ADSTART
@@ -94,16 +132,50 @@ wait_adc_complete:
   ldr r1, =ADC_DR
   ldr r0, [r1]
   ldr r2, =#2000
-  sub r3, r0, r2
   cmp r0, r3
-  ble less
-  bl turn_led_off
-
-less:
-  /* Turn on blue LED when converstion is complete */
-  bl turn_led_on
+  bgt turn_led_on
+  blt turn_led_off
 
   b main_loop
+
+
+tsc_init:
+  ldr r1, =RCC_AHBENR
+  ldr r2, =RCC_TSC_ENABLE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable the TSC Channel */
+  ldr r1, =TSC_IOCCR
+  ldr r2, =TSC_IOCCR_TSC_G1_IO3
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable the TSC Group */
+  ldr r1, =TSC_IOGCSR
+  ldr r2, =TSC_IOGCSR_G1_ENABLE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable Sampling for IO Channel 3 */
+  ldr r1, =TSC_IOSCR
+  ldr r2, =TSC_IOSCR_IO3
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable TSC (no aquisition will be started until START is set) */
+  ldr r1, =TSC_CR
+  ldr r2, =TSC_CR_ENABLE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  bx lr
+
 
 gpio_init:
   /* Enable Port C clock on AHB bus */
