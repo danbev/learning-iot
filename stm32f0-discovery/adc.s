@@ -127,17 +127,24 @@ wait_adc_complete:
   cmp r0, #0x00
   beq wait_adc_complete
 
-
+adc_loop:
   /* Converted signal show now be in ADC Data Registry */
   ldr r1, =ADC_DR
   ldr r0, [r1]
   ldr r2, =#2000
-  cmp r0, r3
-  bgt turn_led_on
-  blt turn_led_off
-
-  b main_loop
-
+  cmp r0, r2
+  bgt led_on
+  blt led_off
+led_on:
+  bl turn_led_on
+  b done
+led_off:
+  bl turn_led_off
+  b done
+done:
+  bl delay
+  b adc_loop
+  
 
 tsc_init:
   ldr r1, =RCC_AHBENR
@@ -259,3 +266,11 @@ wait_adc_ready:
   bx lr
 
 .include "blue-led.s"
+
+.equ DELAY_LENGTH, 100000
+delay:
+  ldr r0,=DELAY_LENGTH
+dloop:
+  sub r0, r0, #1
+  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
+  bx  lr
