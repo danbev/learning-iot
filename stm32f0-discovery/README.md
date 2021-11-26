@@ -351,7 +351,7 @@ finally another high signal which produces `1000001` which is 41h, 65d, and
 ![UART Transmit oscilloscope image 2](./uart-tx-osc2.jpg "UART TX oscilloscope image 2")
 
 ### UART Receive Example
-This example is similar to the previous one but instead of syncrhonously
+This example is similar to the previous one but instead of synchronously
 transmitting we will be receiving data. 
 
 The pin for receiving is called USART1_RX and if we look in the datasheet we
