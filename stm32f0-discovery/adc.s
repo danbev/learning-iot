@@ -46,7 +46,7 @@
 .equ CR_ADEN, 1 << 0                /* AD enable                */
 .equ CR_ADSTART, 1 << 2             /* Start a conversion       */
 .equ CCR_TEN, 1 << 23               /* Enable temerature sensor */
-.equ CFGR1_CONT, 0 << 13            /* Continuous conversion mode. 0=single  */ 
+.equ CFGR1_CONT, 1 << 13            /* Continuous conversion mode. 0=single  */
 
 .equ GPIOA_BASE, 0x48000000
 .equ GPIOA_MODER_OFFSET, 0x00
@@ -55,8 +55,8 @@
 .equ GPIOA_AFLR, GPIOA_BASE + GPIOA_AFLR_OFFSET
 
 .equ GPIO_PORTA_ENABLE, 1 << 18
-.equ AF_ENABLE_PA2, 3 << 4
-.equ AF_ENABLE_PA3, 3 << 6
+.equ AF_ENABLE_PA2, 2 << 4
+.equ AF_ENABLE_PA3, 2 << 6
 .equ AF3_ENABLE_PA2, 3 << 8
 .equ AF3_ENABLE_PA3, 3 << 12
 .equ ADC_CHANNEL_2, 1 << 2
@@ -93,11 +93,17 @@ wait_adc_complete:
   /* Converted signal show now be in ADC Data Registry */
   ldr r1, =ADC_DR
   ldr r0, [r1]
+  ldr r2, =#2000
+  sub r3, r0, r2
+  cmp r0, r3
+  ble less
+  bl turn_led_off
 
+less:
   /* Turn on blue LED when converstion is complete */
   bl turn_led_on
 
-  b .
+  b main_loop
 
 gpio_init:
   /* Enable Port C clock on AHB bus */
@@ -141,7 +147,7 @@ adc_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Set single conversion mode */
+  /* Set the conversion mode (single or continuous) */
   ldr r1, =ADC_CFGR1
   ldr r2, =CFGR1_CONT
   ldr r0, [r1]
