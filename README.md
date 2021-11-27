@@ -2454,44 +2454,73 @@ tank is empty. If we open the valve before the tank is empty we can make sure
 that we have a steady flow of water.
 
 A capacitor has a container and inside it we have anode foil and a cathode foil
-with a separator between them. These are rolled up (like a RullTårta) with two
-terminals connected to
+with a separator between them called dielectric insulator.
 
 ```
  +----------->------------->--+
  |     +-----------+          |  +---------------+
  ^     | Capacitor |          +->| Battery       |
  |     |*  *  *    |             |               |
- +----<+-----------|             |               |
- +---->+-----------|          +-<|               |
+ +----<+-----------+             |               |
+ +---->+-----------+          +-<|               |
  ^     | **        |          |  +---------------+
  |     +-----------+          |
  +-----------<-------------<--+
 
 * = electrons
 ``` 
-Notice that there is a non-conductive layer in the capacitor preventing
-the flow of electrons. Hooking up a battery will eventually lead to the
+We have a few properties that are important here and these properties decide
+the capacity of the capitor (how much charge it can hold):
+```
+1) Area of the conductive plates
+2) Distance between the plates
+3) ε₀ the permittitvity of the free space (vacuum between the plates)
+4) εᵣ the dielectric constant (of the insulator material between the plates)
+
+              A
+C = ε₀ * εᵣ * -
+              d
+```
+So the size of the plates and the distance between them, and also the type of
+insulator material between them affect the amount of charge that a capacitor can
+store.
+I was not obvious to me what the use of dielectric value was but this is the
+ratio of charge that is permitted on the suface of the conductor (where the
+electrons and "holes" gather). When a dielectric is present the permittitivity
+becomes Kε₀, so we are increasing the capacity by factor kappa. Kappa can be
+influenced by "influencing" the electric field in the capacitor. For examples
+a fingers interaction with the capacitor's electric field represents an increase
+in the dielectric constant and this causes an increase in the amount of charge
+that the capacitor can store. This is way of making a touch sensor if we then
+have something that monitors the capacity, when it increases something is
+influencing the electric field and this could then send a signal to cause and
+action to happen.
+
+
+Notice that there is a non-conductive layer in between the conducive plates 
+preventing the flow of electrons. Hooking up a battery will eventually lead to the
 capacitor having the same voltage as the battery, the electrons in the lower
 compartment in the diagram above and no more current will flow. So we have 
-a build of of electrons on one side:
+a build up of electrons on one side:
 ```
  +----------->------------->--+
  |     +-----------+          |  +---------------+
  ^     | Capacitor |          +->| Battery       |
  |     |           | (+)         |               |
- +----<+-----------|             |               |
- +---->+-----------|          +-<|               |
+ +----<+-----------+             |               |
+ +---->+-----------+          +-<|               |
  ^     |***********| (-)      |  +---------------+
  |     +-----------+          |
  +-----------<-------------<--+
 
 * = electrons
 ```
-We have a difference in potential between the + and negative which is a
+We have a difference in potential between the positive and negative which is a
 potential voltage. The positively charged particles (electron holes) attract the
 negatively charge electrons and it is the electric field that keeps the
 electrons in place.
+The material used for the dielectric (insulator) has a "dielectric constant" 
+k (kappa, that is a symbol no the letter k).
 
 Now if we connect an LED (and it should have a resistor in this but skipping
 that for now) electrons will have a way to flow:
@@ -2500,8 +2529,8 @@ that for now) electrons will have a way to flow:
            |  ↓     +-----------+          |
            ^  |     | Capacitor |          \
            |  |     | *     *   | (+)      
-+---+-->---+  +---->+-----------|          |
-|LED|         +----<+-----------|          | 
++---+-->---+  +---->+-----------+          |
+|LED|         +----<+-----------+          | 
 +---+--<---+  ↓     |***********| (-)      | 
            |  |     +-----------+          |
            +<-+----------------------------+
@@ -2518,8 +2547,8 @@ as electrons flow out (attracted to the positive terminal of the battery):
            |  ^     +-----------+          |  +----------+
            ^  |     | Capacitor |          +->| Battery  |
            |  |     |***********| (+)         |          |
-+---+-->---+  +---->+-----------|             |          |
-|LED|         +---->+-----------|          +-<|          |
++---+-->---+  +---->+-----------+             |          |
+|LED|         +---->+-----------+          +-<|          |
 +---+--<---+  ^     |*          | (-)      |  +----------+
            |  |     +-----------+          |
            +<-+----------------------<-----+
