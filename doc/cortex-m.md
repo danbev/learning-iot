@@ -881,4 +881,14 @@ The SYSTICK timer can be set to enable interrupts and have an interrupt handler
 called when the interrupt event happens. And example of this can be found in
 [systickint.s](../stm32f0-discovery/systickint.s).
 
-
+One thing to note about the vector table is the addition of 1 to the function
+pointer addresses:
+```assembly
+Vector_Table:                        // Vector                     Exception Nr 
+  .word     0x20002000               // Initial Stack Pointer value       -
+  .word     start + 1                // Reset                             1
+  .word     null_handler + 1         // Non Maskable Interrupt            2
+```
+The +1 is so that the least significant bit be 1 for Thumb
+code. If bit[0] is 0 it seems that will clear the Thumb state and will result
+in a fault of lockup:
