@@ -48,9 +48,6 @@
 .equ SYST_RVR_VALUE, 4000000 - 1
 
 .global start
-.global Vector_Table
-.global systick_handler
-.global null_handler
 
 Vector_Table:                        // Vector                     Exception Nr 
   .word     0x20002000               // Initial Stack Pointer value       -
