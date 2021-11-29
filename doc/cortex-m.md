@@ -685,7 +685,7 @@ Clock cycles    Cₓ Non-touched Cₛ
 2               6              12
 3               6              18
 
-Clock cycles    Cₓ touched     Cₛ
+Clock cycles    Cₓ Touched     Cₛ
 1               9              9
 2               9              18
 ```
@@ -693,21 +693,12 @@ The above values are completely made up and are just a way to understant how I
 think this works. In this case the theshold is 18 (something, perhaps micro
 farads) and without the sensor being touched it would take 3 clock cycles to
 reach the threshold. When the sensor it "touched" this capacitiy of Cₓ increases
-and it only takes two transferrs to reach the threshold. Then this happens it
+and it only takes two transferrs to reach the threshold. When this happens it
 is detected by TSC.
 
-Is enabled by setting TSCEN in RCC_AHBENR
-```
-Bit 24 TSCEN: Touch sensing controller clock enable
-Set and cleared by software.
-  0: TSC clock disabled
-  1: TSC clock enabled
-```
-
-There are 24 capacitive sensing channels and these are divided into 8 groups
-of 4 channels in each. A channel is a pin which we can attach a sensor
-(I think).
-TODO: describe how these sensors work.
+So if we want to have a touch key using the discovery board that I've got I will
+need one GPIO port for the touch key, capacitor Cₓ, and also on GPIO port for
+the sampling capacitor Cₛ.
 
 The STM32F072 Discovery board I'm using has a linear touch sensor/touch key.
 So this sensor can be used as a 3 position linear sensor or as 4 touch keys.
@@ -743,15 +734,106 @@ PA1              TSC_G1_IO2             AF3
 PA2              TSC_G1_IO3             AF3
 PA3              TSC_G1_IO4             AF3
 ```
-Lets start with that enabling Port A pins 2 and 3, and set thier alternative
-functions as AF3. [adc.s](../stm32f0-discovery/adc.s) is implementation for this
-section.
-
-So with the above we will now have PA2 as TSC_G1_IO3, and PA3 TSC_G1_IO4.
-Next we need to enable TSC.
-
 One of the GPIOs is dedicated to the sampling capacitor CS. Only one sampling
 capacitor I/O per analog I/O group must be enabled at a time.
+
+Lets start with that enabling Port A pins 2, PA2 as the key touch sensor
+, and PA3, as the sampling capacitor. So I think we need to set PA2 and PA3
+as the alternative functions as AF3.
+
+
+Hmm, I think I've mix things up a little here with regards to the analog to
+digital converter and the touch sensing controller. I was focusing on the
+sensing here and thinking that I'd be able to read the that value and convert
+it to a digital signal. But the touch sensor is more about having a sensor
+for an action like a button/movement. I'm going to create an example of using
+just the TSC and the ADC example will use an external sensor instread.
+
+[tsc.s](../stm32f0-discovery/tsc.s) is implementation for this section.
+
+We also need to enabled TSC by setting TSCEN in RCC_AHBENR:
+```
+Bit 24 TSCEN: Touch sensing controller clock enable
+Set and cleared by software.
+  0: TSC clock disabled
+  1: TSC clock enabled
+```
+
+#### TSC Base address
+Address: 0x40024000
+
+#### TSC I/O Analog Switch Control Register (TSC_IOASCR)
+Offset: 0x18
+
+```
+These bits are set and cleared by software to enable/disable the Gx_IOy analog switch.
+  0: Gx_IOy analog switch disabled (opened)
+  1: Gx_IOy analog switch enabled (closed)
+Note: These bits control the I/O analog switch whatever the I/O control mode is (even if
+controlled by standard GPIO registers).
+```
+TODO: not sure if this need to be set for this example.
+
+#### TSC I/O Sampling Control Register (TSC_IOSRC)
+Offset: 0x20
+
+This register is used to set the sampling capacitor.
+
+```
+Bits 31:0 Gx_IOy: Gx_IOy sampling mode
+These bits are set and cleared by software to configure the Gx_IOy as a sampling capacitor
+I/O. Only one I/O per analog I/O group must be defined as sampling capacitor.
+  0: Gx_IOy unused
+  1: Gx_IOy used as sampling capacitor
+```
+Like we mentioned above we are going to be using Group 1 and let PA3 be the
+sampling capacitator, so we would set bit 2 which is G1_IO3. 
+
+#### TSC I/O Channel Control Register (TSC_IOCCR)
+Offset: 0x28
+
+This register is used to enable a GPIO pin as a channel.
+```
+Bits 31:0 Gx_IOy: Gx_IOy channel mode
+These bits are set and cleared by software to configure the Gx_IOy as a channel I/O.
+0: Gx_IOy unused
+1: Gx_IOy used as channel
+```
+In our case we are going to use PA2 as the channel so we need to set G1_IO3
+which is bit 3.
+
+#### TSC I/O Group Control Status Register (TSC_IOGCSR)
+Offset: 0x30
+
+This register is used to enable the TSC IO group:
+```
+Bits 23:16 GxS: Analog I/O group x status
+These bits are set by hardware when the acquisition on the corresponding enabled analog I/O
+group x is complete. They are cleared by hardware when a new acquisition is started.
+  0: Acquisition on analog I/O group x is ongoing or not started
+  1: Acquisition on analog I/O group x is complete
+
+Bits 7:0 GxE: Analog I/O group x enable
+These bits are set and cleared by software to enable/disable the acquisition (counter is
+counting) on the corresponding analog I/O group x.
+  0: Acquisition on analog I/O group x disabled
+  1: Acquisition on analog I/O group x enabled
+```
+In our case we need to enable Group 1 which is G1E (bit 0);
+
+#### TSC Group x counter register (TSC_IOGxCR) 
+Where x can be any of the 1-8 groups.
+Address Offset: 0x30 + (0x04 * group nr)
+This register is a register per group which holds the count of the charge
+transfers from Cₓ to the sampling capacitor Cₛ.
+
+```
+Bits 13:0 CNT[13:0]: Counter value
+These bits represent the number of charge transfer cycles generated on the
+analog I/O group x to complete its acquisition (voltage across CS has reached
+the threshold).
+```
+This offset would be 0x34 for group 1.
 
 
 #### TSC Control Register (TSC_CR)
