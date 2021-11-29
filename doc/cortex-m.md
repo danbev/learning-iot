@@ -871,3 +871,14 @@ of the TSC_ICR register.
 Offset: 0x28
 ```
 ```
+
+### Interrupts
+In Cortex-m there is a hardward component in the processor named Nested Vector
+Interrupt Controller (NVIC) that handles interrups, which are called exceptions
+in ARM. So peripherals like UART, Timers can generate interrupts. 
+
+The SYSTICK timer can be set to enable interrupts and have an interrupt handler
+called when the interrupt event happens. And example of this can be found in
+[systickint.s](../stm32f0-discovery/systickint.s).
+
+
