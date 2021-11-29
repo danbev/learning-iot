@@ -666,8 +666,35 @@ software)
 #### Data Register (ADC_DR)
 Address offset:  0x40
 
-### Touch Sensor Controller (TSC)
+### Touch Sensing Controller (TSC)
 Address: 0x40024000
+
+This works using a feature called charge transfer and two capacitors are used.
+One is for the touch sensor itself, Cₓ and one is for a sampling capacitor, Cₛ.
+The capacitor Cₓ is charged and the charge accumulated is transferred into
+the sampling capacitor Cₛ. This process continues until the charge in Cₛ reached
+a predefined limit Vᵢₕ (Input voltage, min high voltage level). This will take
+a certain number of clock cycles for a non-touched sensor. When the sensor is
+"touched" the charge in Cₓ will be a little higher, and this larger charge will
+be transferred into Cₛ. 
+```
+Threshold: 18
+
+Clock cycles    Cₓ Non-touched Cₛ
+1               6              6
+2               6              12
+3               6              18
+
+Clock cycles    Cₓ touched     Cₛ
+1               9              9
+2               9              18
+```
+The above values are completely made up and are just a way to understant how I
+think this works. In this case the theshold is 18 (something, perhaps micro
+farads) and without the sensor being touched it would take 3 clock cycles to
+reach the threshold. When the sensor it "touched" this capacitiy of Cₓ increases
+and it only takes two transferrs to reach the threshold. Then this happens it
+is detected by TSC.
 
 Is enabled by setting TSCEN in RCC_AHBENR
 ```
@@ -675,4 +702,90 @@ Bit 24 TSCEN: Touch sensing controller clock enable
 Set and cleared by software.
   0: TSC clock disabled
   1: TSC clock enabled
+```
+
+There are 24 capacitive sensing channels and these are divided into 8 groups
+of 4 channels in each. A channel is a pin which we can attach a sensor
+(I think).
+TODO: describe how these sensors work.
+
+The STM32F072 Discovery board I'm using has a linear touch sensor/touch key.
+So this sensor can be used as a 3 position linear sensor or as 4 touch keys.
+3 pairs of I/O ports are assigned to the "pad":
+```
+PA2, PA3 (group 1)
+PA6, PA7 (group 2)
+PB0, PB1 (group 3)
+```
+So if I want to use the first section of the "pad" as a touch key I would use
+PA2 and PA3 I guess.
+
+The following is from the discovery board data sheet
+(3.13 Touch sensing controller):
+```
+Group              Pin
+1     TSC_G1_IO1   PA0
+      TSC_G1_IO2   PA1
+      TSC_G1_IO3   PA2
+      TSC_G1_IO4   PA3
+
+2     TSC_G2_IO1   PA4
+      TSC_G2_IO2   PA5
+      TSC_G2_IO3   PA6
+      TSC_G2_IO4   PA7
+...
+```
+And if we look at the laternative function for PA2 we can see that it is AF3.
+```
+Pin              Alternat function      GPIOA_AFR
+PA0              TSC_G1_IO1             AF3
+PA1              TSC_G1_IO2             AF3
+PA2              TSC_G1_IO3             AF3
+PA3              TSC_G1_IO4             AF3
+```
+Lets start with that enabling Port A pins 2 and 3, and set thier alternative
+functions as AF3. [adc.s](../stm32f0-discovery/adc.s) is implementation for this
+section.
+
+So with the above we will now have PA2 as TSC_G1_IO3, and PA3 TSC_G1_IO4.
+Next we need to enable TSC.
+
+One of the GPIOs is dedicated to the sampling capacitor CS. Only one sampling
+capacitor I/O per analog I/O group must be enabled at a time.
+
+
+#### TSC Control Register (TSC_CR)
+Offset:  0x00
+```
+Bit 1 START: Start a new acquisition
+This bit is set by software to start a new acquisition. It is cleared by
+hardware as soon as the acquisition is complete or by software to cancel the
+ongoing acquisition.
+  0: Acquisition not started
+  1: Start a new acquisition
+
+Bit 0 TSCE: Touch sensing controller enable
+This bit is set and cleared by software to enable/disable the touch sensing
+controller.
+  0: Touch sensing controller disabled
+  1: Touch sensing controller enabled
+Note: When the touch sensing controller is disabled, TSC registers settings
+have no effect
+```
+
+#### TSC Interrupt Status Register (ISR)
+Offset: 0x0C
+```
+Bit 0 EOAF: End of acquisition flag
+This bit is set by hardware when the acquisition of all enabled group is
+complete (all GxS bits of all enabled analog I/O groups are set or when a max
+count error is detected). It is cleared by software writing 1 to the bit EOAIC
+of the TSC_ICR register.
+  0: Acquisition is ongoing or not started
+  1: Acquisition is complete
+```
+
+#### TSC I/O Channel Control Register (TSC_IOCCR)
+Offset: 0x28
+```
 ```
