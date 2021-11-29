@@ -44,8 +44,10 @@ Vector_Table:
   .word     0x20002000
 
 ResetVector:
-  .word     start + 1
-
+  .word     start + 1          // The +1 is so that the least significant bit
+                               // be 1 for Thumb code. If bit[0] is 0 it seems
+                               // that will clear the Thumb state and will
+                               // result in a fault of lockup.
 start:
   ldr r1, =RCC_AHBENR
   ldr r2, =GPIO_PORTC_ENABLE
