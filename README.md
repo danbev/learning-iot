@@ -217,6 +217,87 @@ CS   = Chip Select (to select among mulitiple connected peripherals like above)
 * Low power consumption
 * 20 cm distances
 
+#### Clock polarity (CPOL)
+If the CPOL bit is 0, then the SCK pin has a low-level idle state:
+```
+    ---
+    |
+    |
+----
+```
+So the clock in the idle state will be low.
+
+
+If the CPOL bit is 1, then the SCK pin has a high-level idle state:
+```
+----
+    |
+    |
+    ----
+```
+And in this case the clock in the idle state will be high.
+
+#### Clock phase (CPHA)
+CPAH detrmines when data will go out, or when data will sampled during the
+clock cycle phase. If the communication should be writing data on the falling
+edge of the cycle or on the raising edge of the clock cycle.
+
+```
+CPOL = 0 (remember this means the clock is low when idle)
+CPAH = 0
+
+    ----  ----
+    |  |  |  |
+    |  |  |  |
+----   ----  ----
+    ↑
+    |
+  raising edge
+
+
+CPOL = 0 (remember this means the clock is low when idle)
+CPAH = 1
+
+     falling edge
+       |
+       ↓
+    ----  ----
+    |  |  |  |
+    |  |  |  |
+----   ----  ----
+
+
+CPOL = 1 (remember this means the clock is high when idle)
+CPAH = 0
+
+ falling edge
+    |
+    ↓ 
+----   ----  -----
+    |  |  |  |
+    |  |  |  |
+    ----  ---- 
+
+CPOL = 1 (remember this means the clock is high when idle)
+CPAH = 1
+
+----   ----  -----
+    |  |  |  |
+    |  |  |  |
+    ----  ---- 
+       ↑
+       |
+    raising edge
+
+```
+Now, clock polarity and clock phase can be combined as we might be able to tell
+from above. We can have {CPOL=0, CPHA=0}, {CPOL=1, CPAH=0}, {CPOL=0, CPAH=1}, 
+and {CPOL=1, CPAH=1}.
+
+One thing to note is that we always want to sample data in the middle of a clock
+cycle and never close to the edges as that means that data i changing and
+sampling then migth cause corruption to data.
+
 ### Universal Asynchonous Receiver/Transmitter (UART)
 UART is not a communications protocol like SPI and I2C but instead a physical
 component/circuit in a microcontroller or a standalone integrated circuit. The
