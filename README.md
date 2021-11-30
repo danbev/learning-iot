@@ -146,7 +146,7 @@ raising edge +-- fallin edge
 This is a single point instead of a region.
 
 So lets say we want to send 5 (101). First we have to let the receiver know that
-we are going to send by setting a wire to high which is sometimes called slave
+we are going to send by setting a wire to low which is sometimes called slave
 select (SS_bar). After this is done we can send bits to the receiver:
 ```
     Sender                   Receiver
@@ -182,8 +182,6 @@ And so on:
 
 10  SOUT   --------------1-> RIN  101
 ```
-I'm not 100% sure about the above but that is my understanding so far. I'm
-still waiting for a real device to try this out and verify.
 
 ### Serial Peripheral Interface (SPI) 
 Is a synchronous serial communication spec developed by Motorola (1980s) and
@@ -196,20 +194,20 @@ protocol.
    | SPI         SCLK|-------+-->|SCLK   SPI       |
    | Controller  COPI|------+--->|COPI   Peripheral|
    |             CIPO|<----+-----|CIPO             |
-   |           SS_bar|---------->|SS_bar           |
+   |               CS|---------->|CS               |
    +-----------------+     |||   +-----------------+
                  ^         |||
                  |         |||   +-----------------+
                  |         ||+-->|SCLK   SPI       |
                  |         |+--->|COPI   Peripheral|
                  |         +-----|CIPO             |
-                 +-------------->|SS_bar           |
+                 +-------------->|CS               |
                                  +-----------------+
 
 SCLK = SPI Clock
 CIPO = Controller Input Peripheral Output
 COPI = Controller Output Peripheral Input
-SS   = Slave Select (to select among mulitiple connected slaves like above) 
+CS   = Chip Select (to select among mulitiple connected peripherals like above) 
 ```
 * Full Duplex
 * Synchronous (it uses the clock to sync)
