@@ -81,6 +81,7 @@ start:
   bl spi_init
 
 main_loop:
+  bl delay
   ldr r1, =SPI1_SR
   ldr r2, =SPI1_SR_BSY_FLAG
 wait_busy_flag:
