@@ -892,3 +892,101 @@ Vector_Table:                        // Vector                     Exception Nr
 The +1 is so that the least significant bit be 1 for Thumb
 code. If bit[0] is 0 it seems that will clear the Thumb state and will result
 in a fault of lockup:
+
+### Serial Peripheral Interface
+Can be used with an interrupt or by polling and requires 4 pins for
+communication. The wires uses are the same as described in
+[Serial Peripheral Interface (SPI)](../README.md#serial-peripheral-interface-(spi)
+but the Chip Select is called NSS instead and can have one of following
+functions:
+* Chip Select (normal peripheral select)
+* Synchronize the data frame
+* Detect a conflict between masters
+
+The board I'm working on has two SPIs that are capable of communicating at
+18Mbit/s.
+
+SPI base addresses:
+```
+SPI1 base address: 0x40013000, APB bus
+SPI2 base address: 0x40003800, APB bus
+```
+
+SPI1 uses RCC_APB2ENR to enable its clock:
+```
+Bit 12 SPI1EN: SPI1 clock enable
+Set and cleared by software.
+  0: SPI1 clock disabled
+  1: SPI1 clock enabled
+```
+SPI2 uses RCC_APB1ENR to enable its clock:
+```
+Bit 14 SPI2EN: SPI2 clock enable
+Set and cleared by software.
+  0: SPI2 clock disabled
+  1: SPI2 clock enabled
+```
+
+And we need four pins, one for clock, one for COPI, one for CIPO which are
+normal GPIO pins, and one for NSS (Peripheral Select). We need to see where
+these pins are on our board.  We can lookup this information in the boards data
+sheet in Table 14 "pin definitions" page 38:
+```
+PA4   SPI1_NSS  (Peripheral select)
+PA5   SPI1_SCL  (Clock)
+PA6   SPI1_MISO (Master Input Slave Output)
+PA7   SPI1_MOSI (Master Output Slave Input)
+```
+And if we look in Table 15 on page 44 we can see what Alternative Function we
+need to configure these pins to enable SPI:
+```
+PA4  SPI1_NSS  AF0
+PA5  SPI1_SCL  AF0
+PA6  SPI_MISO  AF0
+PA7  SPI_MOSI  AF0
+```
+
+#### SPI Control Register 1 (SPIx_CR1)
+Offset: 0x00
+Recall that there are two SPIs on my board and they have different base
+addresses which is the reason for the x above.
+
+```
+Bit 6 SPE: SPI enable
+  0: Peripheral disabled
+  1: Peripheral enabled
+
+Bit 2 MSTR: Master selection
+  0: Slave configuration
+  1: Master configuration
+
+Bit1 CPOL: Clock polarity
+  0: CK to 0 when idle
+  1: CK to 1 when idle
+
+Bit 0 CPHA: Clock phase
+  0: The first clock transition is the first data capture edge
+  1: The second clock transition is the first data capture edge
+```
+
+#### SPI Control Register 2 (SPIx_CR2)
+Offset: 0x04
+
+#### SPI Status Register (SPIx_SR)
+Offset: 0x08
+
+```
+Bit 1 TXE: Transmit buffer empty
+  0: Tx buffer not empty
+  1: Tx buffer empty
+Bit 0 RXNE: Receive buffer not empty
+  0: Rx buffer empty
+  1: Rx buffer not empty
+```
+#### SPI Data Register (SPIxDR)
+Offset: 0x08
+```
+Bits 15:0 DR[15:0]: Data register
+Data received or to be transmitted
+The data register serves as an interface between the Rx and Tx FIFOs.
+```
