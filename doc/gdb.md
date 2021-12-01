@@ -43,3 +43,11 @@ Loading section .text, size 0x1d8 lma 0x8000000
 Start address 0x08000008, load size 472
 Transfer rate: 1 KB/sec, 472 bytes/write.
 ```
+
+### Enable inaccessible memory
+If memory is outside of the memory map this command is useful to be able to
+read/write this memory (this can happen if one want to inspect the registers
+related to SysTick for example):
+```console
+(gdb) set mem inaccessible-by-default off
+```
