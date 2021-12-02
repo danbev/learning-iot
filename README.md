@@ -383,16 +383,89 @@ is used to identify the destination peripheral:
    +-+-+-+-+-+-+-+ +---+ +---+  +-+-+-+-+-+-+-+-+
     Address Frame                      Data Frame
     (7 or 10 bits)                     (8 bits)
+
+R/W = 1 Controller is requesting to read
+R/W = 0 Controller is requesting to write
+ACK = Is used by the peripheral that matches the address, which is pulled low
+so there should be a 0 in the ACK bit if the address maches.
 ```
-Communication starts by the SDA (the data line) switches form high voltage
-to low. This is done before the SCL also switches from high to low.
+Try to remember that this communication is one clock cycle at a time, so a
+peripheral can check each bit of the addess and if it matches it can pull its
+signal low. The other peripherals do nothing.
 
-The transmitting side will switch from low voltage level to high `after` the
-SCL line switches from low to high.
+I²C uses open collector circuit for it's bus:
+```
+          +Vcc
+          ----
+            |
+            /
+            \  R
+            /
+    Signal->|-------------+-----------+----------+
+            |             |           |          |
+       S   /             /           /          /
+            |             |           |          |
+           --- GND       ---         ---        ---
+            -             -           -          -
+            .             .           .          .
+           C1             C2         P1          P2
+```
+It is always the controller that initiates the communication. Also, controllers
+cannot communicate with each other, they can only communicate with peripherals.
 
+The controller begins by pulling SDA low (remember that when all switches are
+open the signal is a logic one):
+```
+        Address Frame   
+         
+SDA -+  +--+     +--+  +--+--+--+   +-
+     |  |A6|A5|A4|A3|A2|A1|A0|RW|ACK|
+     +--+  +--+--+  +--+        +---+
+         1  0  0  1  0  1  1  1   0
+```
+The clock is what enables the peripheral when to reads these bits
+```
+        Address Frame   
+         1  0  0  1  0  1  1  1   0
+SDA -+  +--+     +--+  +--+--+--+   +-------+                                 --------
+     |  |A6|A5|A4|A3|A2|A1|A0|RW|ACK|       |  |D7|D6|D5|D4|D3|D2|D1|D0|ACK|
+     +--+  +--+--+  +--+        +---+       +--+
 
+SCL -+    +  +  +  +  +  +  +  +  +             +  +  +  +  +  +  +  +  +  +-------
+     |    |  |  |  |  |  |  |  |  |             |  |  |  |  |  |  |  |  |  |
+     +----+--+--+--+--+--+--+--+--+-------------+--+--+--+--+--+--+--+--+--+
+                                   (between frame the clock is low)
+```
+The clock pulses are supposed to show that they are in the middle of each bit
+and that the peripheral should read then to get the most accurate
+reading/sampling.
 
+Now, each peripheral will detect this pulling low of SDA and read the address
+frame.
 
+#### Clock streching
+Is a way for the peripheral to signal that it needs a little more time to
+gather data it is going to send.
+
+This is performed by the peripheral by pulling the clock low.
+``
+         1  0  0  1  0  1  1  
+SDA -+  +--+     +--+  +--+--+    +
+     |  |D7|D6|D5|D4|D3|D2|D0|    |ACK|
+     +--+  +--+--+  +--+     +----+---+
+SCL -+    +  +  +  +  +  +  +     +
+     |    |  |  |  |  |  |  |     |
+     +----+--+--+--+--+--+--+--+--+
+```
+
+#### Collisions 
+We mentioned earlier that we can have more than one controller. So what happens
+if two controllers start sending data at the same time. I turns out that the
+controllers not only send out data on the SDA but also read from it. So if
+a controller sends out a bit pattern it will check that that bit pattern is
+also on the wire. If another controller wrote the exact same bits then nothing
+happens but if the bits differ then a collision is detected and the controller
+who did not read the same bit pattern that is sent will back off.
 
 In SPI we had a peripheral select wire (SS) which selected the peripheral we
 want to talk to. Instead in I2C each peripheral has an address. This is
