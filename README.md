@@ -2997,3 +2997,50 @@ Now, lets look at a closed switch:
 If we measure the voltage of V₁ we get V₁ = 0.5A * 0 = 0.
 So notice that with the resistor we get a fairly low current when the switch is
 closed.
+
+### Open Collector Circuit
+```
+          +Vcc
+          ----
+            |
+            /
+            \  R
+            /
+         V₁ |----
+            |
+       S   /
+            |
+           --- GND
+            -
+            .
+```
+V₁ is going to be equal to either the voltate of the pull up resistor if the
+switch is open, and equal to ground if the switch is closed. So either a logic
+one or logic 0. If the switch is open it is called that it is pulled up to the
+Vcc, and if it is closed it is pulled down to GND.
+
+Now, take a look at what we can do if we place multiple of these next to each
+other in parallel:
+```
+          +Vcc
+          ----
+            |
+            /
+            \  R
+            /
+    Signal->|-------------+-----------+
+            |             |           |
+       S   /             /           /
+            |             |           |
+           --- GND       ---         ---
+            -             -           -
+            .             .           .
+```
+So the only way for the signal, which is a voltage, to represent a logic 1 is
+if one of the switches is close. We don't know which one is closed just that
+one is closed. This acts like AND, if one is closed then the signal is 1 and
+if all are 0 then we know they are all open.
+This can be used to allow devices/component to communicate in half-duplex, only
+one can communicate at a time but the communication can be bidirectional. This
+is something that is used by the I²C protocol.
+
