@@ -2167,7 +2167,7 @@ input buffer     / |              |
 The enable line controlls if this pin will acts as an output of input buffer.
 
 ### Tristate logic
-This is used in many circuites where so that the same output line can be shared.
+This is used in many circuits so that the same output line can be shared.
 
 A GPIO pin can assume one of three values:
 * Logical 0 (connected to ground (0 volatage, on))
@@ -2183,16 +2183,16 @@ A GPIO pin can assume one of three values:
 (input) |/
 
 ```
-This acts as a switch where is "enable" is on then the switch is closed, and if
+This acts as a switch where is "enable" is on, then the switch is closed, and if
 "enable" is off it is open. Notice that when the switch is closed the input
 is not affecting the output so this removes this input from the output. If we
-mave multiple inputs connected to the same output we can have it such that only
+have multiple inputs connected to the same output we can have it such that only
 one of the inputs affects the output at a time.
 
 ### Floating signal
 When a signal floats is means that it is neither connected to ground or to VCC,
 and the signals volatage is indeterminate. For example, say we have a pin on a
-microcontroller which we hook up with a button. When we press the button lets
+microcontroller which we hook up with a button. When we press the button, lets
 say we have set things up so that the pin will go low (0V). So when we press it
 will be 0V and we can read the voltage from our program and act when the pin
 is 0V. But what is the value when we are not pressing. It is actually going to
@@ -2200,7 +2200,7 @@ be random 0 or 1. This is a bad thing.
 
 
 ### Pull-up resistor
-Is really just a resistor but it is the way it is used that give it its name:
+Is really just a resistor, but it is the way it is used that give it its name:
 ```
      5V
      |
@@ -2213,7 +2213,7 @@ Is really just a resistor but it is the way it is used that give it its name:
 |                +------+
 Gnd
 ```
-So when is circuit is open the pin will be read as 5V (on). When it is closed
+So when this circuit is open the pin will be read as 5V (on). When it is closed
 it will be read as Gnd (off). But it will not be random on/off.
 
 ### Pull-down resistor
@@ -2242,8 +2242,8 @@ When the output goes low, the signal is actively `pulled` to ground, and when
 the output goes high it is actively `pushed` to VCC.
 
 ### Open Drain
-In this case we the pin only has two states GND or floating which does not sound
-very useful, but it can be compined with a pull-resistor. So I think this allows
+In this case the pin only has two states, GND or floating, which does not sound
+very useful, but it can be combined with a pull-resistor. So I think this allows
 for multiple components connected to the same line, like in I²C.
 TODO: explain this properly.
 
@@ -2269,6 +2269,15 @@ These bits are written by software to configure the I/O pull-up or pull-down
 ```
 Does this mean that if we don't configure our pin in GPIOx-OTYPER and don't
 configure it in GPIOx-PUPDR that it will floating?
+
+
+### Current sink
+Means that current is flowing into the pin. Opposite or current source. Think
+kitchen sink.
+
+### Current source
+Means that current if flowing out of the pin. Opposite of current sink. Think
+kitchen tap.
 
 
 ### GPIO speed
