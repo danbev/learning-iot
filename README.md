@@ -347,6 +347,15 @@ The is not way to support multiple peripherals.
 Was first developed in 1982 by Phillips and a public spec came out in 1992
 which allowed speeds of 400kHz and an address of 10-bits.
 
+There are three additional modes:
+* fast-mode plus, 1MHz
+* high-speed mode, 3.4MHz
+* ultra-fast mode, 5MHz
+
+Intel introduced a variant of I²C in 1995 called System Management Bus (SMBus)
+intended to improve communiciation predictability between ICs on PC
+motherboards. SMBus limits the speed of communication to 10kHz to 100kHz.
+
 Only requires two pins.
 ```
    +------------------+           +-----------------+
@@ -405,10 +414,8 @@ simple shift register at either end.
 Compared to SPI there is one additional bit of data being sent which can affect
 the data rate.
 
-Open drain 
-
 ### Current
-Is the flow of free electrons
+Is the flow of free electrons.
 
 ### Concuctors
 Take a conductor like a coppar wire which is good at allowing a current to flow
@@ -507,7 +514,7 @@ shell is full and
 
 ### Semi-conductors
 These have properties that are in between conductors and insulators, hence the
-name semi-conductors. If a semi-conductor is exposed to head this can improve it
+name semi-conductors. If a semi-conductor is exposed to heat this can improve it
 conductivity. But there is another way to improve the conducitivty of a semi-
 conductor which is to add impurities to it (called doping).
 
