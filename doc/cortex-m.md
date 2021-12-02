@@ -946,6 +946,19 @@ PA6  SPI_MISO  AF0
 PA7  SPI_MOSI  AF0
 ```
 
+For SPI2 we can use:
+```
+PB12  SPI2_NSS  (Peripheral select)
+PB13  SPI2_SCL  (Clock)
+PB14  SPI2_MISO (Master Input Slave Output)
+PB15  SPI2_MOSI (Master Output Slave Input)
+
+PB12  SPI2_NSS  AF0
+PB13  SPI2_SCL  AF0
+PB14  SPI2_MISO AF0
+PB15  SPI2_MOSI AF0
+```
+
 #### SPI Control Register 1 (SPIx_CR1)
 Offset: 0x00
 Recall that there are two SPIs on my board and they have different base
@@ -955,6 +968,16 @@ addresses which is the reason for the x above.
 Bit 6 SPE: SPI enable
   0: Peripheral disabled
   1: Peripheral enabled
+
+Bits 5:3 BR[2:0]: Baud rate control
+  000: fPCLK/2
+  001: fPCLK/4
+  010: fPCLK/8
+  011: fPCLK/16
+  100: fPCLK/32
+  101: fPCLK/64
+  110: fPCLK/128
+  111: fPCLK/256
 
 Bit 2 MSTR: Master selection
   0: Slave configuration
