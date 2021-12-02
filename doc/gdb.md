@@ -1,6 +1,12 @@
 ### GDB commands related to embedded devices
 The document contains gdb command useful when debugging embedded programs.
 
+Commands like resetting and flashing a device can be done from gdb using
+the `monitor` command to send commands to openocd. One way to work with this is
+to have gdb connected to openocd and place gdb in the background (CTRL+Z) to
+recompile, and the use `fg` to bring gdb to the forground again. Then reset
+halt and flash the device. 
+
 ```console
 $ arm-none-eabi-gdb spi.elf
 (gdb) target remote localhost:3333
