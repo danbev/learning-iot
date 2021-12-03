@@ -163,11 +163,4 @@ output_loop:
   pop {pc}
 
 .include "blue-led.s"
-
-.equ DELAY_LENGTH, 100000
-delay:
-  ldr r0,=DELAY_LENGTH
-dloop:
-  sub r0, r0, #1
-  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
-  bx  lr
+.include "delay.s"
