@@ -1013,3 +1013,45 @@ Bits 15:0 DR[15:0]: Data register
 Data received or to be transmitted
 The data register serves as an interface between the Rx and Tx FIFOs.
 ```
+
+### Inter-integrated circuit (I²C)
+* Standard Mode (Sm) up to 100kHz
+* Fast Mode (Fm) up to 400kHz
+* Fast Mode plus (Fm+) up to 1MHz
+
+It is also SMBus and PMBus (power management bus) compatible.
+
+My board has two I²C interfaces named I2C1 and IC22:
+```
+I2C1 base address: 0x40005400   APB
+I2C2 base address: 0x40005800   APB
+```
+The clocks can be enabled by using RCC_APB1ENR:
+```
+Bit 22 I2C2EN: I2C2 clock enable
+Set and cleared by software.
+  0: I2C2 clock disabled
+  1: I2C2 clock enabled
+Bit 21 I2C1EN: I2C1 clock enable
+Set and cleared by software.
+  0: I2C1 clock disabled
+  1: I2C1 clock enabled
+```
+If I2C1 is used the following GPIO pins are available:
+```
+PB6  I2C1_SCL    AF1
+PB7  I2C1_SDA    AF1
+PB8  I2C1_SCL    AF1
+PB9  I2C1_SDA    AF1
+```
+If I2C2 is used the following GPIO pins are available:
+```
+PB10 I2C2_SCL    AF1
+PB11 I2C2_SDA    AF1
+PB13 I2C2_SCL    AF1
+PB14 I2C2_SDA    AF1
+```
+
+#### Control Register (I2C_CR1
+Offset: 0x00
+
