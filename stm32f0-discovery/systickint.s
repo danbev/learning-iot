@@ -15,23 +15,10 @@
 /* SysTick Calibration Value Register */
 .equ SYST_CALIB, 0xE000E01C
 
-/* Advanced High Performace Bus Enable Register offset (from RCC) */
-.equ AHBENR_OFFSET, 0x14
-.equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
-
-.equ GPIOC_MODER_OFFSET, 0x00
-.equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
-
-.equ GPIOC_BSRR_OFFSET, 0x18
-.equ GPIOC_BSRR, GPIOC_BASE + GPIOC_BSRR_OFFSET
-
 .equ GPIOC_ODR_OFFSET, 0x14
 .equ GPIOC_ODR, GPIOC_BASE + GPIOC_ODR_OFFSET
 
-.equ GPIO_PORTC_ENABLE, 1 << 19
-.equ GPIOC_MODER_MASK, 1 << 14
 .equ GPIOC_ODR_PC7, 1 << 7
-.equ BSRR_9_SET, 1 << 7
 .equ BSRR_9_RESET, 1 << 23
 
 /* Enable the timer */
