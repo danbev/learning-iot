@@ -1,3 +1,5 @@
+.global delay
+
 .equ DELAY_LENGTH, 100000
 delay:
   ldr r0,=DELAY_LENGTH
