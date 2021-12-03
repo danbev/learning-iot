@@ -356,7 +356,7 @@ Intel introduced a variant of I²C in 1995 called System Management Bus (SMBus)
 intended to improve communiciation predictability between ICs on PC
 motherboards. SMBus limits the speed of communication to 10kHz to 100kHz.
 
-Only requires two pins.
+Only requires two pins/wires:
 ```
    +------------------+           +-----------------+
    | Controller 1  SCL|<--+------>|SCL  Peripheral 1|
@@ -495,9 +495,9 @@ the data rate.
 ### Current
 Is the flow of free electrons.
 
-### Concuctors
+### Conductors
 Take a conductor like a coppar wire which is good at allowing a current to flow
-through it. Now, coppar is made up on coppar atoms which like all atoms contain
+through it. Now, coppar is made up of coppar atoms which like all atoms contain
 protons, neutrons, and electrons:
 ```
 Cu
@@ -510,18 +510,14 @@ Electrons: 29
            Shell 4: 1 electrons (free electron)
 ```
 A coppar wire without any current flowing will have electrons randomly moving
-from atom to atom but this is not in any perticular direction. If an electron
-moves away from its atom that would leave the atom slightly positively charged
-and that would attract an electron. How does the electron leave the atom, this
-is a little unclear to me. One thing I've read is that it is actually the atom
-that overlap the volume of other atoms and exchange the free atom. So there
-does not need to be any energy to cause the electron to move. But I've also read
-that this could be influence of room-temprature heat energy.
+from atom to atom, but this is not in any perticular direction. If an electron
+moves away from its atom that will leave the atom slightly positively charged
+and that would attract an electron. 
 
-So we have the sea of electrons that are
-moving around randomly. Now, if we connect a cell that contains one end with
-negative electrons and the otherside with atoms what are positivly charged (
-would attract electrons) the electrons will move towards the positiv end.
+So we have the sea of electrons that are moving around randomly. Now, if we
+connect a cell that contains one end with negative electrons and the otherside
+with atoms what are positivly charged (would attract electrons) the electrons
+will move towards the positiv end.
 
 The conduction band is the band above the valence band. 
 ```
@@ -587,14 +583,15 @@ for electrons to move into the conduction band. This is possible with heat.
 
 ### Insulators
 High reisistance to the flow of electricity, which means that their valance
-shell is full and 
+shell is full and also there is a large gap between the valancy and conduction
+bands.
 
 
 ### Semi-conductors
 These have properties that are in between conductors and insulators, hence the
-name semi-conductors. If a semi-conductor is exposed to heat this can improve it
-conductivity. But there is another way to improve the conducitivty of a semi-
-conductor which is to add impurities to it (called doping).
+name semi-conductors. If a semi-conductor is exposed to heat this can improve
+its conductivity. But there is another way to improve the conducitivty of a
+semi-conductor which is to add impurities to it (called doping).
 
 If we take a look at a silicon cristal:
 ```
@@ -612,11 +609,12 @@ If we take a look at a silicon cristal:
  Si  [* *]  Si  [* *]  Si  [* *]
 ```
 So we can see that we have these covelent bounds between the atoms and all of
-the free electrons in the valance shell are bound. There are not free electrons
-of "holes".
+the free electrons in the valance shell are bound. There are no free electrons
+or "holes" which is an atom which is slightly positively charge and it lacks
+an electron (or perhaps more than one?).
 
-If we replace on of these atoms will an atom with only 5 electrons (like fosfor)
-in its valance shell what would happen:
+If we replace one of these atoms with an atom with only 5 electrons
+(like fosfor) in its valance shell what would happen:
 ```
                                           [* *] = covalent bond
  Si  [* *]  Si  [* *]  Si  [* *]
@@ -631,15 +629,16 @@ in its valance shell what would happen:
 
  Si  [* *]  Si  [* *]  Si  [* *]
 ```
-It can still bound with the other 3 atoms around it but also has an additional
+It can still bond with the other 3 atoms around it but also has an additional
 electron left over. This free electron can now move in the conduction band. This
 makes this silicon cristal more conductive then before. Because we have a free
 electron by this process and electrons are negatively charged this is called
 an n-type conductor now.
+
 So that is one way we can increase the connectivity of silicon. But how about
 replacing an atom with something that only has 3 electrons in its valance shell:
 
-So if we hook up a battery to this the free electron will be attracted to the
+So if we hook up a battery this the free electron will be attracted to the
 positive terminal and the electrons from the negative terminal will be able
 to move in their place through the material (in/through the conduction band):
 ```
@@ -648,7 +647,7 @@ to move in their place through the material (in/through the conduction band):
 
      ⌈*⌉       ⌈*⌉         ⌈*⌉
      ⌊*⌋       ⌊*⌋         ⌊*⌋
-                 *
+                 * <------------------ free electron moved
 +--- Si  [* *]  P  [* *]  Si  [* *] <-----------+
 |                                               |
 |    ⌈*⌉       ⌈*⌉         ⌈*⌉                  |
@@ -661,11 +660,11 @@ to move in their place through the material (in/through the conduction band):
 +-------------> + || - -------------------------+
                   |
 ```
-It can still bound with the other 3 atoms around it but also has an additional
 
 So lets try with alunminum (Ai):
 ```
                                           [* *] = covalent bond
+                                              x = hole/missing electron
  Si  [* *]  Si  [* *]  Si  [* *]
 
  ⌈*⌉       ⌈*⌉         ⌈*⌉
@@ -678,9 +677,10 @@ So lets try with alunminum (Ai):
 
  Si  [* *]  Si  [* *]  Si  [* *]
 ```
-Notice that we have a missing electron so thre is no covalent bond between the
-Ai atom the Ai atom to the right. This is called a p-type semi-conductor. This
-also conducts electricity better than pure silicon so the conductivity goes up.
+Notice that we have a missing electron so there is no covalent bond between the
+Ai atom ine the middle the Ai atom to the right of it. This is called a
+p-type semi-conductor. This also conducts electricity better than pure silicon
+so the conductivity goes up.
 
 In the case of N-type we know that the electrons are free to flow in the
 conduction band. This is not what happens for P-type, instead the electrons flow
@@ -706,8 +706,9 @@ the positive terminal, hence they will move to holes:
 ```
 The holes are what allow electrons to flow and this happens in the valance band
 as opposed to n-type doping where the flow happens in the conduction band.
+
 With a batteri cell attached the electrons will be attracted to the positive
-terminal. There for electrons will fill the holes:
+terminal. Therefor electrons will fill the holes:
 ```
  x  o  x  x  x
      <-
@@ -717,7 +718,7 @@ terminal. There for electrons will fill the holes:
            <-
  x  x  x  x  o
 ```
-Now, what I think will  happen is that one electron will "leave" and and one
+Now, what I think will happen is that one electron will "leave" and and one
 will enter:
 ```
 x <- o  x  x  x  o <-x
