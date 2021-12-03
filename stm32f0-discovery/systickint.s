@@ -85,7 +85,7 @@ turn_on:
   pop {pc} 
 
 start:
-  bl gpio_init
+  bl led_init
   bl systick_init
 
 main_loop:
@@ -112,36 +112,4 @@ systick_init:
   mov r2, #(SYST_CSR_CLK_SOURCE + SYST_CSR_ENABLE + SYST_CSR_TICKINT)
   str r2, [r1]
 
-  bx lr
-
-gpio_init:
-  /* Enable Port C clock */
-  ldr r1, =RCC_AHBENR
-  ldr r2, =GPIO_PORTC_ENABLE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =GPIOC_MODER
-  ldr r2, =GPIOC_MODER_MASK
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  bx lr
-
-turn_led_on:
-  ldr r1,=GPIOC_BSRR
-  ldr r2,=BSRR_9_SET
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-  bx lr
-
-turn_led_off:
-  ldr r1,=GPIOC_BSRR
-  ldr r2,=BSRR_9_RESET
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
   bx lr
