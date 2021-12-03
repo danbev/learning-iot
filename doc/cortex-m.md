@@ -97,6 +97,26 @@ SysTick                         15                    0x0000 003C
 Interrups                       16                    0x0000 0040
 ...                             ...                   ...
 ```
+This would look something like this in assembly:
+```assembly
+Vector_Table:                        // Vector                     Exception Nr 
+  .word     0x20002000               // Initial Stack Pointer value       -
+  .word     start + 1                // Reset                             1
+  .word     null_handler + 1         // Non Maskable Interrupt            2
+  .word     null_handler + 1         // Hard Fault                        3
+  .word     null_handler + 1         // Memory Fault                      4
+  .word     null_handler + 1         // Bus Fault                         5
+  .word     null_handler + 1         // Usage Fault                       6
+  .word     null_handler + 1         // Reserved                          7
+  .word     null_handler + 1         // Reserved                          8
+  .word     null_handler + 1         // Reserved                          9
+  .word     null_handler + 1         // Reserved                         10
+  .word     null_handler + 1         // SVCall                           11
+  .word     null_handler + 1         // Debug Monitor                    12
+  .word     null_handler + 1         // Reserved                         13
+  .word     null_handler + 1         // Reserved for debug               14
+  .word     systick_handler + 1      // SysTick                          15
+```
 
 
 #### Current Process State Register (CPSR)
