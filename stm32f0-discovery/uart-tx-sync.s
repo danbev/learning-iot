@@ -172,21 +172,7 @@ output_loop:
 .equ BSRR_9_SET, 1 << 7
 .equ BSRR_9_RESET, 1 << 23
 
-turn_led_on:
-  ldr r1,=GPIOC_BSRR
-  ldr r2,=BSRR_9_SET
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-  bx lr
-
-turn_led_off:
-  ldr r1,=GPIOC_BSRR
-  ldr r2,=BSRR_9_RESET
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-  bx lr
+.include "blue-led.s"
 
 .equ DELAY_LENGTH, 100000
 delay:
