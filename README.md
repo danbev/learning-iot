@@ -762,14 +762,11 @@ The free electron would be attracted to fill the hole
                              |  |
  Si  [* *]  Si  [* *]  Si    |  |   Si  [* *]  Si  [* *]  Si  [* *]
 ```
-One thing that I was missing is that even though there is an extra electron,
-the Ai has an additional proton (remember that atoms have the same number of
-proton and electrons) so that side is neutral, both sides are to begin with.
 
-And a hole can also move to the n-type side. This will create an area between
-these two where there are now extra electrons, or any extra holes, so there
-are now charge carriers in this region. This region is called the depletion
-region and it like an insulator.
+A hole can also move to the n-type side. This will create an area between
+these two reqions where there are now extra electrons, or any extra holes, so
+there are now charge carriers in this region. This region is called the
+depletion region and it like an insulator.
 ```
                 Depletion Region
             N          ↓       P
@@ -791,7 +788,7 @@ region and it like an insulator.
 
 Now if we hook up a power source we will not get a current flowing initially as
 the depletion region prevents the flow. But if the batteri has enough voltage,
-like > 0.7v this will overcome the.
+like > 0.7v this will overcome the barrier.
 ```
                Depletion Region
             N          ↓        P
@@ -850,9 +847,9 @@ will leave the n-region, causing the depletion region to become larger:
                    | | 
                    | 
 ```
-As the depletion region becomes larger meaning that there are no charge carriers
-in this region this component will act like an insulator. So no current will
-flow.
+As the depletion region becomes larger, meaning that there are no charge
+carriers in this region, this component will act like an insulator. So no
+current will flow.
 
 If we stick an n-type region next to a p-type and then another n-type we get
 the following:
@@ -892,7 +889,7 @@ Well this will increase number of electrons in the left-most n-type region,
 and some electrons will leave the right-most n-type region but there will not
 be a current flowing. 
 
-Lets try looking up a second power source like this:
+Lets try hooking up a second power source like this:
 ```
                     Depletion Regions
                      |          |
@@ -918,6 +915,7 @@ Lets try looking up a second power source like this:
 Notice that this extra connection between the left-most n-type and the p-type
 is the same as we hade above where we saw that current would flow through that
 connetion.
+
 Now, we have electrons entering from both battries. When they make these types
 of components the first n-type region is very heavyly doped. So once this
 second current starts flowing, those extra electrons can now also move through
@@ -928,7 +926,7 @@ and these holes are physically close to the left-most n-type's electrons. That
 depletion region was created when electrons left the n-type into the depletion
 region which caused the n-type region to become positivley charged (remember
 that the number of electrons and protons match up when neutral and removing a
-electron will make the atom postitive). And those electrions that move into
+electron will make the atom postitive). And those electrons that move into
 depletion region cause the p-type region to become negatively charged.
 The electrons that have now started flowing through the p-type region will be
 attracted to the positive right-most n-type region and therefor be able to
@@ -963,7 +961,7 @@ transistor:
 
 ![NPN transistor circuit with switch off](./doc/npn-off.jpg "NPN Transistor with switch off")
 
-So with out a current flowing through the base and the emitter there is no
+So without a current flowing through the base and the emitter there is no
 current flowing though the transistor. Pressing the button will cause a current
 to flow:
 
@@ -995,7 +993,7 @@ Left button | Right button   LED
 
 
 
-Before any movement has occured we have the following Formal Charge for P
+Before any movement has occured we have the following Formal Charge for P:
 ```
      ⌈*⌉
      ⌊*⌋ *
@@ -1146,6 +1144,7 @@ E-----|  N  |  P  |  N  |-----C
                |
                |
                B
+
 E = emitter
 C = collector
 B = base
@@ -1162,6 +1161,70 @@ normal diode:
                B (anode)
 ```
 And the addition of the first N box is basically the reversal of a diode
+
+
+### Field Effect Transistor
+```
+               Drain +-----------------------+   
+                     |                       |
+           +------------------+              |
+           |      N           |              |
+           |                  |             --- + Vds
+           |--+     C      +--|              -  -
+           |P |     H      |P |              |
+           |  |     A      |  |              |
+Gate -+--+-|  |     N      |  |---+          |
+      |  | |  |     N      |  |   |          |
+      |  | |  |     E      |  |   |          |
+Vgs  --- | |--+     L      +--|   |          |
+      -  | |                  |   |          |
+      |  | |                  |   |          |
+      |  | +------------------+   |          |
+      |  +-----------|------------+          |
+      |       Source |                       |
+      +--------------+-----------------------+
+
+N = N-Type material
+P = P-Type material
+Vds = Voltage drain/source
+Vgs = Voltagae gate/source
+```
+Source is the source of electros and drain the output of electrons.
+By increasing the voltage of Vgs we can cause a depletion zone between the
+two P-type materials which will cause the channel to become smaller, there
+will be more resistance between the source and the drain. One can think of this
+as havin a gardan hose (the channel) where water if flowing through the source
+to the drain and the gate is like a wheel that can be turned to pinch the hose
+which reduces the flow or water. How much pinching is done is determined by
+the voltage beween the gate and the source voltage.
+
+```
+                      FET
+     +-----------------+------------------------+
+     |                                          |
+ Junction FET (JFET)                    Metal Oxide FET (MOSFET)
+     |                                   |                |
+  Depletion Mode                   Depletion Mode    Enhancement Mode
+     |                                   |                |
+ +-----------------+           +------------+         +-----------+    
+ |                 |           |            |         |           |
+N-Channel      P-Channel    N-Channel      P-Channel N-Channel  P-Channel
+
+                                  D
+     D              D             |
+     |              |           |-+
+   |-+            |-+          ||
+G->|           G-<|         G--||-+
+   |-+            |-+          || |
+     |              |           |-+
+     S              S             |
+                                  S
+```
+Depletion mode requires the Gate-Source (Vgs) voltage to switch OFF the current.
+Enhancement mode requires the Gate-Source (Vgs) voltage to switch ON the
+current.
+
+
 
 ### Metal Oxide Semiconductor Field Effect Transistor (MOSFET)
 
@@ -1186,7 +1249,7 @@ And the addition of the first N box is basically the reversal of a diode
 So at this stage we have a PN junction between the substrate and the two N-type
 regions.
 Next an oxide insulator is added between the two N-types. 
-And on top of that a metal later is added.
+And on top of that a metal layer is added.
 And this is the origin of the first part of the name, Metal for the metal plate,
 oxide for the insulator, and semiconductor for the PN.
 
