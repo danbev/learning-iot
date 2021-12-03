@@ -162,16 +162,6 @@ output_loop:
   bl turn_led_off
   pop {pc}
 
-.equ GPIO_PORTC_ENABLE, 1 << 19
-.equ GPIOC_MODER_MASK, 1 << 14
-.equ GPIOC_MODER_OFFSET, 0x00
-.equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
-.equ GPIOC_BASE, 0x48000800
-.equ GPIOC_BSRR_OFFSET, 0x18
-.equ GPIOC_BSRR, GPIOC_BASE + GPIOC_BSRR_OFFSET
-.equ BSRR_9_SET, 1 << 7
-.equ BSRR_9_RESET, 1 << 23
-
 .include "blue-led.s"
 
 .equ DELAY_LENGTH, 100000
