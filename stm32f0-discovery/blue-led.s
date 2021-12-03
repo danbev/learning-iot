@@ -1,3 +1,6 @@
+.equ RCC_BASE, 0x40021000
+.equ AHBENR_OFFSET, 0x14
+.equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
 .equ GPIOC_BASE, 0x48000800
 .equ GPIOC_MODER_OFFSET, 0x00
 .equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
@@ -7,6 +10,10 @@
 .equ BSRR_9_RESET, 1 << 23
 .equ GPIO_PORTC_ENABLE, 1 << 19
 .equ GPIOC_MODER_MASK, 1 << 14
+
+.global led_init
+.global turn_led_on
+.global turn_led_off
 
 led_init:
   /* Enable Port C clock on AHB bus */

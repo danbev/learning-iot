@@ -48,7 +48,7 @@ ResetHandler:              /* Reset                                   1 */
   .word     start + 1 
 
 start:
-  bl gpio_init
+  bl led_init
   bl systick_init
 
 main_loop:
@@ -89,22 +89,6 @@ count_flag_wait:
   ldr r2, =SYST_CSR_COUNT_FLAG
   and r3, r3, r2
   beq count_flag_wait   /* COUNT_FLAG will be 1 only if the timer counted to zero since the last read */
-  bx lr
-
-gpio_init:
-  /* Enable Port C clock */
-  ldr r1, =RCC_AHBENR
-  ldr r2, =GPIO_PORTC_ENABLE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =GPIOC_MODER
-  ldr r2, =GPIOC_MODER_MASK
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   bx lr
 
 turn_led_on:
