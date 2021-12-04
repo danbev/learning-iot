@@ -1003,9 +1003,15 @@ Before any movement has occured we have the following Formal Charge for P:
 
 Bounds: 4
 FC = valance electrons - (Bonds + dots)
-   =                 5 - (4+1) 
-   = 0               
+FC =                 5 - (4+1) 
+FC = 0               
 ```
+This is important and we can note that the charge/voltage is neutral because
+the phosphorus atom has 15 protons and 15 electrons, and 5 of those electrons
+are in its valance shell. The extra free electron does not cause an inbalance
+here, there are still 15 protons and 15 electrons and the other (not shown) Si
+atmos are also neutral.
+
 And for Ai:
 ```
 
@@ -1017,6 +1023,17 @@ And for Ai:
 FC = 3 - (3 + O)
 FC = 0
 ```
+Ai has 13 protons and 3 electrons, and three of those electons are in its
+valance shell. So even though there is a hole it does not cause an imbalance
+at this point.
+
+But if/when a free electron from from one side moves over to the other side
+things change. When the free electron from moves from the P atom to the Ai atom
+the P atom is now imbalanced, it now has one more proton than it has electrons
+and is now positively charged. A similar thing happens on the Ai side where the
+hole is filled with the electron. The Ai atom now has one more electron than it
+has protons and is therefor negatively charged. 
+
 Now, after the move of the free electron to the hole we have the following
 formal charge for P:
 ```
@@ -1024,6 +1041,7 @@ FC = 5 - (4 + 0)
    = 1
 ```
 This means that it has a positive formal charge.
+
 And for Ai:
 ```
      ⌈*⌉
@@ -1036,6 +1054,7 @@ FC = 3 - (4 + O)
 FC = 3 - 4
 FC = -1
 ```
+This means that it has a negative formal charge.
 
 ```
        P                            N
@@ -1058,6 +1077,7 @@ The free electrons will drift to fill in the holes:
 +--------------------+-------------------------+
 ```
 
+And this will cause the sides to positively and negatively charged:
 ```
        P                            N
 +--------------------+-------------------------+
@@ -1067,6 +1087,11 @@ The free electrons will drift to fill in the holes:
 | o    o   o        -|+*   *  *     *    *     |
 +--------------------+-------------------------+
 ```
+When we have a charge(voltage difference) we also have the generation of an
+electric field. So for electrons to move through this electric field more
+energy is required (up until now we have only been thinking in terms of thermal
+energy like the head of room temperature).
+
 ```
        P                            N
 +--------------------+-------------------------+
@@ -1079,9 +1104,23 @@ The free electrons will drift to fill in the holes:
                   Electric field accross the PN junction
 ```
 The electric field makes it difficult for new electrons on the N side to cross
-the PN junktion now. The free electrons still have a force acting upon them that
+the PN junction now. The free electrons still have a force acting upon them that
 wants to move them to the other side, but there is also a force acting in the
-opposite direction. When these forces are equal then no electrons will move over
+opposite direction. 
+```
+                  |       ↑
+          P       ↓       |         N
+      o o      -->-<--|<--+-->   *  *
+       o    o  -->-<--|<--+-->      *  *
+       o    o  -->-<--|<--+-->      *
+                  ↑       |
+                  |       ↓
+```
+Notice that the electric field is a vector, which has a magnitude and a
+direction and the direction is different, the opposite for the negative side.
+
+
+When these forces are equal then no electrons will move over
 from the right side to the left side.
 
 So applying a current to the N side that overcomes the force of the PN junction
