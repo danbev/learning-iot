@@ -1072,6 +1072,166 @@ PB13 I2C2_SCL    AF1
 PB14 I2C2_SDA    AF1
 ```
 
-#### Control Register (I2C_CR1
+#### Control Register 1 (I2C_CR1)
 Offset: 0x00
 
+```
+Bit 0 PE: Peripheral enable
+0: Peripheral disable
+1: Peripheral enable
+
+The I2C can be enabled by setting the PE bit in the I2C_CR1 register.
+```
+
+#### Control Register 2 (I2C_CR2)
+Offset: 0x04
+
+```
+Bits 23:16 NBYTES[7:0]: Number of bytes
+The number of bytes to be transmitted/received is programmed there. This field
+is don’t care in slave mode with SBC=0.
+Note: Changing these bits when the START bit is set is not allowed.
+
+Bit 15 NACK: NACK generation (slave mode)
+The bit is set by software, cleared by hardware when the NACK is sent, or when
+a STOP condition or an Address matched is received, or when PE=0.
+  0: an ACK is sent after current received byte.
+  1: a NACK is sent after current received byte.
+
+Bit 14 STOP: Stop generation (master mode)
+The bit is set by software, cleared by hardware when a Stop condition is
+detected, or when PE = 0.
+In Master Mode:
+  0: No Stop generation.
+  1: Stop generation after current byte transfer.
+
+Bit 13 START: Start generation
+This bit is set by software, and cleared by hardware after the Start followed
+by the address sequence is sent, by an arbitration loss, by a timeout error
+detection, or when PE = 0. It can also be cleared by software by writing ‘1’ to
+the ADDRCF bit in the I2C_ICR register.
+  0: No Start generation.
+  1: Restart/Start generation:
+– If the I2C is already in master mode with AUTOEND = 0, setting this bit
+generates a Repeated Start condition when RELOAD=0, after the end of the NBYTES
+transfer.
+– Otherwise setting this bit will generate a START condition once the bus is
+free
+
+Bit 11 ADD10: 10-bit addressing mode (master mode)
+  0: The master operates in 7-bit addressing mode,
+  1: The master operates in 10-bit addressing mode
+
+Bit 10 RD_WRN: Transfer direction (master mode)
+  0: Master requests a write transfer.
+  1: Master requests a read transfer.
+
+Bits 9:8 SADD[9:8]: Slave address bit 9:8 (master mode)
+In 7-bit addressing mode (ADD10 = 0):
+These bits are don’t care
+In 10-bit addressing mode (ADD10 = 1):
+These bits should be written with bits 9:8 of the slave address to be sent
+Note: Changing these bits when the START bit is set is not allowed.
+
+Bits 7:1 SADD[7:1]: Slave address bit 7:1 (master mode)
+In 7-bit addressing mode (ADD10 = 0):
+These bits should be written with the 7-bit slave address to be sent
+In 10-bit addressing mode (ADD10 = 1):
+These bits should be written with bits 7:1 of the slave address to be sent.
+Note: Changing these bits when the START bit is set is not allowed.
+
+Bit 0 SADD0: Slave address bit 0 (master mode)
+In 7-bit addressing mode (ADD10 = 0):
+This bit is don’t care
+In 10-bit addressing mode (ADD10 = 1):
+This bit should be written with bit 0 of the slave address to be sent
+
+```
+
+### Own Address 1 Register (I2C_OAR1)
+Offset: 0x08
+
+```
+Bit 15 OA1EN: Own Address 1 enable
+  0: Own address 1 disabled. The received slave address OA1 is NACKed.
+  1: Own address 1 enabled. The received slave address OA1 is ACKed.
+
+Bits 7:1 OA1[7:1]: Interface address
+7-bit addressing mode: 7-bit address
+10-bit addressing mode: bits 7:1 of 10-bit address
+```
+I'm currenlty now sure about the difference between Own Address 1 and Own
+Address 2. TODO: clarify/explain the differences between these.
+
+
+### Own Address 1 Register (I2C_OAR1)
+Offset: 0x0C
+
+```
+Bit 15 OA2EN: Own Address 2 enable
+  0: Own address 2 disabled. The received slave address OA2 is NACKed.
+  1: Own address 2 enabled. The received slave address OA2 is ACKed.
+
+Bits 7:1 OA2[7:1]: Interface address
+7-bit addressing mode: 7-bit address
+```
+
+### Interrupt and status register (I2C_ISR)
+Offset: 0x18
+
+```
+Bits 23:17 ADDCODE[6:0]: Address match code (Slave mode)
+These bits are updated with the received address when an address match event
+occurs (ADDR = 1).
+
+
+Bit 16 DIR: Transfer direction (Slave mode)
+This flag is updated when an address match event occurs (ADDR=1).
+  0: Write transfer, slave enters receiver mode.
+  1: Read transfer, slave enters transmitter mode
+
+Bit 15 BUSY: Bus busy
+This flag indicates that a communication is in progress on the bus. It is set
+by hardware when a START condition is detected. It is cleared by hardware when
+a Stop condition is detected, or when PE=0
+
+Bit 6 TC: Transfer Complete (master mode)
+This flag is set by hardware when RELOAD=0, AUTOEND=0 and NBYTES data have been
+transferred. It is cleared by software when START bit or STOP bit is set.
+
+Bit 3 ADDR: Address matched (slave mode)
+This bit is set by hardware as soon as the received slave address matched with
+one of the enabled slave addresses. It is cleared by software by setting ADDRCF
+bit.
+
+Bit 2 RXNE: Receive data register not empty (receivers)
+This bit is set by hardware when the received data is copied into the I2C_RXDR
+register, and is ready to be read. It is cleared when I2C_RXDR is read. 
+
+
+Bit 1 TXIS: Transmit interrupt status (transmitters)
+This bit is set by hardware when the I2C_TXDR register is empty and the data to
+be transmitted must be written in the I2C_TXDR register. It is cleared when the
+next data to be sent is written in the I2C_TXDR register. 
+
+Bit 0 TXE: Transmit data register empty (transmitters)
+This bit is set by hardware when the I2C_TXDR register is empty. It is cleared
+when the next data to be sent is written in the I2C_TXDR register. 
+```
+
+### Receive Data Register (I2C_RXDR)
+Offset: 0x24
+
+```
+Bits 7:0 RXDATA[7:0] 8-bit receive data
+Data byte received from the I2C bus
+```
+
+### Transmit Data Register (I2C_TXDR)
+Offset: 0x28
+
+```
+Bits 7:0 TXDATA[7:0] 8-bit transmit data
+Data byte to be transmitted to the I2C bus.
+Note: These bits can be written only when TXE=1
+```
