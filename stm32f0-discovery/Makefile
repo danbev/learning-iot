@@ -9,9 +9,6 @@ uart-tx-sync.elf : uart-tx-sync.o uart-tx.o delay.o
 uart-tx.o: uart-tx.s
 	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
-uart-tx.o: uart-tx.s
-	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
-
 %.elf : %.o blue-led.o
 	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ blue-led.o
 	objcopy -O ihex $@ $@.hex
