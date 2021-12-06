@@ -392,7 +392,8 @@ is used to identify the destination peripheral:
 R/W = 1 Controller is requesting to read
 R/W = 0 Controller is requesting to write
 ACK = Is used by the peripheral that matches the address, which is pulled low
-so there should be a 0 in the ACK bit if the address maches.
+so there should be a 0 in the ACK bit if the address maches. If this is not
+pulled low this is interpreted as a NACK by the controller.
 ```
 Try to remember that this communication is one clock cycle at a time, so a
 peripheral can check each bit of the addess and if it matches it can pull its
@@ -467,7 +468,7 @@ Is a way for the peripheral to signal that it needs a little more time to
 gather data it is going to send.
 
 This is performed by the peripheral by pulling the clock low.
-``
+```
          1  0  0  1  0  1  1  
 SDA -+  +--+     +--+  +--+--+    +
      |  |D7|D6|D5|D4|D3|D2|D0|    |ACK|
@@ -1264,19 +1265,19 @@ the voltage beween the gate and the source voltage.
      |                                   |                |
   Depletion Mode                   Depletion Mode    Enhancement Mode
      |                                   |                |
- +-----------------+           +------------+         +-----------+    
- |                 |           |            |         |           |
-N-Channel      P-Channel    N-Channel      P-Channel N-Channel  P-Channel
+ +-----------------+           +----------            +-----------+    
+ |                 |           |                      |           |
+N-Channel      P-Channel    N-Channel              N-Channel  P-Channel
 
-                                  D
-     D              D             |
-     |              |           |-+
-   |-+            |-+          ||
-G->|           G-<|         G--||-+
-   |-+            |-+          || |
-     |              |           |-+
-     S              S             |
-                                  S
+                                  D                 D             D
+     D              D             |                 |             |
+     |              |           |-+               |-+           |-+
+   |-+            |-+          ||                ||            ||
+G->|           G-<|         G--||<+           G--||<+       G--||>+
+   |-+            |-+          || |              || |          || |
+     |              |           |-+               |-+           |-+
+     S              S             |                 |             |
+                                  S                 S             S
 ```
 Depletion mode requires the Gate-Source (Vgs) voltage to switch OFF the current.
 Enhancement mode requires the Gate-Source (Vgs) voltage to switch ON the
