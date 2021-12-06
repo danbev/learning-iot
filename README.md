@@ -343,9 +343,11 @@ One thing to note is that the data being sent can be a maxium of 9 bits.
 The is not way to support multiple peripherals.
 
 
-### Inter-Integrated Circuit (I²C)
-Was first developed in 1982 by Phillips and a public spec came out in 1992
-which allowed speeds of 400kHz and an address of 10-bits.
+### Inter-IC (Integrated Circuit) (I²C/I2C)
+Was first developed in 1982 by Phillips Semiconductors (which is now NXP
+semiconductors) and a public
+[specification](https://www.nxp.com/docs/en/user-guide/UM10204.pdf) came out in
+1992 which allowed speeds of 400kHz and an address of 10-bits.
 
 There are three additional modes:
 * fast-mode plus, 1MHz
@@ -434,14 +436,19 @@ SDA -+  +--+     +--+  +--+--+--+   +-------+                                 --
 SCL -+    +  +  +  +  +  +  +  +  +             +  +  +  +  +  +  +  +  +  +-------
      |    |  |  |  |  |  |  |  |  |             |  |  |  |  |  |  |  |  |  |
      +----+--+--+--+--+--+--+--+--+-------------+--+--+--+--+--+--+--+--+--+
+                                        ↑
                                    (between frame the clock is low)
 ```
 The clock pulses are supposed to show that they are in the middle of each bit
-and that the peripheral should read then to get the most accurate
+and that the peripheral should read at the point to get the most accurate
 reading/sampling.
 
 Now, each peripheral will detect this pulling low of SDA and read the address
 frame.
+
+If none of the peripherals match the address, that is SDA has not been pulled
+low,  then they all leave the SDA unchanged and the master will consider this
+an NACK and the controller will send the stop bit.
 
 #### Clock streching
 Is a way for the peripheral to signal that it needs a little more time to
