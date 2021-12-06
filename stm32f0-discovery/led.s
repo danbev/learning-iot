@@ -2,21 +2,21 @@
 
 .text
 
-@ General Purpose IO Port C base register
+/* General Purpose IO Port C base register */
 .equ GPIOC_BASE, 0x48000800
-@ Reset and Clock Control register base address
+/* Reset and Clock Control register base address */
 .equ RCC_BASE, 0x40021000
 
-@ Advanced High Performance Bus Enable Register (RCC_AHBENR)
+/* Advanced High Performance Bus Enable Register (RCC_AHBENR) */
 .equ AHBENR_OFFSET, 0x14
 .equ RCC_AHBENR, RCC_BASE + AHBENR_OFFSET
-@ Mask to enable I/O PORT C clock
+/* Mask to enable I/O PORT C clock */
 .equ GPIO_PORTC_ENABLE, 1 << 19
 
-@ MODER Register
+/* MODER Register */
 .equ GPIOC_MODER_OFFSET, 0x00
 .equ GPIOC_MODER, GPIOC_BASE + GPIOC_MODER_OFFSET
-@ Output Data Register
+/* Output Data Register */
 .equ GPIOC_ODR_OFFSET, 0x14
 .equ GPIOC_ODR, GPIOC_BASE + GPIOC_ODR_OFFSET
 
@@ -41,22 +41,8 @@
 .equ GPIOC_MODER_MASK, GPIOC_MODER_MASK_BLUE + GPIOC_MODER_MASK_GREEN
 .equ LED_MASK, LED_MASK_BLUE + LED_MASK_GREEN
 
-/* Enable writing for MODER6 (Mode Register)  which is the red LED. */
-/*
-.equ GPIOC_MODER_MASK, 1 << (RED * 2)
-.equ LED_MASK, 1 << RED
-*/
-
-.equ DELAY_LENGTH, 0x000fffff
-
-/* Set up interrupt vector table: 
- entry 0: initial stack pointer
- entry 1: reset address
-*/
 Vector_Table:    
   .word     0x20002000
-
-ResetVector:
   .word     start + 1
 
 start:
@@ -83,13 +69,6 @@ main_loop:
  
   b   main_loop
          
-delay:
-  ldr r0,=DELAY_LENGTH
-dloop:
-  sub r0, r0, #1
-  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
-  bx  lr
- 
 set_bits: 
   ldr r0, [r1]   /* deref r1 and store in r0. */
   orr r0, r0, r2 /* OR that with r2 saving back to r0. */
