@@ -33,8 +33,8 @@ i2c-c.o: i2c-c.s
 	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
 
-%.elf : %.o blue-led.o
-	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ blue-led.o
+%.elf : %.o blue-led.o delay.o
+	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ blue-led.o delay.o
 	objcopy -O ihex $@ $@.hex
 
 %.o: %.s
