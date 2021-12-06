@@ -23,6 +23,8 @@
 .equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
 .equ I2C1_CR2_SADD, 0x5 << 7         /* Peripheral address            */
+.equ I2C1_CR2_AUTOEND, 1 << 25       /* Send STOP after NBYTES        */
+.equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
 
 .global start
 
@@ -33,7 +35,44 @@ Vector_Table:
 start:
   bl i2c_init
   bl i2c_controller_init
+  bl i2c_write
   b .
+
+i2c_write:
+  /* Set the number of bytes to write */
+  ldr r1, =I2C1_CR2
+  ldr r2, =I2C1_CR2_NBYTES
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Sent STOP condition automatically when NBYTES have been sent */
+  ldr r1, =I2C1_CR2
+  ldr r2, =I2C1_CR2_AUTOEND
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set the peripheral target address */
+  ldr r1, =I2C1_CR2
+  ldr r2, =I2C1_CR2_SADD
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Write 'A' to the transmit data directory */
+  ldr r1, =I2C1_TXDR
+  mov r2, #'A'
+  str r2, [r1]
+
+  /* Start condition */
+  ldr r1, =I2C1_CR2
+  ldr r2, =I2C1_CR2_START
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  bx lr
 
 i2c_controller_init:
   /* Set 7 bit addressing mode */
@@ -49,14 +88,6 @@ i2c_controller_init:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-
-  /* Set the peripheral target address */
-  ldr r1, =I2C1_CR2
-  ldr r2, =I2C1_CR2_SADD
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
 
   /* Enable Peripheral */
   ldr r1, =I2C1_CR1
