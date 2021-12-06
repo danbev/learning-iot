@@ -10,7 +10,6 @@ ResetVector:
   .word     start + 1
 
 start:
-  mov r1, #2
   bl uart_init
 main_loop:
   bl delay
