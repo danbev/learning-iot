@@ -22,6 +22,9 @@
 .equ I2C1_CR2_OFFSET, 0x04
 .equ I2C1_CR2, I2C1_BASE + I2C1_CR2_OFFSET
 
+.equ I2C1_ISR_OFFSET, 0x18
+.equ I2C1_ISR, I2C1_BASE + I2C1_ISR_OFFSET
+
 .equ RCC_APB1_I2C1EN, 1 << 21
 .equ GPIOA_ALT_PA6, 1 << 12
 .equ GPIOA_ALT_PA7, 1 << 14
@@ -51,8 +54,3 @@ i2c_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =I2C1_CR1
-  ldr r2, =I2C1_PE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]

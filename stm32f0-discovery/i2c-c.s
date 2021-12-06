@@ -12,6 +12,13 @@
 .equ I2C1_CR2_OFFSET, 0x04
 .equ I2C1_CR2, I2C1_BASE + I2C1_CR2_OFFSET
 
+.equ I2C1_ISR_OFFSET, 0x18
+.equ I2C1_ISR, I2C1_BASE + I2C1_ISR_OFFSET
+
+/* Transmit Data Register */
+.equ I2C1_TXDR_OFFSET, 0x28
+.equ I2C1_TXDR, I2C1_BASE + I2C1_TXDR_OFFSET
+
 .equ I2C1_CR2_START, 1 << 13         /* Set START condition           */
 .equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
@@ -50,3 +57,12 @@ i2c_controller_init:
   orr r0, r0, r2
   str r0, [r1]
 
+
+  /* Enable Peripheral */
+  ldr r1, =I2C1_CR1
+  ldr r2, =I2C1_PE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  bx lr 
