@@ -16,6 +16,13 @@ i2c.elf : i2c.o uart-tx.o delay.o
 i2c.o: i2c.s
 	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
+i2c-p.elf : i2c.o i2c-p.o uart-tx.o delay.o
+	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ uart-tx.o delay.o
+	objcopy -O ihex $@ $@.hex
+
+i2c-p.o: i2c-p.s
+	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
+
 %.elf : %.o blue-led.o
 	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ blue-led.o
 	objcopy -O ihex $@ $@.hex
