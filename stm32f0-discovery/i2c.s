@@ -40,9 +40,9 @@
 .equ GPIOA_AF1_PA7, 1 << 28
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
-.equ I2C1_TIMINGR_PRESC, 1 << 0          /* Prescalar value                   */
-.equ I2C1_TIMINGR_SCLDEL, 1 << 0         /* SCL delay                         */
-.equ I2C1_TIMINGR_SDADEL, 1 << 0         /* SDA delay                         */
+.equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */
+.equ I2C1_TIMINGR_SCLDEL, 0x4 << 20      /* SCL delay                         */
+.equ I2C1_TIMINGR_SDADEL, 0x2 << 16      /* SDA delay                         */
 
 .equ I2C1_CR1_ANFOFF, 0 << 12            /* Enable/Disable Analog noise filter*/
 .equ I2C1_CR1_NOSTRETCH, 1 << 17         /* Disable clock stretching          */

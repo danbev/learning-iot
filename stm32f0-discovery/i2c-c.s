@@ -29,8 +29,8 @@
 .equ I2C1_CR2_SADD, 0x5 << 7         /* Peripheral address            */
 .equ I2C1_CR2_AUTOEND, 1 << 25       /* Send STOP after NBYTES        */
 .equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
-.equ I2C1_TIMINGR_SCLH, 0 << 15      /* SCL High period               */
-.equ I2C1_TIMINGR_SCLL, 0 << 7       /* SCL Low period                */
+.equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
+.equ I2C1_TIMINGR_SCLL, 0xC7 << 0    /* SCL Low period                */
 
 .global start
 
