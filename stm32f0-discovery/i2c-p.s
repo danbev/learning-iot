@@ -25,6 +25,8 @@
 
 .equ I2C1_OAR1_OA1, 0x5 << 7          /* Peripheral interface address      */
 .equ I2C1_OAR1_OA1EN, 1 << 15         /* Enable Own Address1               */
+.equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
+.equ I2C1_PE, 1 << 0
 
 .global start
 
@@ -33,6 +35,7 @@ Vector_Table:
   .word     start + 1
 
 start:
+  mov r0, #1
   bl i2c_init
   bl uart_init
   bl i2c_peripheral_init
@@ -49,13 +52,6 @@ i2c_peripheral_init:
   /* Enable OA1EN */
   ldr r1, =I2C1_OAR1
   ldr r2, =I2C1_OAR1_OA1EN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Set 7 bit addressing mode */
-  ldr r1, =I2C1_CR2
-  ldr r2, =I2C1_CR2_ADD10
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]

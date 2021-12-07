@@ -34,10 +34,10 @@
 .equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
 
 .equ RCC_APB1_I2C1EN, 1 << 21
-.equ GPIOA_ALT_PA6, 1 << 12
-.equ GPIOA_ALT_PA7, 1 << 14
-.equ GPIOA_AF1_PA6, 1 << 24
-.equ GPIOA_AF1_PA7, 1 << 28
+.equ GPIOA_ALT_PA6, 1 << 12              /* SCL PA6                           */
+.equ GPIOA_ALT_PA7, 1 << 14              /* SDA PA7                           */
+.equ GPIOA_AF1_PA6, 1 << 24              /* SCL PA6                           */
+.equ GPIOA_AF1_PA7, 1 << 28              /* SDA PA7                           */
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */

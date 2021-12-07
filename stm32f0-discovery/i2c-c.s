@@ -31,6 +31,7 @@
 .equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
 .equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
 .equ I2C1_TIMINGR_SCLL, 0xC7 << 0    /* SCL Low period                */
+.equ I2C1_PE, 1 << 0
 
 .global start
 
