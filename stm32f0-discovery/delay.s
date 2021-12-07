@@ -1,3 +1,4 @@
+.text
 .global delay
 
 .equ DELAY_LENGTH, 100000

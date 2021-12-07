@@ -35,7 +35,6 @@ Vector_Table:
   .word     start + 1
 
 start:
-  mov r0, #1
   bl i2c_init
   bl uart_init
   bl i2c_peripheral_init
