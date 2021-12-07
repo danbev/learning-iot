@@ -25,12 +25,20 @@
 .equ I2C1_ISR_OFFSET, 0x18
 .equ I2C1_ISR, I2C1_BASE + I2C1_ISR_OFFSET
 
+/* Timing Register */
+.equ I2C1_TIMINGR_OFFSET, 0x28
+.equ I2C1_TIMINGR, I2C1_BASE + I2C1_TIMINGR_OFFSET
+
 .equ RCC_APB1_I2C1EN, 1 << 21
 .equ GPIOA_ALT_PA6, 1 << 12
 .equ GPIOA_ALT_PA7, 1 << 14
 .equ GPIOA_AF1_PA6, 1 << 24
 .equ GPIOA_AF1_PA7, 1 << 28
 .equ I2C1_PE, 1 << 0
+
+.equ I2C1_TIMINGR_PRESC, 1 << 0          /* Prescalar value */
+.equ I2C1_TIMINGR_SCLDEL, 1 << 0         /* SCL delay       */
+.equ I2C1_TIMINGR_SDADEL, 1 << 0         /* SDA delay       */
 
 .global i2c_init
 
@@ -54,3 +62,25 @@ i2c_init:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Set Prescalar value */
+  ldr r1, =I2C1_TIMINGR
+  ldr r2, =I2C1_TIMINGR_PRESC
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set SCL delay */
+  ldr r1, =I2C1_TIMINGR
+  ldr r2, =I2C1_TIMINGR_SCLDEL
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set SDA delay */
+  ldr r1, =I2C1_TIMINGR
+  ldr r2, =I2C1_TIMINGR_SDADEL
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  bx lr
