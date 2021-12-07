@@ -1,3 +1,4 @@
+/* Micro Controller Clock Output (MCO) example */
 .text
 
 /* Reset Clock and Counter register base address */
@@ -59,6 +60,7 @@ start:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Enable the MicroController Clock Output (MCO) */
   ldr r0, =RCC_CFGR
   ldr r1, =MCO_SYSCLK
   ldr r2, [r0]
