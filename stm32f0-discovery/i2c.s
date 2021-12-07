@@ -38,7 +38,6 @@
 .equ GPIOA_ALT_PA7, 1 << 14
 .equ GPIOA_AF1_PA6, 1 << 24
 .equ GPIOA_AF1_PA7, 1 << 28
-.equ I2C1_PE, 1 << 0
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 0          /* Prescalar value                   */
@@ -46,17 +45,11 @@
 .equ I2C1_TIMINGR_SDADEL, 1 << 0         /* SDA delay                         */
 
 .equ I2C1_CR1_ANFOFF, 0 << 12            /* Enable/Disable Analog noise filter*/
+.equ I2C1_CR1_NOSTRETCH, 1 << 17         /* Disable clock stretching          */
 
 .global i2c_init
 
 i2c_init:
-  /* Set clock source for I2C1 */
-  ldr r1, =RCC_CFGR3
-  ldr r2, =RCC_CFGR3_I2C1SW
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   /* Clock enable I2C1 */
   ldr r1, =RCC_APB1ENR
   ldr r2, =RCC_APB1_I2C1EN
@@ -76,9 +69,23 @@ i2c_init:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Clear PE Peripheral */
+  ldr r1, =I2C1_CR1
+  ldr r2, =(0 << 0)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Enable/Disable Noise filter */
   ldr r1, =I2C1_CR1
   ldr r2, =I2C1_CR1_ANFOFF
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set clock source for I2C1 */
+  ldr r1, =RCC_CFGR3
+  ldr r2, =RCC_CFGR3_I2C1SW
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -100,6 +107,13 @@ i2c_init:
   /* Set SDA delay */
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_SDADEL
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set NOSTRETCH */
+  ldr r1, =I2C1_CR1
+  ldr r2, =I2C1_CR1_NOSTRETCH
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
