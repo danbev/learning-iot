@@ -221,6 +221,7 @@ Clock speed/prescalar = counts
 8000000/800   = 10000
 8000000/8000  = 1000
 8000000/80000 = 100
+```
 
 ### System clock (SYSCLK) selection
 The following can be sources for this clock:
