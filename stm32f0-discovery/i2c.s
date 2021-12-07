@@ -29,12 +29,17 @@
 .equ I2C1_TIMINGR_OFFSET, 0x28
 .equ I2C1_TIMINGR, I2C1_BASE + I2C1_TIMINGR_OFFSET
 
+/* Clock configuration register 3 (RCC_CFGR3) */
+.equ RCC_CFGR3_OFFSET, 0x30
+.equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
+
 .equ RCC_APB1_I2C1EN, 1 << 21
 .equ GPIOA_ALT_PA6, 1 << 12
 .equ GPIOA_ALT_PA7, 1 << 14
 .equ GPIOA_AF1_PA6, 1 << 24
 .equ GPIOA_AF1_PA7, 1 << 28
 .equ I2C1_PE, 1 << 0
+.equ RCC_CFGR3_I2C1SW, 1 << 4           /* Clock source, 0=HSI, 1=SYSCLK */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 0          /* Prescalar value */
 .equ I2C1_TIMINGR_SCLDEL, 1 << 0         /* SCL delay       */
@@ -43,6 +48,13 @@
 .global i2c_init
 
 i2c_init:
+  /* Set clock source for I2C1 */
+  ldr r1, =RCC_CFGR3
+  ldr r2, =RCC_CFGR3_I2C1SW
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Clock enable I2C1 */
   ldr r1, =RCC_APB1ENR
   ldr r2, =RCC_APB1_I2C1EN
