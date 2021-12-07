@@ -5,9 +5,6 @@
 /* Reset Clock and Counter register base address */
 .equ RCC_BASE, 0x40021000
 
-/* General Purpose IO Port C base register */
-.equ GPIOC_BASE, 0x48000800
-
 /* General Purpose IO Port A base register */
 .equ GPIOA_BASE, 0x48000000
 
