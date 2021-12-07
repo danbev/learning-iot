@@ -46,6 +46,13 @@ i2c_peripheral_init:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Enable OA1EN */
+  ldr r1, =I2C1_OAR1
+  ldr r2, =I2C1_OAR1_OA1EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Set 7 bit addressing mode */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_ADD10
