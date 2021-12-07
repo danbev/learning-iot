@@ -33,9 +33,8 @@
 .equ MCO_SYSCLK, 4 << 24
 .global start
 
-Vector_Table:              /* Vector                       Exception Nr */
-  .word     0x20002000     /* Initial Stack Pointer value             - */
-ResetHandler:              /* Reset                                   1 */
+Vector_Table:
+  .word     0x20002000
   .word     start + 1 
 
 start:
