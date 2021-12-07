@@ -304,7 +304,7 @@ Address offset: 0x24
 
 #### TIM2 Prescalar (TIM2_PSC)
 Address offset: 0x28
-```
+
 This value is that is placed in the prescalar register and can be though of as
 the clock source frequence for this timer. This value will then be used with the
 auto-reload value.
@@ -934,6 +934,7 @@ This bit is set and cleared by software to select the I2C1 clock source.
   0: HSI clock selected as I2C1 clock source (default)
   1: System clock (SYSCLK) selected as I2C1 clock
 ```
+So by default we will have 8MHz I2CCLK.
 
 The I2C is clocked by `I2CCLK`. Before enabling the peripheral I2C master clock
 must be configured by setting the `SCLH`, and `SCLL` bits in `I2C_TIMINGR`.
