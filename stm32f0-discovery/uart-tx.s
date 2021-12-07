@@ -1,5 +1,5 @@
 .thumb
-//.text
+.text
 
 /* Reset Clock and Counter register base address */
 .equ RCC_BASE, 0x40021000
@@ -74,7 +74,6 @@ uart_init:
   orr r0, r0, r2 
   str r0, [r1]
 
-
   /* Enable USART1 clock */
   ldr r1, =RCC_APB2ENR
   ldr r2, =RCC_USART1_ENABLE
@@ -134,11 +133,3 @@ output_loop:
   ldr r2, =USART_TDR
   str r3, [r2]
   pop {pc}
-
-.equ DELAY_LENGTH, 100000
-delay:
-  ldr r0,=DELAY_LENGTH
-dloop:
-  sub r0, r0, #1
-  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
-  bx  lr
