@@ -15,6 +15,10 @@
 .equ I2C1_ISR_OFFSET, 0x18
 .equ I2C1_ISR, I2C1_BASE + I2C1_ISR_OFFSET
 
+/* Timing Register */
+.equ I2C1_TIMINGR_OFFSET, 0x28
+.equ I2C1_TIMINGR, I2C1_BASE + I2C1_TIMINGR_OFFSET
+
 /* Transmit Data Register */
 .equ I2C1_TXDR_OFFSET, 0x28
 .equ I2C1_TXDR, I2C1_BASE + I2C1_TXDR_OFFSET
@@ -25,6 +29,8 @@
 .equ I2C1_CR2_SADD, 0x5 << 7         /* Peripheral address            */
 .equ I2C1_CR2_AUTOEND, 1 << 25       /* Send STOP after NBYTES        */
 .equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
+.equ I2C1_TIMINGR_SCLH, 0 << 15      /* SCL High period               */
+.equ I2C1_TIMINGR_SCLL, 0 << 7       /* SCL Low period                */
 
 .global start
 
@@ -85,6 +91,20 @@ i2c_controller_init:
   /* Set write transfer direction */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_RD_WRN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* SCL High period */
+  ldr r1, =I2C1_TIMINGR
+  ldr r2, =I2C1_TIMINGR_SCLH
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* SCL Low period */
+  ldr r1, =I2C1_TIMINGR
+  ldr r2, =I2C1_TIMINGR_SCLL
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
