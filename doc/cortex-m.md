@@ -208,7 +208,19 @@ Is the frequency doubling output of PLL.
 TODO: explain how this works.
 
 ### Clock prescalars
-TODO: explain how this works.
+The prescalar is used to divide the clock source. For example, with the default
+8MHz clock on my board we would get a 8 000 000 counts per second. That is a
+large number of counts and we might not require that. We can therefor divide
+the clock with a number to bring the number of counts down. For example, we
+could divide the clock to bring the number of counts before the under/overflow
+of the counter occurs and we either poll or an interrupt is triggered:
+```
+Clock speed/prescalar = counts
+8000000/8     = 1000000
+8000000/80    = 10000 
+8000000/800   = 10000
+8000000/8000  = 1000
+8000000/80000 = 100
 
 ### System clock (SYSCLK) selection
 The following can be sources for this clock:
@@ -228,7 +240,7 @@ Here we can see that we are running at 8Mhz:
 ![MCO image2](./mco2.jpg "MCO example image 2")
 
 ### Timer vs Clock
-If the source of the clock is internal, like RC or PLL that this is called a
+If the source of the clock is internal, like RC or PLL then it is called a
 timer. If the clock source is externally provided to the CPU this is called
 a clock.
 Both are used to create delays, count events, and for measuring time between
@@ -292,20 +304,7 @@ Address offset: 0x24
 #### TIM2 Prescalar (TIM2_PSC)
 Address offset: 0x28
 ```
-The prescalare is used to divide the clock source. For example, with the default
-8MHz clock on my board we would get a 8 000 000 counts per second. That is a
-large number of counts and we might not require that. We can therefor divide
-the clock with a number to bring the number of counts down. For example, we
-could divide the clock to bring the number of counts before the under/overflow
-of the counter occurs and we either poll or an interrupt is triggered:
-```
-8000000/8     = 1000000
-8000000/80    = 10000 
-8000000/800   = 10000
-8000000/8000  = 1000
-8000000/80000 = 100
-```
-This value is that is placed in the prescalare register and can be though of as
+This value is that is placed in the prescalar register and can be though of as
 the clock source frequence for this timer. This value will then be used with the
 auto-reload value.
 
@@ -337,155 +336,6 @@ have a delay of 5 seconds just using this setup would not work (one would have
 to call the timer multiple times but it would not be possible to have a delay
 of 5 seconds with just one count of the timer).
 
-
-###
-```
-1) Enable Clock to Peripheral
-Open the clock gate?
-
-2) Set the pin to output mode
-So we need 2 registers, the data register and the direction register. We need
-the addresses of these registers and these can be found in the data sheet of
-the specific MCU.
-
-So say we want to use PA5, that is pin 5 of Port A.
-We first need to enable clock to PORTA.
-Next, we set PA5 to output.
-Then, write output to PA5.
-
-So we have to look at the data sheet to see how PORTA is connected, meaning
-which bus it is connected to. So this might be throug the AHB1 bus for example.
-We also need to know the address of the PORT A and we can also look this up
-in the data sheet for the MCU.
-As an example looking in https://www.st.com/resource/en/datasheet/stm32f411ce.pdf
-and page 54 we find a table with the entry for GPIOA:
-```
-0x4002 0000 - 0x4002 03FF GPIOA
-```
-So that is the start address followed by the end address.
-So 0x40020000 is the base address of GPIO PORT A:
-```assembly
-GPIO_BASE 0x40020000
-```
-Now to enable the clock to the PORT we have to go through the RCC which is the
-Reset and Clock Control
-```
-0x4002 3800 - 0x4002 3BFF RCC
-```
-
-```assembly
-RCC_BASE 0x40023800
-```
-The direction register is called the MODE register in stm32 so we have to find
-the address of this register. ODR (Output Data Register) is the name of the
-output register. To get these addresses we use an offset from the GPIO base
-register. We can think of GPIO_BASE as struct in C and it has different member
-which we can access, and instead of using names we use offsets.
-
-https://www.st.com/resource/en/reference_manual/dm00119316-stm32f411xc-e-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf
-on page 117 we find RCC_AHB1ENR which is the name of this register:
-```text
-6.3.9 RCC AHB1 peripheral clock enable register (RCC_AHB1ENR)
-  Address offset: 0x30
-  Reset value: 0x0000 0000
-```
-So using the RCC address we can get to the AHB1ENR (AHB1 enable?) by taking
-RCC_BASE + 0x30.
-```assembly
-AHB1ENR_OFFSET 0x30
-```
-This register is 32 bits and is layout is described in the document. We are
-interested in enabling GPIO A and this is bit number 0 called GPIOAEN:
-```
-Bit 0 GPIOAEN: IO port A clock enable
-Set and cleared by software.
-0: IO port A clock disabled
-1: IO port A clock enabled
-```
-This can be enabled using as left shift:
-```
-GPIOA_EN 1<<0
-```
-Next we need the address of the MODE register (MODER), this is the direction
-register which should be set to out in this case. This can also be found in
-the same document.
-```
-8.4.1 GPIO port mode register (GPIOx_MODER) (x = A..E and H)
-Address offset: 0x00
-Reset values:
-• 0xA800 0000 for port A
-• 0x0000 0280 for port B
-• 0x0000 0000 for other ports
-```
-Notice that GPIOx_MODER where x can be A..E or H. So In our case it will be
-CPIOA_MODER.
-
-This register is 32 bits and deviced into 15 two pit pairs. So we have MODER0-
-MODER15. Each of these have two bits and can represent the following values:
-```
-00: Input (reset state)
-01: General purpose output mode
-10: Alternate function mode (UART, PWM, DAC, etc)
-11: Analog mode
-```
-Recall that we are trying to set PA5, that is pin 5 of Port A. We would therefor
-set the bit-pair number five, MODER5 (notice the 5):
-So we have to set bit 10 = 1, and bit 11 = 0.
-```
-MODER5_OUT 1 << 10
-MODER_OFFSET  0x00
-```
-Using this value will set PA5 direction/mode to output.
-So that was setting the direction, next we have to set the data register
-
-8.4.6 GPIO port output data register (GPIOx_ODR) (x = A..E and H)
-Address offset: 0x14
-Reset value: 0x0000 0000
-
-Bits 31:16 Reserved, must be kept at reset value.
-Bits 15:0 ODRy: Port output data (y = 0..15)
-These bits can be read and written by software.
-
-We are interested in ODR5 (pin number 5).
-```assembly
-; GPIOA_BASE 0x40020000
-; RCC_BASE 0x40023800   (Reset and Clock Control register base)
-
-; AHB1ENR_OFFSET 0x30   (Advanded Higher Performace Bus 1, Enable Register Offset)
-;                       Offset from RCC_BASE
-; GPIOA_EN 1<<0         (GPIO Port A Enable)
-
-; MODER_OFFSET  0x00    (Mode/direction register offset, its the first member
-;                        of the "struct")
-; MODER5_OUT 1 << 10    (set the output bit)
-
-; ODR_OFFSET 0x14
-; LED_ON 1 << 5
-
-RCC_BASE           equ 0x40023800
-AHB1ENR_OFFSET     equ 0x30
-RCC_AHB1ENR        equ RCC_BASE + AHB1ENR_OFFSET
-
-GPIOA_BASE         equ 0x40020000
-CPIOA_MODER_OFFSET equ 0x00
-CPIOA_MODER        equ GPIOA_BASE + CPIOA_MODER_OFFSET 
-
-CPIOA_ODR_OFFSET   equ 0x14
-CPIOA_ODR          equ CPIOA_BASE + CPIOA_ODR_OFFSET
-
-GPIOA_EN           equ 1<<0
-MODER5_OUT         equ 1 << 10
-LED_ON             equ 1 << 5
-
-.text
-
-
-```
-Notice that `RCC_BASE + AHB1ENR_OFFSET` is really like writing something like
-`rcc_base->ahb1enr_offset` in C just that the compiler knows the size of the
-members of a struct and can do this calculation for us.
-
-3) Write to the pin
 
 ### System Timer (SysTick)
 Can be used to schedule something to happen on a regular basis using an internal
@@ -746,7 +596,7 @@ Group              Pin
       TSC_G2_IO4   PA7
 ...
 ```
-And if we look at the laternative function for PA2 we can see that it is AF3.
+And if we look at the aternative function for PA2 we can see that it is AF3.
 ```
 Pin              Alternat function      GPIOA_AFR
 PA0              TSC_G1_IO1             AF3
@@ -762,7 +612,7 @@ Lets start with that enabling Port A pins 2, PA2 as the key touch sensor
 as the alternative functions as AF3.
 
 
-Hmm, I think I've mix things up a little here with regards to the analog to
+Hmm, I think I've mixed things up a little here with regards to the analog to
 digital converter and the touch sensing controller. I was focusing on the
 sensing here and thinking that I'd be able to read the that value and convert
 it to a digital signal. But the touch sensor is more about having a sensor
@@ -1087,6 +937,13 @@ The I2C can be enabled by setting the PE bit in the I2C_CR1 register.
 Offset: 0x04
 
 ```
+Bit 25 AUTOEND: Automatic end mode (master mode)
+This bit is set and cleared by software.
+  0: software end mode: TC flag is set when NBYTES data are transferred,
+     stretching SCL low.
+  1: Automatic end mode: a STOP condition is automatically sent when NBYTES
+     data are transferred.
+
 Bits 23:16 NBYTES[7:0]: Number of bytes
 The number of bytes to be transmitted/received is programmed there. This field
 is don’t care in slave mode with SBC=0.
