@@ -922,6 +922,97 @@ PB13 I2C2_SCL    AF1
 PB14 I2C2_SDA    AF1
 ```
 
+The I2CCLK is an independent clock source and can be either `SYSCLK` or `HSI`
+which is chosen by setting `RCC_I2C1SW`
+
+#### Clock configuration register 3 (RCC_CFGR3)
+Offset (From RCC): 0x30
+```
+Bit 4 I2C1SW: I2C1 clock source selection
+This bit is set and cleared by software to select the I2C1 clock source.
+  0: HSI clock selected as I2C1 clock source (default)
+  1: System clock (SYSCLK) selected as I2C1 clock
+```
+
+The I2C is clocked by `I2CCLK`. Before enabling the peripheral I2C master clock
+must be configured by setting the `SCLH`, and `SCLL` bits in `I2C_TIMINGR`.
+These fields are for configuring the SCL (the clock wire) high and low values.
+Take the START condition which where the controller will pull SDA low while
+SCL is high. Both sides need to know how long the controller will hold SDA low
+in order for that to indicate that a start condition is meant (at least this is
+what I think these configuration options are).
+
+The I2C spec defines two values named t_f and t_r.
+
+t_f (f for fall) is the time it takes to fall from 70% - 30% on the falling
+edge:
+```
+------
+      \ 70 %   ↑
+       \       | ←--- t_f
+        \ 30 % ↓
+         -------
+```
+t_r (r for raise) is the time it takes to raise from 30% - 70% on the raisning
+edge:
+```
+          ------------
+         / 70%  ↑
+        /       | ←--- t_r
+       / 30%    ↓
+-------
+```
+
+#### Hold time for Start Condition
+As mentioned previously the start condition is when the SDA is pulled low before
+SCL is pulled low (so SCL is high) and there is a hold time associated with this
+state called Hold Time for Start Condition (t_hd:STA) and this specified the min
+time that SDA should be held low before SCL can be pulled low.
+t_hd:STA is measured as the time taken from 30% amplitude of the SDA falling
+(from high to low) to 70% of the amplitude of SCL falling (from high to low):
+```
+SDA   ------
+            \ 70%   
+             \       
+              \ 30% 
+               -------
+              ↑   
+              |----------------|
+                 t_hd:STA      ↓
+SCL   -------------------------
+                               \ 70%
+                                \  
+                                 \ 30%
+                                  -------
+```
+
+#### Setup time
+Is the amount of time data must remain stable before it is sampled.
+
+Start setup time is only taken into account for a repeated start condition.
+
+#### Hold time
+Is the time interval after sampling of data has been initiated.
+```
+              HD:DAT
+                |
+                ↓
+            |-| |----|
+         ----      
+        /    \
+       /      \
+SCL ---        -----
+
+
+SDA ---------------\
+                    \
+                     -----
+               |----|
+               HD:DAT
+```
+
+Start hold time sets the min time SDA should be low before SCL goes high.
+
 #### Control Register 1 (I2C_CR1)
 Offset: 0x00
 
@@ -1091,4 +1182,33 @@ Offset: 0x28
 Bits 7:0 TXDATA[7:0] 8-bit transmit data
 Data byte to be transmitted to the I2C bus.
 Note: These bits can be written only when TXE=1
+```
+
+### Timing Register (I2C_TIMINGR)
+The controller and the peripherals need to be configured correctly to allow for
+the correct data hold times and set up times. 
+
+
+
+Offset: 0x10
+
+```
+Bits 31:28 PRESC[3:0]: Timing prescaler
+This field is used to prescale I2CCLK in order to generate the clock period
+tPRESC used for data setup and hold counters and for SCL high and low level
+counters.
+
+Bits 23:20 SCLDEL[3:0]: Data setup time
+This field is used to generate a delay tSCLDEL between SDA edge and SCL rising
+edge. In master mode and in slave mode with NOSTRETCH = 0, the SCL line is
+stretched low during tSCLDEL.
+
+tSCLDEL = (SCLDEL+1) x tPRESC
+
+Bits 15:8 SCLH[7:0]: SCL high period (master mode)
+This field is used to generate the SCL high period in master mode.
+
+Bits 7:0 SCLL[7:0]: SCL low period (master mode)
+This field is used to generate the SCL low period in master mode
+
 ```
