@@ -13,13 +13,13 @@ External (to the microcontroller):
 * Resistor capacitator
 * Capacitator only
 
-One thing to not is that temperature changes can lead to changes in frequency
+One thing to note is that temperature changes can lead to changes in frequency
 and is something that might be an issue when deciding which clock source to be
 used.
 
 ### CMOS Clocks
 Are basically crystal oscilators that do not include any method of temperature
-compensation
+compensation.
 
 ### Quartz Crystals
 When a voltage source is applied to a small thin piece of quartz crystal, it
@@ -31,9 +31,9 @@ Is a crystal oscillator with a temperature controlled internal mini oven which
 allows it to maintain a consistent temperature of the crystal and other key
 components (rememeber that otherwise a change in temperature could change the
 frequency of the signal). So the goal of the OCXO is to keep the crystal and
-the internal components stabil when outside temperatures change.
+the internal components stable when the outside temperatures change.
 
-These are used when when one need to have a signal stabil within a range of
+These are used when one need to have a stable signal within a range of
 ±1 x 10-8 or better. But they are more expensive and also consume more power.
 
 
@@ -106,8 +106,8 @@ discharge:
   +----<-----+
 ```
 Notice that the polarity of the capacitor has been reversed and since the
-capitor is now charge its electrons will flow in the other direction (compare
-to the two above states that is). If we again think or our imaginary graph we
+capitor is now charged its electrons will flow in the other direction (compared
+with the two above states that is). If we again think or our imaginary graph we
 are back at zero before the capacitor starts to discharge and we are now going
 below zero (think of a sine wave) and when the current is at its maxium the
 inductor will have stored its maxium amount of energy and the current will
@@ -127,8 +127,8 @@ polarity once again. This is now a period in our wave, we started from zero
 to our max current, then down to zero current, then continued down to the max
 "negative" current, and back up again to zero. So this is providing a wave with
 all the properties like amplitute, frequency, and phase. But this will not
-continue for every as there are things that cause the amplitude to decrease, and
-that I mean is that electrons (the current) are lost to heat, resistance in
+continue forever as there are things that cause the amplitude to decrease, and
+by that I mean that electrons (the current) are lost to heat, resistance in
 wires that will cause the maxium current to become less for each period/cycle.
 This means that our amplitude will decrease over time and eventually become
 zero. But if we have some way of preventing this from happening we would have
