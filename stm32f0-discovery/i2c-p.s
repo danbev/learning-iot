@@ -23,12 +23,14 @@
 .equ I2C1_RXDR_OFFSET, 0x24
 .equ I2C1_RXDR, I2C1_BASE + I2C1_RXDR_OFFSET
 
-.equ I2C1_OAR1_OA1, 0x08 << 7          /* Peripheral interface address      */
+.equ I2C1_OAR1_OA1, 0x08 << 7         /* Peripheral interface address      */
 .equ I2C1_OAR1_OA1EN, 1 << 15         /* Enable Own Address1               */
+.equ I2C1_OAR1_OA1MODE, 0 << 10       /* 7-bit address                     */
 .equ I2C1_CR2_ADD10, 0 << 11          /* Addressing mode, 0 = 7 bits       */
 .equ I2C1_PE, 1 << 0                  /* Peripheral enable                 */
 .equ I2C1_ISR_ADDR, 1 << 3            /* Address matched                   */
 .equ I2C1_ISR_RXNE, 1 << 2            /* Address matched                   */
+.equ I2C1_CR1_GCEN, 1 << 19           /* Address matched                   */
 
 .global start
 
@@ -74,9 +76,21 @@ i2c_peripheral_init:
   orr r0, r0, r2
   str r0, [r1]
 
+  ldr r1, =I2C1_OAR1
+  ldr r2, =I2C1_OAR1_OA1EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Enable OA1EN */
   ldr r1, =I2C1_OAR1
   ldr r2, =I2C1_OAR1_OA1EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  ldr r1, =I2C1_OAR1
+  ldr r2, =I2C1_OAR1_OA1MODE
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -88,8 +102,8 @@ i2c_peripheral_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =I2C1_OAR1
-  ldr r2, =I2C1_OAR1_OA1
+  ldr r1, =I2C1_CR1
+  ldr r2, =I2C1_CR1_GCEN
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
