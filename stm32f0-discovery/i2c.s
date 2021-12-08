@@ -40,8 +40,8 @@
 .equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
 
 .equ RCC_APB1_I2C1EN, 1 << 21
-.equ GPIOA_ALT_PA6, 1 << 12              /* SCL PA6                           */
-.equ GPIOA_ALT_PA7, 1 << 14              /* SDA PA7                           */
+.equ GPIOA_ALT_PA6, 2 << 12              /* SCL PA6                           */
+.equ GPIOA_ALT_PA7, 2 << 14              /* SDA PA7                           */
 .equ GPIOA_AF1_PA6, 1 << 24              /* SCL PA6                           */
 .equ GPIOA_AF1_PA7, 1 << 28              /* SDA PA7                           */
 .equ GPIOA_OTYPER_PA6, 1 << 6            /* Open-drain PA6                    */
