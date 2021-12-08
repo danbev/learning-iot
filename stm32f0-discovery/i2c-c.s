@@ -26,7 +26,7 @@
 .equ I2C1_CR2_START, 1 << 13         /* Set START condition           */
 .equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
-.equ I2C1_CR2_SADD, 0x08 << 7         /* Peripheral address            */
+.equ I2C1_CR2_SADD, 0x08 << 1        /* Peripheral address            */
 .equ I2C1_CR2_AUTOEND, 0 << 25       /* Send STOP after NBYTES        */
 .equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
 .equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
