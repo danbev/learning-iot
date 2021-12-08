@@ -16,6 +16,12 @@
 .equ GPIOA_AFRL_OFFSET, 0x20
 .equ GPIOA_AFRL, GPIOA_BASE + GPIOA_AFRL_OFFSET
 
+.equ GPIOA_OTYPER_OFFSET, 0x04
+.equ GPIOA_OTYPER, GPIOA_BASE + GPIOA_OTYPER_OFFSET
+
+.equ GPIOA_PUPDR_OFFSET, 0x0C
+.equ GPIOA_PUPDR, GPIOA_BASE + GPIOA_PUPDR_OFFSET
+
 .equ I2C1_CR1_OFFSET, 0x00
 .equ I2C1_CR1, I2C1_BASE + I2C1_CR1_OFFSET
 
@@ -38,6 +44,10 @@
 .equ GPIOA_ALT_PA7, 1 << 14              /* SDA PA7                           */
 .equ GPIOA_AF1_PA6, 1 << 24              /* SCL PA6                           */
 .equ GPIOA_AF1_PA7, 1 << 28              /* SDA PA7                           */
+.equ GPIOA_OTYPER_PA6, 1 << 6            /* Open-drain PA6                    */
+.equ GPIOA_OTYPER_PA7, 1 << 7            /* Open-drain PA7                    */
+.equ GPIOA_PUPDR_PA6, 0x00 << 12         /* Non pull-up/pull-down PA6         */
+.equ GPIOA_PUPDR_PA7, 0x00 << 14         /* Non pull-up/pull-down PA7         */
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */
@@ -65,6 +75,20 @@ i2c_init:
 
   ldr r1, =GPIOA_AFRL
   ldr r2, =(GPIOA_AF1_PA6 + GPIOA_AF1_PA7)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set output type to open-drain */
+  ldr r1, =GPIOA_OTYPER
+  ldr r2, =(GPIOA_OTYPER_PA6 + GPIOA_OTYPER_PA7)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set no pull-up/pull-down */
+  ldr r1, =GPIOA_PUPDR
+  ldr r2, =(GPIOA_PUPDR_PA6 + GPIOA_PUPDR_PA7)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
