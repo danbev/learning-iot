@@ -23,7 +23,7 @@
 .equ I2C1_RXDR_OFFSET, 0x24
 .equ I2C1_RXDR, I2C1_BASE + I2C1_RXDR_OFFSET
 
-.equ I2C1_OAR1_OA1, 0x08 << 7         /* Peripheral interface address      */
+.equ I2C1_OAR1_OA1, 0x08 << 1         /* Peripheral interface address      */
 .equ I2C1_OAR1_OA1EN, 1 << 15         /* Enable Own Address1               */
 .equ I2C1_OAR1_OA1MODE, 0 << 10       /* 7-bit address                     */
 .equ I2C1_CR2_ADD10, 0 << 11          /* Addressing mode, 0 = 7 bits       */
