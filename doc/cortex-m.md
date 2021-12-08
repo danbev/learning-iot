@@ -1214,3 +1214,6 @@ Bits 7:0 SCLL[7:0]: SCL low period (master mode)
 This field is used to generate the SCL low period in master mode
 
 ```
+
+Controller example: [i2c-c.s](../stm32f0-discovery/i2c-c.s)  
+Peripheral example: [i2c-p.s](../stm32f0-discovery/i2c-p.s)  
