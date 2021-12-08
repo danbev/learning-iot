@@ -5,22 +5,28 @@
 .equ RCC_BASE, 0x40021000
 
 .equ I2C1_BASE, 0x40005400
-.equ GPIOA_BASE, 0x48000000
+.equ GPIOB_BASE, 0x48000400
 
 .equ APB1ENR_OFFSET, 0x1C
 .equ RCC_APB1ENR, RCC_BASE + APB1ENR_OFFSET
 
-.equ GPIOA_MODER_OFFSET, 0x00
-.equ GPIOA_MODER, GPIOA_BASE + GPIOA_MODER_OFFSET
+.equ RCC_AHBENR_OFFSET, 0x14
+.equ RCC_AHBENR, RCC_BASE + RCC_AHBENR_OFFSET
 
-.equ GPIOA_AFRL_OFFSET, 0x20
-.equ GPIOA_AFRL, GPIOA_BASE + GPIOA_AFRL_OFFSET
+.equ GPIOB_MODER_OFFSET, 0x00
+.equ GPIOB_MODER, GPIOB_BASE + GPIOB_MODER_OFFSET
 
-.equ GPIOA_OTYPER_OFFSET, 0x04
-.equ GPIOA_OTYPER, GPIOA_BASE + GPIOA_OTYPER_OFFSET
+.equ GPIOB_AFRL_OFFSET, 0x20
+.equ GPIOB_AFRL, GPIOB_BASE + GPIOB_AFRL_OFFSET
 
-.equ GPIOA_PUPDR_OFFSET, 0x0C
-.equ GPIOA_PUPDR, GPIOA_BASE + GPIOA_PUPDR_OFFSET
+.equ GPIOB_OTYPER_OFFSET, 0x04
+.equ GPIOB_OTYPER, GPIOB_BASE + GPIOB_OTYPER_OFFSET
+
+.equ GPIOB_OSPEEDR_OFFSET, 0x08
+.equ GPIOB_OSPEEDR, GPIOB_BASE + GPIOB_OSPEEDR_OFFSET
+
+.equ GPIOB_PUPDR_OFFSET, 0x0C
+.equ GPIOB_PUPDR, GPIOB_BASE + GPIOB_PUPDR_OFFSET
 
 .equ I2C1_CR1_OFFSET, 0x00
 .equ I2C1_CR1, I2C1_BASE + I2C1_CR1_OFFSET
@@ -40,14 +46,17 @@
 .equ RCC_CFGR3, RCC_BASE + RCC_CFGR3_OFFSET
 
 .equ RCC_APB1_I2C1EN, 1 << 21
-.equ GPIOA_ALT_PA6, 2 << 12              /* SCL PA6                           */
-.equ GPIOA_ALT_PA7, 2 << 14              /* SDA PA7                           */
-.equ GPIOA_AF1_PA6, 1 << 24              /* SCL PA6                           */
-.equ GPIOA_AF1_PA7, 1 << 28              /* SDA PA7                           */
-.equ GPIOA_OTYPER_PA6, 1 << 6            /* Open-drain PA6                    */
-.equ GPIOA_OTYPER_PA7, 1 << 7            /* Open-drain PA7                    */
-.equ GPIOA_PUPDR_PA6, 1 << 12            /* pull-up PA6                       */
-.equ GPIOA_PUPDR_PA7, 1 << 14            /* pull-up PA7                       */
+.equ RCC_AHBENR_IOPBEN, 1 << 18
+.equ GPIOB_ALT_PB6, 2 << 12              /* SCL PB6                           */
+.equ GPIOB_ALT_PB7, 2 << 14              /* SDA PB7                           */
+.equ GPIOB_AF1_PB6, 1 << 24              /* SCL PB6                           */
+.equ GPIOB_AF1_PB7, 1 << 28              /* SDA PB7                           */
+.equ GPIOB_OTYPER_PB6, 1 << 6            /* Open-drain PB6                    */
+.equ GPIOB_OTYPER_PB7, 1 << 7            /* Open-drain PB7                    */
+.equ GPIOB_OSPEEDR_PB6, 1 << 12          /* Speed for PB6                     */
+.equ GPIOB_OSPEEDR_PB7, 1 << 14          /* Speed for PB7                     */
+.equ GPIOB_PUPDR_PB6, 1 << 12            /* pull-up PB6                       */
+.equ GPIOB_PUPDR_PB7, 1 << 14            /* pull-up PB7                       */
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */
@@ -67,28 +76,42 @@ i2c_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIOA_MODER
-  ldr r2, =(GPIOA_ALT_PA6 + GPIOA_ALT_PA7)
+  /* Clock enable Port B */
+  ldr r1, =RCC_AHBENR
+  ldr r2, =RCC_AHBENR_IOPBEN
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIOA_AFRL
-  ldr r2, =(GPIOA_AF1_PA6 + GPIOA_AF1_PA7)
+  ldr r1, =GPIOB_MODER
+  ldr r2, =(GPIOB_ALT_PB6 + GPIOB_ALT_PB7)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Set output type to open-drain */
-  ldr r1, =GPIOA_OTYPER
-  ldr r2, =(GPIOA_OTYPER_PA6 + GPIOA_OTYPER_PA7)
+  ldr r1, =GPIOB_AFRL
+  ldr r2, =(GPIOB_AF1_PB6 + GPIOB_AF1_PB7)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set output type */
+  ldr r1, =GPIOB_OTYPER
+  ldr r2, =(GPIOB_OTYPER_PB6 + GPIOB_OTYPER_PB7)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set pin speed */
+  ldr r1, =GPIOB_OSPEEDR
+  ldr r2, =(GPIOB_OSPEEDR_PB6 + GPIOB_OSPEEDR_PB7)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   /* Set no pull-up/pull-down */
-  ldr r1, =GPIOA_PUPDR
-  ldr r2, =(GPIOA_PUPDR_PA6 + GPIOA_PUPDR_PA7)
+  ldr r1, =GPIOB_PUPDR
+  ldr r2, =(GPIOB_PUPDR_PB6 + GPIOB_PUPDR_PB7)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
