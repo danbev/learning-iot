@@ -32,6 +32,9 @@
 .equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
 .equ I2C1_TIMINGR_SCLL, 0xC7 << 0    /* SCL Low period                */
 .equ I2C1_PE, 1 << 0
+.equ I2C1_ISR_TXIS, 1 << 1 
+.equ I2C1_ISR_TXE, 1 << 0 
+.equ I2C1_ISR_TC, 1 << 6
 
 .global start
 
@@ -67,17 +70,35 @@ i2c_write:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Write 'A' to the transmit data directory */
-  ldr r1, =I2C1_TXDR
-  mov r2, #'A'
-  str r2, [r1]
-
   /* Start condition */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_START
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+
+  /* Wait for trasmit data register empty flag to be set */
+  ldr r1, =I2C1_ISR
+  ldr r2, =I2C1_ISR_TXE
+wait_for_txis:
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x00
+  beq wait_for_txis
+
+  /* Write 'A' to the transmit data directory */
+  ldr r1, =I2C1_TXDR
+  mov r2, #'A'
+  str r2, [r1]
+
+  /* Wait for transfer complete */
+  ldr r1, =I2C1_ISR
+  ldr r2, =I2C1_ISR_TC
+wait_transfer_complete:
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x00
+  beq wait_transfer_complete
 
   bx lr
 
