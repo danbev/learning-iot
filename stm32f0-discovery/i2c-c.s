@@ -35,6 +35,7 @@
 .equ I2C1_ISR_TXIS, 1 << 1 
 .equ I2C1_ISR_TXE, 1 << 0 
 .equ I2C1_ISR_TC, 1 << 6
+.equ I2C1_ISR_NACKF, 1 << 4
 
 .global start
 
@@ -77,14 +78,21 @@ i2c_write:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Wait for trasmit data register empty flag to be set */
+  /* Wait for transmit data register empty flag to be set */
+wait_for_peripheral:
   ldr r1, =I2C1_ISR
-  ldr r2, =I2C1_ISR_TXE
-wait_for_txis:
+  ldr r2, =I2C1_ISR_NACKF
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x01
+  beq nack_received
+
+  ldr r1, =I2C1_ISR
+  ldr r2, =I2C1_ISR_TXIS
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, #0x00
-  beq wait_for_txis
+  beq wait_for_peripheral
 
   /* Write 'A' to the transmit data directory */
   ldr r1, =I2C1_TXDR
@@ -101,6 +109,9 @@ wait_transfer_complete:
   beq wait_transfer_complete
 
   bx lr
+
+nack_received:
+  b .
 
 i2c_controller_init:
   /* Set 7 bit addressing mode */
