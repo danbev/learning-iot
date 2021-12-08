@@ -46,8 +46,8 @@
 .equ GPIOA_AF1_PA7, 1 << 28              /* SDA PA7                           */
 .equ GPIOA_OTYPER_PA6, 1 << 6            /* Open-drain PA6                    */
 .equ GPIOA_OTYPER_PA7, 1 << 7            /* Open-drain PA7                    */
-.equ GPIOA_PUPDR_PA6, 0x00 << 12         /* Non pull-up/pull-down PA6         */
-.equ GPIOA_PUPDR_PA7, 0x00 << 14         /* Non pull-up/pull-down PA7         */
+.equ GPIOA_PUPDR_PA6, 1 << 12            /* pull-up PA6                       */
+.equ GPIOA_PUPDR_PA7, 1 << 14            /* pull-up PA7                       */
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */
