@@ -25,8 +25,10 @@
 
 .equ I2C1_OAR1_OA1, 0x5 << 7          /* Peripheral interface address      */
 .equ I2C1_OAR1_OA1EN, 1 << 15         /* Enable Own Address1               */
-.equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
-.equ I2C1_PE, 1 << 0
+.equ I2C1_CR2_ADD10, 0 << 11          /* Addressing mode, 0 = 7 bits       */
+.equ I2C1_PE, 1 << 0                  /* Peripheral enable                 */
+.equ I2C1_ISR_ADDR, 1 << 3            /* Address matched                   */
+.equ I2C1_ISR_RXNE, 1 << 2            /* Address matched                   */
 
 .global start
 
@@ -38,7 +40,31 @@ start:
   bl i2c_init
   bl uart_init
   bl i2c_peripheral_init
-  b .
+
+main_loop:
+  /* Wait for address that matches this peripheral */
+  ldr r1, =I2C1_ISR
+  ldr r2, =I2C1_ISR_ADDR
+wait_for_addr:
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x00
+  b wait_for_addr
+
+  /* Wait for Receive data register to be filled (not empty) */
+  ldr r1, =I2C1_ISR
+  ldr r2, =I2C1_ISR_RXNE
+wait_for_rxne:
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x00
+  b wait_for_rxne
+
+  /* Read from Recieve data register */
+  ldr r1, =I2C1_ISR_RXNE
+  ldr r0, [r1]
+  bl uart_write_char
+  b main_loop
 
 i2c_peripheral_init:
   /* Set 7 bit addressing mode */
