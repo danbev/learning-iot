@@ -6,6 +6,9 @@
 
 .equ I2C1_BASE, 0x40005400
 
+.equ APB1ENR_OFFSET, 0x1C
+.equ RCC_APB1ENR, RCC_BASE + APB1ENR_OFFSET
+
 .equ I2C1_CR1_OFFSET, 0x00
 .equ I2C1_CR1, I2C1_BASE + I2C1_CR1_OFFSET
 
@@ -26,9 +29,9 @@
 .equ I2C1_CR2_START, 1 << 13         /* Set START condition           */
 .equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
-.equ I2C1_CR2_SADD, 0x08 << 1        /* Peripheral address            */
+.equ I2C1_CR2_SADD, 0x19 << 0        /* Peripheral address            */
 .equ I2C1_CR2_AUTOEND, 0 << 25       /* Send STOP after NBYTES        */
-.equ I2C1_CR2_NBYTES, 1 << 23        /* Number of bytes to trasmit    */
+.equ I2C1_CR2_NBYTES, 1 << 16        /* Number of bytes to transmit   */
 .equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
 .equ I2C1_TIMINGR_SCLL, 0xC7 << 0    /* SCL Low period                */
 .equ I2C1_PE, 1 << 0
@@ -37,6 +40,7 @@
 .equ I2C1_ISR_TC, 1 << 6
 .equ I2C1_ISR_NACKF, 1 << 4
 
+.equ RCC_APB1_I2C1EN, 1 << 21
 
 .global start
 
@@ -47,10 +51,12 @@ Vector_Table:
 start:
   bl i2c_init
   bl i2c_controller_init
+  bl led_init
   bl i2c_write
   b .
 
 i2c_write:
+  bl turn_led_on
   /* Set the number of bytes to write */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_NBYTES
@@ -59,11 +65,13 @@ i2c_write:
   str r0, [r1]
 
   /* Send STOP condition automatically when NBYTES have been sent */
+/*
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_AUTOEND
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* Set the peripheral target address */
   ldr r1, =I2C1_CR2
@@ -109,12 +117,23 @@ wait_transfer_complete:
   cmp r0, #0x00
   beq wait_transfer_complete
 
+  bl delay
+  bl turn_led_off
+
   bx lr
 
 nack_received:
+  bl turn_led_off
   b .
 
 i2c_controller_init:
+  /* Clock enable I2C1 */
+  ldr r1, =RCC_APB1ENR
+  ldr r2, =RCC_APB1_I2C1EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Set 7 bit addressing mode */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_ADD10
