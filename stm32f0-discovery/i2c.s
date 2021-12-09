@@ -64,18 +64,10 @@
 .equ I2C1_TIMINGR_SDADEL, 0x2 << 16      /* SDA delay                         */
 
 .equ I2C1_CR1_ANFOFF, 0 << 12            /* Enable/Disable Analog noise filter*/
-.equ I2C1_CR1_NOSTRETCH, 1 << 17         /* Disable clock stretching          */
 
 .global i2c_init
 
 i2c_init:
-  /* Clock enable I2C1 */
-  ldr r1, =RCC_APB1ENR
-  ldr r2, =RCC_APB1_I2C1EN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   /* Clock enable Port B */
   ldr r1, =RCC_AHBENR
   ldr r2, =RCC_AHBENR_IOPBEN
@@ -154,13 +146,6 @@ i2c_init:
   /* Set SDA delay */
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_SDADEL
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Set NOSTRETCH */
-  ldr r1, =I2C1_CR1
-  ldr r2, =I2C1_CR1_NOSTRETCH
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
