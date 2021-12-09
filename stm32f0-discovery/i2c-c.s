@@ -37,6 +37,7 @@
 .equ I2C1_ISR_TC, 1 << 6
 .equ I2C1_ISR_NACKF, 1 << 4
 
+
 .global start
 
 Vector_Table:    
@@ -84,7 +85,7 @@ wait_for_peripheral:
   ldr r2, =I2C1_ISR_NACKF
   ldr r0, [r1]
   and r0, r0, r2
-  cmp r0, #0x01
+  cmp r0, r2
   beq nack_received
 
   ldr r1, =I2C1_ISR
