@@ -23,10 +23,9 @@
 .equ I2C1_RXDR_OFFSET, 0x24
 .equ I2C1_RXDR, I2C1_BASE + I2C1_RXDR_OFFSET
 
-.equ I2C1_OAR1_OA1, 0x08 << 1         /* Peripheral interface address      */
+.equ I2C1_OAR1_OA1, 0x08 << 1         /* Peripheral own address            */
 .equ I2C1_OAR1_OA1EN, 1 << 15         /* Enable Own Address1               */
 .equ I2C1_OAR1_OA1MODE, 0 << 10       /* 7-bit address                     */
-.equ I2C1_CR2_ADD10, 0 << 11          /* Addressing mode, 0 = 7 bits       */
 .equ I2C1_PE, 1 << 0                  /* Peripheral enable                 */
 .equ I2C1_ISR_ADDR, 1 << 3            /* Address matched                   */
 .equ I2C1_ISR_RXNE, 1 << 2            /* Address matched                   */
@@ -50,8 +49,8 @@ main_loop:
 wait_for_addr:
   ldr r0, [r1]
   and r0, r0, r2
-  cmp r0, #0x00
-  b wait_for_addr
+  cmp r0, r2
+  bne wait_for_addr
 
   /* Wait for Receive data register to be filled (not empty) */
   ldr r1, =I2C1_ISR
@@ -69,35 +68,30 @@ wait_for_rxne:
   b main_loop
 
 i2c_peripheral_init:
-  /* Set 7 bit addressing mode */
-  ldr r1, =I2C1_CR2
-  ldr r2, =I2C1_CR2_ADD10
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Enable OA1EN */
-  ldr r1, =I2C1_OAR1
-  ldr r2, =I2C1_OAR1_OA1EN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
+  /* Set 7-bit addressing mode */
   ldr r1, =I2C1_OAR1
   ldr r2, =I2C1_OAR1_OA1MODE
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Set the interface address of the peripheral */
+  /* Set this peripherals address */
   ldr r1, =I2C1_OAR1
   ldr r2, =I2C1_OAR1_OA1
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Enable the general call */
   ldr r1, =I2C1_CR1
   ldr r2, =I2C1_CR1_GCEN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Enable OA1EN so that this peripherals address will be ACK:ed */
+  ldr r1, =I2C1_OAR1
+  ldr r2, =I2C1_OAR1_OA1EN
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
