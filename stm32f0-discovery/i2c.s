@@ -53,8 +53,8 @@
 .equ GPIOB_AF1_PB7, 1 << 28              /* SDA PB7                           */
 .equ GPIOB_OTYPER_PB6, 1 << 6            /* Open-drain PB6                    */
 .equ GPIOB_OTYPER_PB7, 1 << 7            /* Open-drain PB7                    */
-.equ GPIOB_OSPEEDR_PB6, 1 << 12          /* Speed for PB6                     */
-.equ GPIOB_OSPEEDR_PB7, 1 << 14          /* Speed for PB7                     */
+.equ GPIOB_OSPEEDR_PB6, 0 << 12          /* Speed for PB6                     */
+.equ GPIOB_OSPEEDR_PB7, 0 << 14          /* Speed for PB7                     */
 .equ GPIOB_PUPDR_PB6, 1 << 12            /* pull-up PB6                       */
 .equ GPIOB_PUPDR_PB7, 1 << 14            /* pull-up PB7                       */
 .equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
