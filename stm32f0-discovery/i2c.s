@@ -68,6 +68,7 @@
 .global i2c_init
 
 i2c_init:
+  /* Clock enable I2C1 */
   ldr r1, =RCC_APB1ENR
   ldr r2, =RCC_APB1_I2C1EN
   ldr r0, [r1]
