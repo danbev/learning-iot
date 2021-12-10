@@ -18,6 +18,10 @@ wave is high for 12 squares, that will become 480µs. Now, if we change the
 horizontal setting to be 80µs instead that will make each square 80µs instead
 and we will only have 6 squares for the same 480µs. 
 
+We can use the horizontal nob to position the wave on the grids to make
+measuring easier. Like if we have a time unit of 200µs and a period of our wave
+takes 5 squares that would be one 1000µs, or 0.001sec or 1ms.
+
 ### Voltage grid (vertial)
 This grid shows the voltage and it is per square, what I mean is that if the
 display says 2.00V that means that each square in the grid (vertical direction)
@@ -30,8 +34,13 @@ display the wave of the data. By pressing the `TRIG MENU` button we can access
 the setting to specify the type, which can be at the edge, and we can also
 specify that we want to trigger on raising or falling edge (this is done further
 down in the Slope section).
+
 In the case of I2C SCL should be high and then pulled low, so I think it makes
 sense to trigger on the falling edge.
+Now the signal I'm seeing (not sure if this is correct at the moment) is not
+a square wave. We can use a trigger to get a stable view of the wave (instead
+of one that is moving around all over the place). This trigger should be at
+the middle of the wave.
 
 ### Volts/Div
 This nob is available for both channels and what this allows us to do is to
