@@ -68,6 +68,12 @@
 .global i2c_init
 
 i2c_init:
+  ldr r1, =RCC_APB1ENR
+  ldr r2, =RCC_APB1_I2C1EN
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Clock enable Port B */
   ldr r1, =RCC_AHBENR
   ldr r2, =RCC_AHBENR_IOPBEN

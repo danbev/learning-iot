@@ -6,9 +6,6 @@
 
 .equ I2C1_BASE, 0x40005400
 
-.equ APB1ENR_OFFSET, 0x1C
-.equ RCC_APB1ENR, RCC_BASE + APB1ENR_OFFSET
-
 .equ I2C1_CR1_OFFSET, 0x00
 .equ I2C1_CR1, I2C1_BASE + I2C1_CR1_OFFSET
 
@@ -40,8 +37,6 @@
 .equ I2C1_ISR_TC, 1 << 6
 .equ I2C1_ISR_NACKF, 1 << 4
 
-.equ RCC_APB1_I2C1EN, 1 << 21
-
 .global start
 
 Vector_Table:    
@@ -65,13 +60,11 @@ i2c_write:
   str r0, [r1]
 
   /* Send STOP condition automatically when NBYTES have been sent */
-/*
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_AUTOEND
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-*/
 
   /* Set the peripheral target address */
   ldr r1, =I2C1_CR2
@@ -127,13 +120,6 @@ nack_received:
   b .
 
 i2c_controller_init:
-  /* Clock enable I2C1 */
-  ldr r1, =RCC_APB1ENR
-  ldr r2, =RCC_APB1_I2C1EN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   /* Set 7 bit addressing mode */
   ldr r1, =I2C1_CR2
   ldr r2, =I2C1_CR2_ADD10
