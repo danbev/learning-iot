@@ -26,11 +26,13 @@
 .equ I2C1_CR2_START, 1 << 13         /* Set START condition           */
 .equ I2C1_CR2_ADD10, 0 << 11         /* Addressing mode, 0 = 7 bits   */
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
-.equ I2C1_CR2_SADD, 0x19 << 0        /* Peripheral address            */
-.equ I2C1_CR2_AUTOEND, 0 << 25       /* Send STOP after NBYTES        */
-.equ I2C1_CR2_NBYTES, 1 << 16        /* Number of bytes to transmit   */
-.equ I2C1_TIMINGR_SCLH, 0xC3 << 8    /* SCL High period               */
-.equ I2C1_TIMINGR_SCLL, 0xC7 << 0    /* SCL Low period                */
+.equ I2C1_CR2_SADD, 0x19 << 1        /* Peripheral address            */
+.equ I2C1_CR2_AUTOEND, 1 << 25       /* Send STOP after NBYTES        */
+.equ I2C1_CR2_NBYTES, 3 << 16        /* Number of bytes to transmit   */
+
+.equ I2C1_TIMINGR_SCLH, 0xF << 8     /* SCL High period, standard mode 100kHz */
+.equ I2C1_TIMINGR_SCLL, 0x13 << 0    /* SCL Low period, standard mode 100kHz  */
+
 .equ I2C1_PE, 1 << 0
 .equ I2C1_ISR_TXIS, 1 << 1 
 .equ I2C1_ISR_TXE, 1 << 0 
@@ -46,6 +48,7 @@ Vector_Table:
 start:
   bl i2c_init
   bl i2c_controller_init
+  ldr r1, =I2C1_ISR
   bl led_init
   bl i2c_write
   b .

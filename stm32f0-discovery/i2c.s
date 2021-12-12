@@ -19,6 +19,9 @@
 .equ GPIOB_AFRL_OFFSET, 0x20
 .equ GPIOB_AFRL, GPIOB_BASE + GPIOB_AFRL_OFFSET
 
+.equ GPIOB_AFRH_OFFSET, 0x24
+.equ GPIOB_AFRH, GPIOB_BASE + GPIOB_AFRH_OFFSET
+
 .equ GPIOB_OTYPER_OFFSET, 0x04
 .equ GPIOB_OTYPER, GPIOB_BASE + GPIOB_OTYPER_OFFSET
 
@@ -47,21 +50,21 @@
 
 .equ RCC_APB1_I2C1EN, 1 << 21
 .equ RCC_AHBENR_IOPBEN, 1 << 18
-.equ GPIOB_ALT_PB6, 2 << 12              /* SCL PB6                           */
-.equ GPIOB_ALT_PB7, 2 << 14              /* SDA PB7                           */
-.equ GPIOB_AF1_PB6, 1 << 24              /* SCL PB6                           */
-.equ GPIOB_AF1_PB7, 1 << 28              /* SDA PB7                           */
-.equ GPIOB_OTYPER_PB6, 1 << 6            /* Open-drain PB6                    */
-.equ GPIOB_OTYPER_PB7, 1 << 7            /* Open-drain PB7                    */
-.equ GPIOB_OSPEEDR_PB6, 0 << 12          /* Speed for PB6                     */
-.equ GPIOB_OSPEEDR_PB7, 0 << 14          /* Speed for PB7                     */
-.equ GPIOB_PUPDR_PB6, 1 << 12            /* pull-up PB6                       */
-.equ GPIOB_PUPDR_PB7, 1 << 14            /* pull-up PB7                       */
-.equ RCC_CFGR3_I2C1SW, 1 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
+.equ GPIOB_ALT_PB8, 2 << 16              /* SCL PB8                           */
+.equ GPIOB_ALT_PB9, 2 << 18              /* SDA PB9                           */
+.equ GPIOB_AF1_PB8, 1 << 0               /* SCL PB8                           */
+.equ GPIOB_AF1_PB9, 1 << 4               /* SDA PB9                           */
+.equ GPIOB_OTYPER_PB8, 1 << 8            /* Open-drain PB8                    */
+.equ GPIOB_OTYPER_PB9, 1 << 9            /* Open-drain PB9                    */
+.equ GPIOB_OSPEEDR_PB8, 1 << 16          /* Speed for PB8                     */
+.equ GPIOB_OSPEEDR_PB9, 1 << 18          /* Speed for PB9                     */
+.equ GPIOB_PUPDR_PB8, 0 << 16            /* pull-up PB8                       */
+.equ GPIOB_PUPDR_PB9, 0 << 18            /* pull-up PB9                       */
+.equ RCC_CFGR3_I2C1SW, 0 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
-.equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar value                   */
-.equ I2C1_TIMINGR_SCLDEL, 0x4 << 20      /* SCL delay                         */
-.equ I2C1_TIMINGR_SDADEL, 0x2 << 16      /* SDA delay                         */
+.equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar, standard mode 100kHz   */
+.equ I2C1_TIMINGR_SDADEL, 0x2 << 16      /* SDA delay, standard mode 10/100   */
+.equ I2C1_TIMINGR_SCLDEL, 0x4 << 20      /* SCL delay, standard mode 10/100   */
 
 .equ I2C1_CR1_ANFOFF, 0 << 12            /* Enable/Disable Analog noise filter*/
 
@@ -83,34 +86,34 @@ i2c_init:
   str r0, [r1]
 
   ldr r1, =GPIOB_MODER
-  ldr r2, =(GPIOB_ALT_PB6 + GPIOB_ALT_PB7)
+  ldr r2, =(GPIOB_ALT_PB8 + GPIOB_ALT_PB9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIOB_AFRL
-  ldr r2, =(GPIOB_AF1_PB6 + GPIOB_AF1_PB7)
+  ldr r1, =GPIOB_AFRH
+  ldr r2, =(GPIOB_AF1_PB8 + GPIOB_AF1_PB9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   /* Set output type */
   ldr r1, =GPIOB_OTYPER
-  ldr r2, =(GPIOB_OTYPER_PB6 + GPIOB_OTYPER_PB7)
+  ldr r2, =(GPIOB_OTYPER_PB8 + GPIOB_OTYPER_PB9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   /* Set pin speed */
   ldr r1, =GPIOB_OSPEEDR
-  ldr r2, =(GPIOB_OSPEEDR_PB6 + GPIOB_OSPEEDR_PB7)
+  ldr r2, =(GPIOB_OSPEEDR_PB8 + GPIOB_OSPEEDR_PB9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   /* Set no pull-up/pull-down */
   ldr r1, =GPIOB_PUPDR
-  ldr r2, =(GPIOB_PUPDR_PB6 + GPIOB_PUPDR_PB7)
+  ldr r2, =(GPIOB_PUPDR_PB8 + GPIOB_PUPDR_PB9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
