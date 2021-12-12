@@ -59,6 +59,7 @@ main_loop:
   ldr r1, =I2C1_ISR
   ldr r2, =I2C1_ISR_ADDR
 wait_for_addr:
+  bl delay
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, r2

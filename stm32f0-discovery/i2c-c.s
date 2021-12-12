@@ -138,18 +138,23 @@ i2c_controller_init:
   str r0, [r1]
 
   /* SCL High period */
+
+/*
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_SCLH
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* SCL Low period */
+/*
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_SCLL
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* Enable Peripheral */
   ldr r1, =I2C1_CR1
