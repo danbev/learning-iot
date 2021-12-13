@@ -36,6 +36,8 @@ main_loop:
   ldr r1, =GPIOA_IDR
   ldr r0, [r1]
   bl uart_write_char
+
+  bl delay
   
   b main_loop
 
@@ -53,7 +55,7 @@ pull_up_pin_init:
   str r0, [r1]
 
   ldr r1, =GPIOA_PUPDR
-  ldr r2, =GPIOA_OTYPER_PA0
+  ldr r2, =GPIOA_PUPDR_PA0
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
