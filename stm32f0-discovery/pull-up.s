@@ -16,9 +16,13 @@
 .equ GPIOA_PUPDR_OFFSET, 0x0C
 .equ GPIOA_PUPDR, GPIOA_BASE + GPIOA_PUPDR_OFFSET
 
-.equ GPIOA_MODER_PA4, 0 << 8
-.equ GPIOA_OTYPER_PA4, 1 << 4
-.equ GPIOA_PUPDR_PA4, 0 << 8
+.equ GPIOA_SPEEDR_OFFSET, 0x08
+.equ GPIOA_SPEEDR, GPIOA_BASE + GPIOA_SPEEDR_OFFSET
+
+.equ GPIOA_MODER_PA4, 0 << 8     /* Input mode           */
+.equ GPIOA_OTYPER_PA4, 1 << 4    /* Open-drain           */
+.equ GPIOA_SPEEDR_PA4, 1 << 8    /* Medium speed         */
+.equ GPIOA_PUPDR_PA4, 0x00 << 8  /* No pull-up/push-down */
 .equ GPIOA_IDR_PA4, 1 << 4
 
 .global start
@@ -34,11 +38,13 @@ start:
 main_loop:
   bl delay
 
+  /* Read the input pin state */
   ldr r1, =GPIOA_IDR
   ldr r0, [r1]
   ldr r2, =GPIOA_IDR_PA4
   and r0, r0, r2
   lsr r0, #4
+
   bl uart_write_char
 
   bl delay
@@ -60,6 +66,12 @@ pull_up_pin_init:
 
   ldr r1, =GPIOA_PUPDR
   ldr r2, =GPIOA_PUPDR_PA4
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  ldr r1, =GPIOA_SPEEDR
+  ldr r2, =GPIOA_SPEEDR_PA4
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
