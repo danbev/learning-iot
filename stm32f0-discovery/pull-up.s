@@ -16,10 +16,10 @@
 .equ GPIOA_PUPDR_OFFSET, 0x0C
 .equ GPIOA_PUPDR, GPIOA_BASE + GPIOA_PUPDR_OFFSET
 
-.equ GPIOA_MODER_AF_PA0, 0 << 0
-.equ GPIOA_OTYPER_PA0, 1 << 0
-.equ GPIOA_PUPDR_PA0, 0 << 0
-.equ GPIOA_IDR_PA0, 1 << 0
+.equ GPIOA_MODER_PA4, 0 << 8
+.equ GPIOA_OTYPER_PA4, 1 << 4
+.equ GPIOA_PUPDR_PA4, 0 << 8
+.equ GPIOA_IDR_PA4, 1 << 4
 
 .global start
 
@@ -36,8 +36,9 @@ main_loop:
 
   ldr r1, =GPIOA_IDR
   ldr r0, [r1]
-  ldr r2, =GPIOA_IDR_PA0
+  ldr r2, =GPIOA_IDR_PA4
   and r0, r0, r2
+  lsr r0, #4
   bl uart_write_char
 
   bl delay
@@ -46,19 +47,19 @@ main_loop:
 
 pull_up_pin_init:
   ldr r1, =GPIOA_MODER
-  ldr r2, =GPIOA_MODER_AF_PA0
+  ldr r2, =GPIOA_MODER_PA4
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOA_OTYPER
-  ldr r2, =GPIOA_OTYPER_PA0
+  ldr r2, =GPIOA_OTYPER_PA4
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOA_PUPDR
-  ldr r2, =GPIOA_PUPDR_PA0
+  ldr r2, =GPIOA_PUPDR_PA4
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
