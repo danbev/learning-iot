@@ -1499,7 +1499,7 @@ Now, my understanding was that electrons flow out of the negative terminal of
 the voltage source through the LED where they cause the LED to shine. So the
 resistor would not be of any use in that case, it would have to be placed before
 the LED in my way of thinking. This is not how electricity works. Instead what
-happens is it is the voltage difference that pushed the electrons through the
+happens is it is the voltage difference that pushes the electrons through the
 LED. To find out the current (I) that flows through this circuit we use
 current = voltage/resistence. So the pressure, the pushing of electrons,
 through the circuit will be limited by the resistor. Think of this like a pipe
@@ -1519,7 +1519,7 @@ voltage    = current x resistance
 resistance =  -------
               current
 ```
-Notice that current is the voltage difference diviced by the resistance of the
+Notice that current is the voltage difference divided by the resistance of the
 circuit. TODO: expand on this a little more.
 
 ### Ground
