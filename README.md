@@ -478,6 +478,31 @@ SCL -+    +  +  +  +  +  +  +     +
      +----+--+--+--+--+--+--+--+--+
 ```
 
+#### I2C Example
+[i2c-c.s](stm32f0-discovery/i2c.c.s) is the controller which currently
+send an single `A` to the peripheral [i2c-p.s](stm32f0-discovery/i2c.p.s).
+Both of these programs are flashed onto STM32F072B-Discovery boards and
+connected using PB6 (SCL) and PB7(SDA).
+
+
+![I2C example](./doc/i2c-example.jpg "Example of I2C communication")
+
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 18:49:45
+
+Press CTRL-A Z for help on special keys
+
+A
+```
+Currently the controller only sends on byte so to see more `A`s being sent
+we have to press the reset button. TODO: change this so that it just
+continues sending bytes.
+
 #### Collisions 
 We mentioned earlier that we can have more than one controller. So what happens
 if two controllers start sending data at the same time. I turns out that the
