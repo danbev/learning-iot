@@ -19,6 +19,7 @@
 .equ GPIOA_MODER_AF_PA0, 0 << 0
 .equ GPIOA_OTYPER_PA0, 1 << 0
 .equ GPIOA_PUPDR_PA0, 0 << 0
+.equ GPIOA_IDR_PA0, 1 << 0
 
 .global start
 
@@ -35,6 +36,8 @@ main_loop:
 
   ldr r1, =GPIOA_IDR
   ldr r0, [r1]
+  ldr r2, =GPIOA_IDR_PA0
+  and r0, r0, r2
   bl uart_write_char
 
   bl delay
