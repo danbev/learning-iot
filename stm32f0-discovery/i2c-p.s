@@ -74,6 +74,7 @@ wait_for_addr:
   orr r0, r0, r2
   str r0, [r1]
 
+
   /* Wait for Receive data register to be filled (not empty) */
   ldr r1, =I2C1_ISR
   ldr r2, =I2C1_ISR_RXNE
@@ -81,10 +82,10 @@ wait_for_rxne:
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, #0x00
-  b wait_for_rxne
+  beq wait_for_rxne
 
   /* Read from Recieve data register */
-  ldr r1, =I2C1_ISR_RXNE
+  ldr r1, =I2C1_RXDR
   ldr r0, [r1]
   bl uart_write_char
 
