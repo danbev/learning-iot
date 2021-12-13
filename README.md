@@ -2459,7 +2459,7 @@ Port /dev/ttyUSB0, 11:08:09
 Press CTRL-A Z for help on special keys                                                   
                                                                                           
 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
-```console
+```
 Now we are reading 01 consistently.
 
 
@@ -2503,7 +2503,7 @@ Port /dev/ttyUSB0, 11:08:09
 Press CTRL-A Z for help on special keys                                                   
                                                                                           
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-```console
+```
 Now we are reading 00 consistently.
 
 ### pull-push
