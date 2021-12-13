@@ -479,8 +479,8 @@ SCL -+    +  +  +  +  +  +  +     +
 ```
 
 #### I2C Example
-[i2c-c.s](stm32f0-discovery/i2c.c.s) is the controller which currently
-send an single `A` to the peripheral [i2c-p.s](stm32f0-discovery/i2c.p.s).
+[i2c-c.s](stm32f0-discovery/i2c-c.s) is the controller which currently
+send an single `A` to the peripheral [i2c-p.s](stm32f0-discovery/i2c-p.s).
 Both of these programs are flashed onto STM32F072B-Discovery boards and
 connected using PB6 (SCL) and PB7(SDA).
 
