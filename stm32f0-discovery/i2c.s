@@ -10,6 +10,9 @@
 .equ APB1ENR_OFFSET, 0x1C
 .equ RCC_APB1ENR, RCC_BASE + APB1ENR_OFFSET
 
+.equ RCC_CR, 0x00
+.equ RCC_CR, RCC_BASE + RCC_CR
+
 .equ RCC_AHBENR_OFFSET, 0x14
 .equ RCC_AHBENR, RCC_BASE + RCC_AHBENR_OFFSET
 
@@ -58,8 +61,8 @@
 .equ GPIOB_OTYPER_PB7, 1 << 7            /* Open-drain PB7                    */
 .equ GPIOB_OSPEEDR_PB6, 3 << 12          /* Speed for PB6                     */
 .equ GPIOB_OSPEEDR_PB7, 3 << 14          /* Speed for PB7                     */
-.equ GPIOB_PUPDR_PB6, 0 << 12            /* No pull-up/pull-down PB6          */
-.equ GPIOB_PUPDR_PB7, 0 << 14            /* No pull-up/pull-down PB7          */
+.equ GPIOB_PUPDR_PB6, 1 << 12            /* No pull-up/pull-down PB6          */
+.equ GPIOB_PUPDR_PB7, 1 << 14            /* No pull-up/pull-down PB7          */
 .equ RCC_CFGR3_I2C1SW, 0 << 4            /* Clock source, 0=HSI, 1=SYSCLK     */
 
 .equ I2C1_TIMINGR_PRESC, 1 << 28         /* Prescalar, standard mode 100kHz   */
@@ -69,9 +72,17 @@
 .equ I2C1_CR1_ANFOFF, 0 << 12            /* Enable/Disable Analog noise filter*/
 .equ I2C1_TIMINGR_VALUE, 0x2000090E
 
+.equ RCC_CR_HSION, 1 << 0
+
 .global i2c_init
 
 i2c_init:
+  ldr r1, =RCC_CR
+  ldr r2, =RCC_CR_HSION
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Clock enable I2C1 */
   ldr r1, =RCC_APB1ENR
   ldr r2, =RCC_APB1_I2C1EN
@@ -140,11 +151,12 @@ i2c_init:
   orr r0, r0, r2
   str r0, [r1]
 
+/*
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_VALUE
   str r2, [r1]
+*/
 
-/*
   ldr r1, =I2C1_TIMINGR
   ldr r2, =I2C1_TIMINGR_PRESC
   ldr r0, [r1]
@@ -162,6 +174,5 @@ i2c_init:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-*/
 
   bx lr
