@@ -2424,6 +2424,45 @@ Gnd
 So when this circuit is open the pin will be read as 5V (on). When it is closed
 it will be read as Gnd (off). But it will not be random on/off.
 
+[pull-up.s](stm32f0-discovery/pull-up.s) is an example of what can happen if
+we have GPIO pin in input mode and the type as open-drain with out any pull-up
+or pull-down resistors
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0 -H
+
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 11:08:09
+
+Press CTRL-A Z for help on special keys                                                   
+                                                                                          
+01 01 01 01 01 01 01 01 01 01 00 00 00 00 01 01 ...
+```
+Notice that we are randomly reading 01/00.
+
+Now if we connect a pull-up resistor:
+
+![Pull-up resistor example circuit](./doc/pull-up.jpg "Example circuit for pull-up resistor")
+
+And run the example we get:
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0 -H
+
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 11:08:09
+
+Press CTRL-A Z for help on special keys                                                   
+                                                                                          
+01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01
+```console
+Now we are reading 01 consistently.
+
+
 ### Pull-down resistor
 Is pretty much the inverse of a pull-up resistor:
 ```
@@ -2439,11 +2478,33 @@ Is pretty much the inverse of a pull-up resistor:
              Gnd
 ```
 In this case when the ciruit is open the pin will be read as Gnd (off) and when
-it is closed it will be read as 5V(on).  So again it wil not be random on/off.
+it is closed it will be read as 5V(on).  So again it will not be random on/off.
 
 Pull-up and pull-down are mostly used in interfaces that have unidirectional
 lines like SPI and UART (there is a one-to-one connection, compare this with
 I²C which can one controller can be connected to multiple peripherals).
+
+Below is an example which can be used with
+[pull-up.s](stm32f0-discovery/pull-up.s) to show what using a pull-down
+resistor might look like:
+
+![Pull-down resistor example circuit](./doc/pull-down.jpg "Example circuit for pull-down resistor")
+
+And if we run this example the output will be:
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0 -H
+
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 11:08:09
+
+Press CTRL-A Z for help on special keys                                                   
+                                                                                          
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```console
+Now we are reading 00 consistently.
 
 ### pull-push
 When the output goes low, the signal is actively `pulled` to ground, and when
