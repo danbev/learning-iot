@@ -28,7 +28,7 @@
 .equ I2C1_CR2_RD_WRN, 0 << 10        /* Transfer direction, 0 = write */
 .equ I2C1_CR2_SADD, 0x19 << 1        /* Peripheral address            */
 .equ I2C1_CR2_AUTOEND, 1 << 25       /* Send STOP after NBYTES        */
-.equ I2C1_CR2_NBYTES, 3 << 16        /* Number of bytes to transmit   */
+.equ I2C1_CR2_NBYTES, 1 << 16        /* Number of bytes to transmit   */
 
 .equ I2C1_TIMINGR_SCLH, 0xF << 8     /* SCL High period, standard mode 100kHz */
 .equ I2C1_TIMINGR_SCLL, 0x13 << 0    /* SCL Low period, standard mode 100kHz  */
