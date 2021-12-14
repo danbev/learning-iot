@@ -3,7 +3,7 @@ LD=arm-none-eabi-ld
 ASFLAGS=-mcpu=cortex-m0 -mthumb -g 
 
 uart-tx-sync.elf : uart-tx-sync.o uart-tx.o delay.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $< uart-tx.o delay.o
+	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 
 uart-tx.o: uart-tx.s
@@ -18,7 +18,7 @@ i2c.o: i2c.s
 
 # I2C Peripheral, uses UART to write received data. 
 i2c-p.elf : i2c-p.o i2c.o uart-tx.o delay.o blue-led.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $< i2c.o delay.o uart-tx.o blue-led.o
+	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 
 i2c-p.o: i2c-p.s
@@ -26,14 +26,14 @@ i2c-p.o: i2c-p.s
 
 # I2C Controller that writes data to the peripheral (does not use UART).
 i2c-c.elf : i2c-c.o i2c.o uart-tx.o delay.o blue-led.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $< i2c.o delay.o uart-tx.o blue-led.o
+	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 
 i2c-c.o: i2c-c.s
 	$(AS) $(ASFLAGS) $< -asghl=led.lst -o $@
 
 pull-up.elf : pull-up.o uart-tx.o delay.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $< delay.o uart-tx.o
+	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 
 pull-up.o: pull-up.s
@@ -57,7 +57,7 @@ spi-c.o: spi-c.s
 
 
 %.elf : %.o blue-led.o delay.o
-	$(LD) $< -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ blue-led.o delay.o
+	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 
 %.o: %.s
