@@ -51,27 +51,21 @@
 .equ GPIOA_BASE, 0x48000000
 .equ GPIOA_MODER_OFFSET, 0x00
 .equ GPIOA_MODER, GPIOA_BASE + GPIOA_MODER_OFFSET
-.equ GPIOA_AFLR_OFFSET, 0x20
-.equ GPIOA_AFLR, GPIOA_BASE + GPIOA_AFLR_OFFSET
 
-.equ GPIO_PORTA_ENABLE, 1 << 18
-.equ AF_ENABLE_PA2, 2 << 4
-.equ AF_ENABLE_PA3, 2 << 6
-.equ AF3_ENABLE_PA2, 3 << 8
-.equ AF3_ENABLE_PA3, 3 << 12
-.equ ADC_CHANNEL_2, 1 << 2
-.equ ADC_CHANNEL_3, 1 << 3
+.equ GPIO_PORTA_ENABLE, 1 << 18      /* Enable Port A           */
+.equ MODER_PA0_ANALOG, 3 << 0        /* Analog mode             */
+.equ ADC_CHANNEL_0, 1 << 0           /* Select Channel 0        */
 
 .global start
 
-Vector_Table:              /* Vector                       Exception Nr */
-  .word     0x20002000     /* Initial Stack Pointer value             - */
-ResetHandler:              /* Reset                                   1 */
+Vector_Table:
+  .word     0x20002000
   .word     start + 1 
 
 start:
   bl gpio_init
   bl adc_init
+  bl led_init
 
 main_loop:
   /* Start a single ADC conversion. Will start immediatly as EXTEN=00 */
@@ -90,10 +84,10 @@ wait_adc_complete:
   beq wait_adc_complete
 
 adc_loop:
-  /* Converted signal show now be in ADC Data Registry */
+  /* Converted signal should now be in ADC Data Registry */
   ldr r1, =ADC_DR
   ldr r0, [r1]
-  ldr r2, =#1800
+  ldr r2, =#234
   cmp r2, r0
   bgt led_on
   blt led_off
@@ -115,13 +109,7 @@ gpio_init:
   str r0, [r1]
 
   ldr r1, =GPIOA_MODER
-  ldr r2, =(AF_ENABLE_PA2 + AF_ENABLE_PA3)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =GPIOA_AFLR
-  ldr r2, =(AF3_ENABLE_PA2 + AF3_ENABLE_PA3)
+  ldr r2, =MODER_PA0_ANALOG
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -145,7 +133,7 @@ adc_init:
 
   /* Select Channel 1 for conversion */
   ldr r1, =ADC_CHSELR
-  ldr r2, =ADC_CHANNEL_3
+  ldr r2, =ADC_CHANNEL_0
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
