@@ -505,8 +505,6 @@ PA2  ADC_IN2
 So we need to select a channel, and probably enable it.
 The type of scanning can be a single scan or a continuous scan.
 
-
-
 If we look at the data sheet we can find that there is one 12-bit ADC which is
 connected to the APB (Advanced Peripheral Bus).
 We can then look at the memory map in the reference manual to find the address:
@@ -536,6 +534,19 @@ software)
 
 #### Data Register (ADC_DR)
 Address offset:  0x40
+
+So if we enable PA0 as an a general input pin and connect a sensors output pin
+to that, in addition to GND and VCC we should be able to read a value from the
+sensor:
+```
+ +-------+
+ | O G V |
+ | U N C |
+ | T D C |
+ | | | | |
+ +-|-|-|-+
+   | | |
+```
 
 ### Touch Sensing Controller (TSC)
 Address: 0x40024000
@@ -912,6 +923,7 @@ If I2C1 is used the following GPIO pins are available:
 ```
 PB6  I2C1_SCL    AF1
 PB7  I2C1_SDA    AF1
+
 PB8  I2C1_SCL    AF1
 PB9  I2C1_SDA    AF1
 ```
@@ -919,6 +931,7 @@ If I2C2 is used the following GPIO pins are available:
 ```
 PB10 I2C2_SCL    AF1
 PB11 I2C2_SDA    AF1
+
 PB13 I2C2_SCL    AF1
 PB14 I2C2_SDA    AF1
 ```
@@ -1214,6 +1227,3 @@ Bits 7:0 SCLL[7:0]: SCL low period (master mode)
 This field is used to generate the SCL low period in master mode
 
 ```
-
-Controller example: [i2c-c.s](../stm32f0-discovery/i2c-c.s)  
-Peripheral example: [i2c-p.s](../stm32f0-discovery/i2c-p.s)  
