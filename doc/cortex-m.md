@@ -548,6 +548,8 @@ sensor:
    | | |
 ```
 
+![Sensor example](./sensor.jpg "Sensor example")
+
 ### Touch Sensing Controller (TSC)
 Address: 0x40024000
 
