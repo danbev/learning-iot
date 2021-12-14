@@ -95,7 +95,6 @@ to an oscilloscope to see that data is written.
 .equ GPIOA_ALT_PA6, 2 << 12        /* CIPO                         */
 .equ GPIOA_ALT_PA7, 2 << 14        /* COPI                         */
 
-.equ GPIOA_AF0_PA4, 0x00 << 16
 .equ GPIOA_AF0_PA5, 0x00 << 20
 .equ GPIOA_AF0_PA6, 0x00 << 24
 .equ GPIOA_AF0_PA7, 0x00 << 28
@@ -119,11 +118,13 @@ to an oscilloscope to see that data is written.
 .equ SPI_CR1_SSM, 1 << 9
 .equ SPI_CR1_SSI, 1 << 8
 .equ SPI_SSOE, 0 << 2
+.equ SPI_CR2_DS, 7 << 8
+.equ SPI_CR2_FRXTH, 1 << 12
 .equ SPI_SR_BSY_FLAG, 1 << 7
 .equ SPI_SR_TXE_EMPTY, 1 << 1
-.equ SPI_CR1_LSBFIRST, 1 << 7
-.equ SPI_CR1_BR, 2 << 3
-.equ SPI_CR1_BIDIOE, 1 << 14
+.equ SPI_CR1_LSBFIRST, 0 << 7
+.equ SPI_CR1_BR, 0 << 3
+//.equ SPI_CR1_BIDIOE, 1 << 14
 .equ SPI_CR1_CPOL, 1 << 1
 .equ SPI_CR1_CPHA, 1 << 0
 .equ SPI_CR_SPE, 1 << 6
@@ -155,7 +156,7 @@ wait_txe_flag:
   ldr r1, =SPI1_DR
   mov r2, #0x41
   uxtb r3, r2 
-  str r3, [r1]
+  strb r2, [r1]
 
 wait_busy_flag:
   ldr r1, =SPI1_SR
@@ -164,9 +165,12 @@ wait_busy_flag:
   cmp r0, r2
   bne wait_busy_flag
 
-  //ldr r1, =SPI1_DR
-  //ldr r0, [r1]
-  //ldr r2, =SPI1_SR
+/*
+  ldr r1, =SPI1_DR
+  ldrb r0, [r1]
+  ldr r2, =SPI1_SR
+  ldr r0, [r2]
+*/
 
   bl delay
   bl turn_led_off
@@ -202,11 +206,13 @@ spi1_init:
   orr r0, r0, r2
   str r0, [r1]
 
+/*
   ldr r1, =GPIOA_OSPEED
   ldr r2, =(GPIOA_SPEED_PA4 + GPIOA_SPEED_PA5 + GPIOA_SPEED_PA6 + GPIOA_SPEED_PA7)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* Set SPI as the controller */
   ldr r1, =SPI1_CR1
@@ -245,13 +251,17 @@ spi1_init:
   orr r0, r0, r2
   str r0, [r1]
 
-/*
   ldr r1, =SPI1_CR2
-  ldr r2, =SPI_SSOE
+  ldr r2, =SPI_CR2_DS
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-*/
+
+  ldr r1, =SPI1_CR2
+  ldr r2, =SPI_CR2_FRXTH
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
 
   bx lr
 
@@ -328,13 +338,3 @@ gpio_init:
   str r0, [r1]
 
   bx lr
-
-.include "blue-led.s"
-
-.equ DELAY_LENGTH, 100000
-delay:
-  ldr r0,=DELAY_LENGTH
-dloop:
-  sub r0, r0, #1
-  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
-  bx  lr
