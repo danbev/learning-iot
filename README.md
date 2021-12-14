@@ -2530,8 +2530,9 @@ something like:
   |     |_____|
 0 +------------------
 ```
-We can see the ups and downs but this if we wanted to turn this back into the
+We can see the ups and downs but if we wanted to turn this back into the
 analog signal it would not represent it very well.
+
 If we have 2-bits instead then:
 ```
 4 |     _
@@ -2541,7 +2542,7 @@ If we have 2-bits instead then:
   | 
 0 +------------------
 ```
-The above diagrams are note really to scale but I they help me to visualize
+The above diagrams are not really to scale but they help me to visualize
 how more bits help to represent the analog wave more closely. Just with two
 bits the digital representation of the wave looks more like the original. Adding
 more bits will improve this even further.
@@ -2556,7 +2557,7 @@ more bits will improve this even further.
 
 This is called the resolution of the ADC.
 
-Lets say that we have sampled and stored a value is 2.5V, and that we have
+Lets say that we have sampled and stored a value of 2.5V, and that we have
 a 3-bit resolution:
 ```
   2.5V
@@ -2601,8 +2602,8 @@ a 3-bit resolution:
       GND -----
            --
 ```
-So our 2.5V analog is read or passed in and we have a reference voltage of
-4.0V for ciruit. This is the voltage used for the comparators and it is
+So our 2.5V analog signal is read or passed in and we have a reference voltage
+of 4.0V for ciruit. This is the voltage used for the comparators and it is
 divided among the 7 comparators in this circuit. Recall that this is a 3-bit
 ADC so we have 0-7 values that can be represented.
 The comparators work in this way:
@@ -2627,7 +2628,7 @@ endoder would output for 2.5V.
 The above type of ADC is called a Flash ADC.
 
 #### Successive Approximation ADC (SAR)
-This type of  ADC is not as fast as the Flash ADC but is a lot cheaper. This is
+This type of ADC is not as fast as the Flash ADC but is a lot cheaper. This is
 like a binary search used to approximate the target value.
 
 In this case we also have a comparator but only one. Vin is the sampled and
@@ -2646,10 +2647,10 @@ held analog signal to be converted:
 |                                       |
 +---------------------------------------+
 ```
-The digital to analog converter will create an analog signal that can be
+The digital to analog (DAC) converter will create an analog signal that can be
 used as Vref for the comparator. This will be compared with Vin and the output
 will be passed by to the logic unit to modify the value of the next output
-input value to the DAC. Being a binary search it will either increase of
+input value to the DAC. Being a binary search it will either increase or
 decrease the value to be checked by half. 
 
 The output of the DAC will initially be 100:
