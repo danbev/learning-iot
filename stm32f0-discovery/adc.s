@@ -108,19 +108,6 @@ done:
   b adc_loop
   
 gpio_init:
-  /* Enable Port C clock on AHB bus */
-  ldr r1, =RCC_AHBENR
-  ldr r2, =GPIO_PORTC_ENABLE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =GPIOC_MODER
-  ldr r2, =GPIOC_MODER_MASK
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   ldr r1, =RCC_AHBENR
   ldr r2, =GPIO_PORTA_ENABLE
   ldr r0, [r1]
@@ -187,13 +174,3 @@ wait_adc_ready:
   beq wait_adc_ready
 
   bx lr
-
-.include "blue-led.s"
-
-.equ DELAY_LENGTH, 100000
-delay:
-  ldr r0,=DELAY_LENGTH
-dloop:
-  sub r0, r0, #1
-  bne dloop      /* branch while the Z (zero) flag is not equal to zero */
-  bx  lr
