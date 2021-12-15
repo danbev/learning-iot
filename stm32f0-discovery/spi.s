@@ -22,9 +22,6 @@ to an oscilloscope to see that data is written.
 
 .equ SPI2_BASE, 0x40003800
 
-.equ SPI1_DR_OFFSET, 0x0C
-.equ SPI1_DR, SPI1_BASE + SPI1_DR_OFFSET
-
 .equ GPIOA_BASE, 0x48000000
 .equ GPIOC_BASE, 0x48000800
 
@@ -46,39 +43,36 @@ to an oscilloscope to see that data is written.
 .equ GPIOA_AFRL_OFFSET, 0x20
 .equ GPIOA_AFRL, GPIOA_BASE + GPIOA_AFRL_OFFSET
 
-.equ GPIOA_OSPEED_OFFSET, 0x08
-.equ GPIOA_OSPEED, GPIOA_BASE + GPIOA_OSPEED_OFFSET
+.equ GPIOA_OSPEEDR_OFFSET, 0x08
+.equ GPIOA_OSPEEDR, GPIOA_BASE + GPIOA_OSPEEDR_OFFSET
 
 .equ GPIO_PORTA_ENABLE, 1 << 17
 .equ GPIOC_ODR_PC7, 1 << 7
 .equ RCC_APB2_SPIEN, 1 << 12
 
-.equ GPIOA_ALT_PA4, 1 << 8         /* NSS (chip/peripheral select) */
-.equ GPIOA_ALT_PA5, 2 << 10        /* Clock select                 */
-.equ GPIOA_ALT_PA6, 2 << 12        /* CIPO                         */
-.equ GPIOA_ALT_PA7, 2 << 14        /* COPI                         */
-
-.equ GPIOA_AF0_PA5, 0x00 << 20
-.equ GPIOA_AF0_PA6, 0x00 << 24
-.equ GPIOA_AF0_PA7, 0x00 << 28
-
 .equ SPI_CR1_SSM, 1 << 9
-.equ SPI_CR1_SSI, 1 << 8
-.equ SPI_SSOE, 0 << 2
-.equ SPI_CR2_DS, 7 << 8
-.equ SPI_CR2_FRXTH, 1 << 12
-.equ SPI_SR_BSY_FLAG, 1 << 7
-.equ SPI_SR_TXE_EMPTY, 1 << 1
+.equ SPI_CR2_DS, 7 << 8         /* 8-bit data size    */
+.equ SPI_CR2_FRXTH, 0 << 12
 .equ SPI_CR1_LSBFIRST, 0 << 7
-.equ SPI_CR1_BR, 0 << 3
+.equ SPI_CR1_BR, 5 << 3
 //.equ SPI_CR1_BIDIOE, 1 << 14
-.equ SPI_CR1_CPOL, 1 << 1
-.equ SPI_CR1_CPHA, 1 << 0
+.equ SPI_CR1_CPOL, 0 << 1
+.equ SPI_CR1_CPHA, 0 << 0
 .equ SPI_CR_SPE, 1 << 6
+
+.equ RCC_CR, 0x00
+.equ RCC_CR, RCC_BASE + RCC_CR
+.equ RCC_CR_HSION, 1 << 0
 
 .global spi_init
 
 spi_init:
+  ldr r1, =RCC_CR
+  ldr r2, =RCC_CR_HSION
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   /* Enable SPI1 clock */
   ldr r1, =RCC_APB2ENR
   ldr r2, =RCC_APB2_SPIEN
@@ -93,46 +87,28 @@ spi_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Set alt function mode for PA4, PA5, PA6, and PA7 */
-  ldr r1, =GPIOA_MODER
-  ldr r2, =(GPIOA_ALT_PA4 + GPIOA_ALT_PA5 + GPIOA_ALT_PA6 + GPIOA_ALT_PA7)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  /* Set AF0 as the alternative functions for PA4, PA5, PA6, and PA7 */
-  ldr r1, =GPIOA_AFRL
-  ldr r2, =(GPIOA_AF0_PA5 + GPIOA_AF0_PA6 + GPIOA_AF0_PA7)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   ldr r1, =SPI1_CR1
   ldr r2, =SPI_CR1_BR
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
+/*
+  ldr r1, =SPI1_CR1
+  ldr r2, =(SPI_CR1_CPOL + SPI_CR1_CPHA)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+*/
+
+  ldr r1, =SPI1_CR1
+  ldr r2, =(SPI_CR1_CPOL + SPI_CR1_CPHA)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   ldr r1, =SPI1_CR1
   ldr r2, =SPI_CR1_LSBFIRST
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR1
-  ldr r2, =(SPI_CR1_SSM + SPI_CR1_SSI)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR1
-  ldr r2, =(SPI_CR1_CPOL +  SPI_CR1_CPHA)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR1
-  ldr r2, =SPI_CR_SPE
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -148,5 +124,6 @@ spi_init:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+
 
   bx lr
