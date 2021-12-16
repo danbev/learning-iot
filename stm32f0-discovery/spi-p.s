@@ -40,14 +40,14 @@ PA7  COPI
 /* PA4 Peripheral Select (NSS) */
 .equ GPIOA_MODER_PA4, 2 << 8
 .equ GPIOA_OTYPER_PA4, 1 << 4
-.equ GPIOA_PUPDR_PA4, 0x01 << 8
+.equ GPIOA_PUPDR_PA4, 0x00 << 8
 .equ GPIOA_AFRL_PA4, 0x00 << 16
 
 /* PA5 Clock Select (SCK) */
 .equ GPIOA_MODER_PA5, 2 << 10
-.equ GPIOA_OTYPER_PA5, 0 << 5
+.equ GPIOA_OTYPER_PA5, 1 << 5
 .equ GPIOA_OSPEEDR_PA5, 0 << 10
-.equ GPIOA_PUPDR_PA5, 0x01 << 10
+.equ GPIOA_PUPDR_PA5, 0x00 << 10
 .equ GPIOA_AFRL_PA5, 0x00 << 20
 
 /* PA6 Controller Input Peripheral Output (CIPO) */
@@ -68,8 +68,6 @@ PA7  COPI
 .equ SPI_SR_RXE, 1 << 0
 .equ SPI_CR_SPE, 1 << 6
 
-.equ SPI_CR1_SSM, 0 << 9
-.equ SPI_CR2_SSOE, 0 << 2
 .equ GPIOA_IDR_PA4_LOW, 0 << 4
 .equ GPIOA_IDR_PA4_HIGH, 1 << 4
 .equ GPIOA_ODR_PA4_LOW, 0 << 4
@@ -95,16 +93,16 @@ start:
 
 main_loop:
   bl delay
-  bl turn_led_on
-  ldr r1, =SPI1_SR
 
 wait_nss:
   ldr r1, =GPIOA_IDR
-  ldr r2, =GPIOA_IDR_PA4_HIGH
+  ldr r2, =GPIOA_IDR_PA4_LOW
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, r2
-  beq wait_nss
+  bne wait_nss
+
+  bl turn_led_on
 
 wait_rxe_flag:
   ldr r1, =SPI1_SR
@@ -117,6 +115,7 @@ wait_rxe_flag:
   /* Read the data register */
   ldr r1, =SPI1_DR
   ldr r0, [r1]
+  //ldr r0, =#0x41
   bl uart_write_char
 
   bl delay
@@ -171,7 +170,7 @@ spi_peripheral_init:
   str r0, [r1]
 
   ldr r1, =GPIOA_PUPDR
-  ldr r2, =GPIOA_PUPDR_PA6
+  ldr r2, =GPIOA_PUPDR_PA5
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -240,18 +239,6 @@ spi_peripheral_init:
 
   ldr r1, =GPIOA_AFRL
   ldr r2, =GPIOA_AFRL_PA7
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR1
-  ldr r2, =SPI_CR1_SSM
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR2
-  ldr r2, =SPI_CR2_SSOE
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
