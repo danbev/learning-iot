@@ -53,8 +53,8 @@ to an oscilloscope to see that data is written.
 .equ SPI_CR1_SSM, 1 << 9
 .equ SPI_CR2_DS, 7 << 8         /* 8-bit data size    */
 .equ SPI_CR2_FRXTH, 0 << 12
-.equ SPI_CR1_LSBFIRST, 0 << 7
-.equ SPI_CR1_BR, 5 << 3
+.equ SPI_CR1_LSBFIRST, 1 << 7
+.equ SPI_CR1_BR, 4 << 3
 //.equ SPI_CR1_BIDIOE, 1 << 14
 .equ SPI_CR1_CPOL, 0 << 1
 .equ SPI_CR1_CPHA, 0 << 0
@@ -67,11 +67,13 @@ to an oscilloscope to see that data is written.
 .global spi_init
 
 spi_init:
+/*
   ldr r1, =RCC_CR
   ldr r2, =RCC_CR_HSION
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* Enable SPI1 clock */
   ldr r1, =RCC_APB2ENR

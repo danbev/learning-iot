@@ -53,11 +53,8 @@ PA7  COPI (Controller Output Peripheral Input)
 .equ RCC_APB2_SPIEN, 1 << 12
 .equ SPI_CR_SPE, 1 << 6
 
-.equ SPI_CR1_SSM, 1 << 9
-.equ SPI_CR1_SSI, 1 << 8
 .equ SPI_CR2_SSOE, 1 << 2
 
-.equ SPI_CR1_BR, 3 << 3
 .equ GPIOA_ODR_PA4_LOW, 0 << 4
 .equ GPIOA_ODR_PA4_HIGH, 1 << 4
 
@@ -146,12 +143,6 @@ wait_busy_flag:
   
   b main_loop
 
-/*
-SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_BR; 
-SPI1->CR2 = SPI_CR2_SSOE | SPI_CR2_RXNEIE | SPI_CR2_FRXTH
- | SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0;
-SPI1->CR1 |= SPI_CR1_SPE;
-*/
 spi_controller_init:
   /* PA4 NSS/Peripheral select */
   ldr r1, =GPIOA_MODER
@@ -276,20 +267,6 @@ spi_controller_init:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-
-/*
-  ldr r1, =SPI1_CR1
-  ldr r2, =SPI_CR1_SSM
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =SPI1_CR1
-  ldr r2, =SPI_CR1_SSI
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-*/
 
   ldr r1, =SPI1_CR2
   ldr r2, =SPI_CR2_SSOE

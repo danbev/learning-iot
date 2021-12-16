@@ -39,7 +39,7 @@ PA7  COPI
 
 /* PA4 Peripheral Select (NSS) */
 .equ GPIOA_MODER_PA4, 2 << 8
-.equ GPIOA_OTYPER_PA4, 0 << 4
+.equ GPIOA_OTYPER_PA4, 1 << 4
 .equ GPIOA_PUPDR_PA4, 0x01 << 8
 .equ GPIOA_AFRL_PA4, 0x00 << 16
 
@@ -54,14 +54,14 @@ PA7  COPI
 .equ GPIOA_MODER_PA6, 2 << 12
 .equ GPIOA_OTYPER_PA6, 0 << 6
 .equ GPIOA_OSPEEDR_PA6, 0 << 12
-.equ GPIOA_PUPDR_PA6, 0x01 << 12
+.equ GPIOA_PUPDR_PA6, 0x00 << 12
 .equ GPIOA_AFRL_PA6, 0x00 << 24
 
 /* PA7 Controller Output Peripheral Input (COPI) */
-.equ GPIOA_MODER_PA7, 2 << 14      /* Alternate function mode             */
-.equ GPIOA_OTYPER_PA7, 0 << 7
+.equ GPIOA_MODER_PA7, 2 << 14
+.equ GPIOA_OTYPER_PA7, 1 << 7
 .equ GPIOA_OSPEEDR_PA7, 0 << 14
-.equ GPIOA_PUPDR_PA7, 0x01 << 14
+.equ GPIOA_PUPDR_PA7, 0x00 << 14
 .equ GPIOA_AFRL_PA7, 0x00 << 28
 
 .equ SPI_CR1_PERIPHERAL, 0 << 2
@@ -99,8 +99,8 @@ main_loop:
   ldr r1, =SPI1_SR
 
 wait_nss:
-  ldr r1, =GPIOA_ODR
-  ldr r2, =GPIOA_ODR_PA4_HIGH
+  ldr r1, =GPIOA_IDR
+  ldr r2, =GPIOA_IDR_PA4_HIGH
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, r2
