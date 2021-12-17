@@ -33,8 +33,8 @@ peripherals.
 .equ GPIO_PORTC_ENABLE, 1 << 19
 .equ RCC_APB_SPI2EN, 1 << 14
 
-.equ SPI_CR2_DS, 7 << 8                /* Data Size: 8-bit data              */
-.equ SPI_CR2_FRXTH, 1 << 12            /* FIFO RX Threshold (8-bits)         */
+.equ SPI_CR2_DS, 0x07 << 8                /* Data Size: 8-bit data              */
+.equ SPI_CR2_FRXTH, 0 << 12            /* FIFO RX Threshold (8-bits)         */
 .equ SPI_CR1_LSBFIRST, 0 << 7          /* Frame format                       */
 .equ SPI_CR1_BR, 0x1 << 3              /* Baud Rate prescalar                */
 .equ SPI_CR1_CPOL, 0 << 1              /* Clock Polarity                     */
