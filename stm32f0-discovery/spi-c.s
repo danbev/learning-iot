@@ -1,10 +1,11 @@
+/*
+Serial Peripheral Interface (SPI) Controller.
+*/
 .thumb
 .text
 
-//.equ SPI1_BASE, 0x40013000
 .equ SPI2_BASE, 0x40003800
 .equ RCC_BASE, 0x40021000
-//.equ GPIOA_BASE, 0x48000000
 .equ GPIOB_BASE, 0x48000400
 .equ GPIOC_BASE, 0x48000800
 
@@ -12,13 +13,6 @@
 .equ SPI_SR_OFFSET, 0x08
 .equ SPI_DR_OFFSET, 0x0C
 .equ SPI_CR2_OFFSET, 0x04
-
-/*
-.equ SPI1_CR1, SPI1_BASE + SPI_CR1_OFFSET
-.equ SPI1_SR, SPI1_BASE + SPI_SR_OFFSET
-.equ SPI1_DR, SPI1_BASE + SPI_DR_OFFSET
-.equ SPI1_CR2, SPI1_BASE + SPI_CR2_OFFSET
-*/
 
 .equ SPI2_CR1, SPI2_BASE + SPI_CR1_OFFSET
 .equ SPI2_SR, SPI2_BASE + SPI_SR_OFFSET
@@ -33,16 +27,6 @@
 .equ GPIO_PUPDR_OFFSET, 0x0C
 .equ GPIO_AFRL_OFFSET, 0x20
 .equ GPIO_AFRH_OFFSET, 0x24
-
-/*
-.equ GPIOA_MODER, GPIOA_BASE + GPIO_MODER_OFFSET
-.equ GPIOA_OSPEEDR, GPIOA_BASE + GPIO_OSPEEDR_OFFSET
-.equ GPIOA_ODR, GPIOA_BASE + GPIO_ODR_OFFSET
-.equ GPIOA_AFRL, GPIOA_BASE + GPIO_AFRL_OFFSET
-.equ GPIOA_OTYPER, GPIOA_BASE + GPIO_OTYPER_OFFSET
-.equ GPIOA_PUPDR, GPIOA_BASE + GPIO_PUPDR_OFFSET
-.equ GPIOA_BSRR, GPIOA_BASE + GPIO_BSRR_OFFSET
-*/
 
 .equ GPIOB_MODER, GPIOB_BASE + GPIO_MODER_OFFSET
 .equ GPIOB_OSPEEDR, GPIOB_BASE + GPIO_OSPEEDR_OFFSET
@@ -139,10 +123,6 @@ wait_txe_flag:
   ldr r2, =#0x41
   str r2, [r1]
 
-  /* Read the data register */
-  //ldr r1, =SPI_DR
-  //ldr r0, [r1]
-
 wait_busy_flag:
   ldr r1, =SPI2_SR
   ldr r2, =SPI_SR_BSY_FLAG
@@ -154,21 +134,6 @@ wait_busy_flag:
   bl delay
   bl turn_led_off
 
-/*
-  ldr r1,=GPIOA_BSRR
-  ldr r2,=GPIO_BSRR_4_SET
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-*/
-
-/*
-  ldr r1, =GPIOA_ODR
-  ldr r2, =GPIOA_ODR_PA4_HIGH
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-*/  
   b main_loop
 
 spi_controller_init:

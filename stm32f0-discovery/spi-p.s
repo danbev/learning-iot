@@ -1,7 +1,9 @@
+/*
+Serial Peripheral Interface (SPI) Peripheral.
+*/
 .thumb
 .text
 
-//.equ SPI1_BASE, 0x40013000
 .equ SPI2_BASE, 0x40003800
 .equ RCC_BASE, 0x40021000
 .equ GPIOA_BASE, 0x48000000
@@ -116,7 +118,6 @@ wait_rxe_flag:
   /* Read the data register */
   ldr r1, =SPI2_DR
   ldr r0, [r1]
-  //ldr r0, =#0x41
   bl uart_write_char
 
   bl delay
