@@ -849,6 +849,7 @@ signal was the same all the time regardless of the data being sent, it almost
 looked like a clock signal where it should have been sending the character `A`
 so 100001 (high low low low low low high). This is what the signal looks like
 when using SPI2.
+![SPI signal image](./spi-signal.jpg "Example of SPI signal")
 
 #### SPI Control Register 1 (SPIx_CR1)
 Offset: 0x00
@@ -911,6 +912,8 @@ where [spi-c.s](../stm32f0-discovery/spi-c.s) is the controller which sends
 a character (currently `A`) to [spi-p.s](../stm32f0-discovery/spi-p.s) which is
 the peripheral. The peripheral then uses UART to send that character out which
 can be displayed using minicom.
+
+![SPI Example image](./spi-example.jpg "SPI Example image")
 
 ### Inter-integrated circuit (I²C)
 * Standard Mode (Sm) up to 100kHz
