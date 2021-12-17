@@ -8,14 +8,10 @@ peripherals.
 /* Reset Clock and Counter register base address */
 .equ RCC_BASE, 0x40021000
 
-.equ SPI1_BASE, 0x40013000
 .equ SPI2_BASE, 0x40003800
 
 .equ SPI_CR1_OFFSET, 0x00
 .equ SPI_CR2_OFFSET, 0x04
-
-.equ SPI1_CR1, SPI1_BASE + SPI_CR1_OFFSET
-.equ SPI1_CR2, SPI1_BASE + SPI_CR2_OFFSET
 
 .equ SPI2_CR1, SPI2_BASE + SPI_CR1_OFFSET
 .equ SPI2_CR2, SPI2_BASE + SPI_CR2_OFFSET
@@ -35,7 +31,6 @@ peripherals.
 .equ GPIO_PORTA_ENABLE, 1 << 17
 .equ GPIO_PORTB_ENABLE, 1 << 18
 .equ GPIO_PORTC_ENABLE, 1 << 19
-.equ RCC_APB_SPI1EN, 1 << 12
 .equ RCC_APB_SPI2EN, 1 << 14
 
 .equ SPI_CR2_DS, 7 << 8                /* Data Size: 8-bit data              */
@@ -85,13 +80,13 @@ spi_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =SPI1_CR2
+  ldr r1, =SPI2_CR2
   ldr r2, =SPI_CR2_DS
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =SPI1_CR2
+  ldr r1, =SPI2_CR2
   ldr r2, =SPI_CR2_FRXTH
   ldr r0, [r1]
   orr r0, r0, r2
