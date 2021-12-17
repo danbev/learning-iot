@@ -41,6 +41,7 @@ peripherals.
 .equ SPI_CR1_CPHA, 1 << 0              /* Clock Phase                        */
 
 .global spi_init
+.global RCC_BASE, SPI2_BASE, SPI2_CR1, SPI2_CR2
 
 spi_init:
   /* Enable SPI2 clock */
