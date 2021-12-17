@@ -66,11 +66,11 @@ Serial Peripheral Interface (SPI) Controller.
 .equ NSS_PUPDR, 0x01 << 18
 .equ NSS_AFRH, 5 << 4
 
-.equ SCL_MODER, 2 << 20
-.equ SCL_OTYPER, 0 << 10
-.equ SCL_OSPEEDR, 0 << 20
-.equ SCL_PUPDR, 0 << 20
-.equ SCL_AFRH, 5 << 8
+.equ SCK_MODER, 2 << 20
+.equ SCK_OTYPER, 0 << 10
+.equ SCK_OSPEEDR, 0 << 20
+.equ SCK_PUPDR, 0 << 20
+.equ SCK_AFRH, 5 << 8
 
 .equ CIPO_MODER, 2 << 4
 .equ CIPO_OTYPER, 0 << 2
@@ -168,33 +168,33 @@ spi_controller_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* SCL (Select Clock) */
+  /* SCK (Select Clock) */
   ldr r1, =GPIOB_MODER
-  ldr r2, =SCL_MODER
+  ldr r2, =SCK_MODER
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOB_OTYPER
-  ldr r2, =SCL_OTYPER
+  ldr r2, =SCK_OTYPER
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOB_OSPEEDR
-  ldr r2, =SCL_OSPEEDR
+  ldr r2, =SCK_OSPEEDR
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOB_PUPDR
-  ldr r2, =SCL_PUPDR
+  ldr r2, =SCK_PUPDR
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOB_AFRH
-  ldr r2, =SCL_AFRH
+  ldr r2, =SCK_AFRH
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
@@ -224,7 +224,6 @@ spi_controller_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIOC_AFRL
   ldr r2, =CIPO_AFRL
   ldr r0, [r1]
   orr r0, r0, r2
