@@ -842,6 +842,13 @@ PB13  SPI2_SCL  AF0
 PB14  SPI2_MISO AF0
 PB15  SPI2_MOSI AF0
 ```
+One thing to note is that I ran into an issue when using SPI1 and using the same
+code worked when switching to SPI2. The problem I ran into was related to the
+Controller Output Peripheral Input (COPI) line. I could see that the data
+signal was the same all the time regardless of the data being sent, it almost
+looked like a clock signal where it should have been sending the character `A`
+so 100001 (high low low low low low high). This is what the signal looks like
+when using SPI2.
 
 #### SPI Control Register 1 (SPIx_CR1)
 Offset: 0x00
@@ -897,6 +904,13 @@ Bits 15:0 DR[15:0]: Data register
 Data received or to be transmitted
 The data register serves as an interface between the Rx and Tx FIFOs.
 ```
+
+#### SPI Example
+The example for SPI consists of two discovery boards connected to each other,
+where [spi-c.s](../stm32f0-discovery/spi-c.s) is the controller which sends
+a character (currently `A`) to [spi-p.s](../stm32f0-discovery/spi-p.s) which is
+the peripheral. The peripheral then uses UART to send that character out which
+can be displayed using minicom.
 
 ### Inter-integrated circuit (I²C)
 * Standard Mode (Sm) up to 100kHz
