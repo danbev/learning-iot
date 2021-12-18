@@ -635,7 +635,7 @@ bands.
 ### Semi-conductors
 These have properties that are in between conductors and insulators, hence the
 name semi-conductors. If a semi-conductor is exposed to heat this can improve
-its conductivity. But there is another way to improve the conducitivty of a
+its conductivity. But there is another way to improve the conductivity of a
 semi-conductor which is to add impurities to it (called doping).
 
 If we take a look at a silicon cristal:
@@ -655,8 +655,8 @@ If we take a look at a silicon cristal:
 ```
 So we can see that we have these covelent bounds between the atoms and all of
 the free electrons in the valance shell are bound. There are no free electrons
-or "holes" which is an atom which is slightly positively charge and it lacks
-an electron (or perhaps more than one?).
+or "holes" (which is an atom which is slightly positively charge and it lacks
+an electron).
 
 If we replace one of these atoms with an atom with only 5 electrons
 (like fosfor) in its valance shell what would happen:
@@ -677,11 +677,9 @@ If we replace one of these atoms with an atom with only 5 electrons
 It can still bond with the other 3 atoms around it but also has an additional
 electron left over. This free electron can now move in the conduction band. This
 makes this silicon cristal more conductive then before. Because we have a free
-electron by this process and electrons are negatively charged this is called
-an n-type conductor now.
-
-So that is one way we can increase the connectivity of silicon. But how about
-replacing an atom with something that only has 3 electrons in its valance shell:
+electron by this process this is called an n-type (for negative) conductor now.
+But also notice that there is still a balance of protons and electrons sinse
+the introduced atom has 5 protons. 
 
 So if we hook up a battery this the free electron will be attracted to the
 positive terminal and the electrons from the negative terminal will be able
@@ -723,7 +721,7 @@ So lets try with alunminum (Ai):
  Si  [* *]  Si  [* *]  Si  [* *]
 ```
 Notice that we have a missing electron so there is no covalent bond between the
-Ai atom ine the middle the Ai atom to the right of it. This is called a
+Ai atom in the middle and the Si atom to the right of it. This is called a
 p-type semi-conductor. This also conducts electricity better than pure silicon
 so the conductivity goes up.
 
@@ -807,11 +805,20 @@ The free electron would be attracted to fill the hole
                              |  |
  Si  [* *]  Si  [* *]  Si    |  |   Si  [* *]  Si  [* *]  Si  [* *]
 ```
+If an electron moves from the n-type to the p-type this will cause an imbalance
+where the n-type size now has a mismatch of the P atom, there is not one proton
+more that there are electrons (remember that this was not the case when the
+free electron was in the n-type side). So the n-type side will now become
+slightly positively charged.
 
-A hole can also move to the n-type side. This will create an area between
-these two reqions where there are now extra electrons, or any extra holes, so
-there are now charge carriers in this region. This region is called the
-depletion region and it like an insulator.
+A hole can also move to the n-type side in which case the p-type area will not
+be imbalanced, the Ai atom will not have one more electron compared to protons
+and become slightly negatively charged. And remember that a charge will create
+an electric field. This electric field will prevent electrons and holes to move
+between these to areas. This process will create an area between these two
+reqions where there are now extra electrons, or any extra holes, so there are
+now charge carriers in this region. This region is called the depletion region
+and it like an insulator.
 ```
                 Depletion Region
             N          ↓       P
@@ -824,10 +831,10 @@ depletion region and it like an insulator.
                Depletion Region
             N          ↓       P
       +--------------+----+-------------+
-      | * * ** *** * | Si |o o oo ooo   |
-      | ** * **  * * | Si | o o o o  oo |
-      | * * ** *** * | Si |o o o        |
-      | * * ** *** * | Si |o   o  o  o o|
+      | * * ** *** * |    |o o oo ooo   |
+      | ** * **  * * |    | o o o o  oo |
+      | * * ** *** * |    |o o o        |
+      | * * ** *** * |    |o   o  o  o o|
       +--------------+----+-------------+
 ```
 
@@ -838,10 +845,10 @@ like > 0.7v this will overcome the barrier.
                Depletion Region
             N          ↓        P
       +--------------+----+-------------+
-      | * * ** *** * | Si |o o oo ooo   |
- +--> | ** * **  * * | Si | o o o o  oo |---------+
- |    | * * ** *** * | Si |o o o        |         |
- |    | * * ** *** * | Si |o   o  o  o o|         |
+      | * * ** *** * |    |o o oo ooo   |
+ +--> | ** * **  * * |    | o o o o  oo |---------+
+ |    | * * ** *** * |    |o o o        |         |
+ |    | * * ** *** * |    |o   o  o  o o|         |
  |    +--------------+----+-------------+         |
  |                                                |
  |                   |                            |
@@ -862,10 +869,10 @@ to the p-type region, and the positive terminal to the n-type region:
                Depletion Region
             N          ↓        P
       +--------------+----+-------------+
-      | * * ** *** * | Si |o o oo ooo   |
- +----| ** * **  * * | Si | o o o o  oo |<--------+
- |    | * * ** *** * | Si |o o o        |         |
- |    | * * ** *** * | Si |o   o  o  o o|         |
+      | * * ** *** * |    |o o oo ooo   |
+ +----| ** * **  * * |    | o o o o  oo |<--------+
+ |    | * * ** *** * |    |o o o        |         |
+ |    | * * ** *** * |    |o   o  o  o o|         |
  |    +--------------+----+-------------+         |
  |                                                |
  |                 |                              |
@@ -880,10 +887,10 @@ will leave the n-region, causing the depletion region to become larger:
                Depletion Region
             N         ↓           P
       +---------------------------------+
-      | * * ** **|    Si    |o oo ooo   |
- +----| ** * **  |    Si    | o o o  oo |<--------+
- |    | * * ** * |    Si    |o o        |         |
- |    | * * ** * |    Si    |  o  o  o o|         |
+      | * * ** **|          |o oo ooo   |
+ +----| ** * **  |          | o o o  oo |<--------+
+ |    | * * ** * |          |o o        |         |
+ |    | * * ** * |          |  o  o  o o|         |
  |    +--------------+----+-------------+         |
  |                                                |
  |                 |                              |
@@ -896,7 +903,7 @@ As the depletion region becomes larger, meaning that there are no charge
 carriers in this region, this component will act like an insulator. So no
 current will flow.
 
-If we stick an n-type region next to a p-type and then another n-type we get
+If we stick an n-type region next to a p-type, and then another n-type we get
 the following:
 ```
                     Depletion Regions
@@ -1575,7 +1582,7 @@ negative terminal we simply use the ground symbol. For example:
   |                       |
   |                       |
  ---                    ---
-  =                      -
+  -                      -
   .                      .
 ```
 Which is the same as writing:
