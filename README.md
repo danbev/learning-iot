@@ -984,7 +984,7 @@ The electrons that have now started flowing through the p-type region will be
 attracted to the positive right-most n-type region and therefor be able to
 flow through it towards the positive terminal output.
 
-This component is called an NPN bipolar junction transistor:
+This component is called an NPN Bipolar Junction Transistor:
 ```
         Emitter(N)      Base(P)  Collector(N)
       +-------------+-+--------+-+----------+
@@ -1198,8 +1198,31 @@ So the flow of electrons can only happen in one direction.
   anode-----| P  | N  |-----cathode
             +----+----+
 ```
+This is how a Diode is made.
 
-### Light Emitting Diod
+So current will flow when electrons can flow from the n-type region to the
+p-type region provided that the voltage applied can over come the depletion
+regions electric field:
+```
+            +----+----+  
+  +---<-----| P  | N  |-----<----+
+  |         +----+----+          |
+  |        +-----------+         |
+  +--->----|+         -|---->----+
+           +-----------+
+
+```
+But no current will flow if we connect it the diode in the other way:
+```
+            +----+----+  
+  +---------| N  | P  |----------+
+  |         +----+----+          |
+  |        +-----------+         |
+  +--------|+         -|---------+
+           +-----------+
+```
+
+### Light Emitting Diode
 Notice that this is basically a Diode that can emit light. 
 ```
     +--+
