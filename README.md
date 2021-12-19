@@ -3218,3 +3218,97 @@ This can be used to allow devices/component to communicate in half-duplex, only
 one can communicate at a time but the communication can be bidirectional. This
 is something that is used by the I²C protocol.
 
+
+### Controller Area Network
+Was designed by Borsch and originally for automobile systems back in 1986.
+A single CAN package can move up to 8 bytes of data.
+
+While this is also a bus like SPI and I²C there is no concept of a single
+controller (I²C can have multiple controllers but is seems to be a little
+messy to set up and CAN is designed for having this).
+
+CAN is not a device to device (or circuit to circuit) communication system like
+SPI and I²C are. Instead CAN uses broadscasting so any node on the bus can
+read the data.
+
+The CAN bus has two wires and looks something like this:
+```
+                          CAN Bus
+
+High signal +---------------------------+--------------+
+            /                           |              /
+      120Ω  \                           |              \ 120Ω
+            /                           |              /
+Low signal  +---------------------------|---+-----------
+                                        |   |
+                                     +------------+
+                                     |Transciever |
+                                     |  Tx   Rx   |
+                                     +------------+
+                                         |    |
+                                     +------------+
+                                     |  Tx    Rx  |
+                                     |            |
+                                     |     MCI    |  
+                                     +------------+
+```
+The resistors at both ends are terminating resistors. To connect a
+microcontroller to the bus a transciever is needed. So to connect two boards
+we will need two 120Ω resistors and two transceivers. I've ordered two
+MCP-2551 CAN modules. 
+
+There is no chip select wire like in SPI, and also there is no address like we
+find in I²C.
+
+Signaling:
+```
+5.0V +
+High |        -----            -----  <--- Dominant state (Active)
+     |       /     \          /
+     |      /       \        /
+     |     /         \      /
+     |-----           ------          <--- Recessive state (Idle)
+2.5V |-----\         /------\
+Low  |      \       /        \
+     |  1    \  0  /     1    \  0
+     |        -----            -----
+  0V +--------------------------------------------
+```
+Dominant state is when the lines are pulled apart, and recessive is when the
+lines are pulled together.
+Recessive state the state when the bus is idle and notice that the state is
+a logic 1 in this case and a dominant state would be logic 0.
+This means that only on CAN Mode (transciever + mcu in our case) can force CAN-
+HI to 0 by using a logic AND:
+```
+Node1   Node2    Dominant
+    0 & 0        0        (ok, recessive state)
+    1 & 0        0        (ok, dominant state)
+    0 & 1        0        (ok, dominant state)
+    1 & 1        1        (two nodes cannot request the dominant state)
+```
+
+Message format and addressing
+```
+     +---+----------+---+
+     |SOF|Identifier|RTR|
+     +---+----------+---+
+Bits:  1      11      1
+
+SOF = Start of Frame
+Identifier = Priority of the message, lower value = higher priority so
+             00000000000 is the highest priority and 11111111111 the lowest.
+RTR = Remote Transmission Request
+IDE = Single identifier extension, 1 = standard extension. 
+```
+
+
+### Signal-Ended Sampling
+Is a way of transmitting an electrical signal from sender to receiver. The
+electrical signal is transmitted by a voltage and we can think of this type of
+signaling of the circuits discussed so far, we have two conductors
+
+### Differential Signaling
+TODO:
+
+
