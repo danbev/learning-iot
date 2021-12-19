@@ -28,7 +28,7 @@ Controller Area Network (CAN)
 .equ GPIOA_AFRH_PA11_AF4, 4 << 12
 .equ GPIOA_AFRH_PA12_AF4, 4 << 16
 
-.global can_init
+.global can_init, CAN_BASE
 
 can_init:
   ldr r1, =RCC_APB1ENR
