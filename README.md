@@ -3309,6 +3309,17 @@ EOF = End Of Frame, marks the end of a CAN frame.
 IFS = Inter-Frame Space, is the time required to move a received frame into its
       proper message buffer area.
 ```
+The `Identifier` is more like an tag/topic for the content in the message which
+receivers can use to determine if they are interested in those types of
+messages. Notice that messages can have a 0 byte payload (`Data` field) which
+can act a signaling message.
+
+The STM32 have packet buffers for incoming and outgoing messages which are
+called `mailboxes`. There are three for outgoing messages and 6 for incoming.
+
+For incoming messages filters can be configured to specify which messages the
+device is interested in and the other messages are ignored. The messages that
+match a filter are passed to a FIFO queue.
 
 ### Signal-Ended Sampling
 Is a way of transmitting an electrical signal from sender to receiver. The
