@@ -3287,21 +3287,28 @@ Node1   Node2    Dominant
     0 & 1        0        (ok, dominant state)
     1 & 1        1        (two nodes cannot request the dominant state)
 ```
+Sending a 0 is will always `win" which is why this is called dominant.
 
-Message format and addressing
+Message format:
 ```
-     +---+----------+---+
-     |SOF|Identifier|RTR|
-     +---+----------+---+
-Bits:  1      11      1
+     +---+----------+---+--+----+---+---+---+---+
+     |SOF|Identifier|RTR|R₀|Data|CRC|ACK|EOF|IFS|
+     +---+----------+---+--+----+---+---+---+---+
+Bits:  1      11      1     0-64 16   2   7   7
 
-SOF = Start of Frame
+SOF = Start of Frame, 0 signals a new packet (the dominant state)
 Identifier = Priority of the message, lower value = higher priority so
              00000000000 is the highest priority and 11111111111 the lowest.
-RTR = Remote Transmission Request
+RTR = Remote Transmission Request.
 IDE = Single identifier extension, 1 = standard extension. 
+R₀  = Reserved bit.
+DLC = Data Length Code contains the number of bytes of data being transmitted.
+CRC = Cyclic Redundance Check contains the checksum.
+ACK = One bit is the ack and one is the delimiter.
+EOF = End Of Frame, marks the end of a CAN frame.
+IFS = Inter-Frame Space, is the time required to move a received frame into its
+      proper message buffer area.
 ```
-
 
 ### Signal-Ended Sampling
 Is a way of transmitting an electrical signal from sender to receiver. The
