@@ -13,12 +13,15 @@ Controller Area Network (CAN) Controller.
 .equ CAN_TDT0R_OFFSET, 0x184    /* TX Data length control register          */
 .equ CAN_TDL0R_OFFSET, 0x188    /* TX Data low register                     */
 .equ CAN_FMR_OFFSET, 0x200      /* Filter Master Register                   */
+.equ CAN_FA1R_OFFSET, 0x21C     /* Filter Activation Register               */
 
 .equ CAN_MCR, CAN_BASE + CAN_MCR_OFFSET
 .equ CAN_MSR, CAN_BASE + CAN_MSR_OFFSET
 .equ CAN_TSR, CAN_BASE + CAN_TSR_OFFSET
 .equ CAN_ESR, CAN_BASE + CAN_ESR_OFFSET
 .equ CAN_BTR, CAN_BASE + CAN_BTR_OFFSET
+.equ CAN_FMR, CAN_BASE + CAN_FMR_OFFSET
+.equ CAN_FA1R, CAN_BASE + CAN_FA1R_OFFSET
 
 .equ CAN_MCR_INRQ, 1 << 0        /* Initialization mode request             */
 .equ CAN_MCR_SLEEP, 1 << 1       /* Sleep mode                              */
@@ -27,6 +30,8 @@ Controller Area Network (CAN) Controller.
 .equ CAN_BTR_TS2, 2 << 20        /* TODO:                                   */
 .equ CAN_BTR_TS1, 3 << 16        /* TODO:                                   */
 .equ CAN_BTR_BRP, 3 << 16        /* Baud Rate Prescalar                     */
+.equ CAN_FMR_INIT, 1 << 0        /* Filter init mode                        */
+.equ CAN_FA1R_FACT0, 1 << 0      /* Activate Filter 0                       */
 
 .global start
 
@@ -75,12 +80,6 @@ wait_inak_set:
   str r0, [r1]
 
   ldr r1, =CAN_BTR
-  ldr r2, =CAN_BTR_LBKM
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_BTR
   ldr r2, =(CAN_BTR_TS1 + CAN_BTR_TS2 + CAN_BTR_BRP)
   ldr r0, [r1]
   orr r0, r0, r2
@@ -100,5 +99,17 @@ wait_inak:
   and r0, r0, r2
   cmp r0, r2
   beq wait_inak
+
+  ldr r1, =CAN_FMR
+  ldr r2, =CAN_FMR_INIT
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  ldr r1, =CAN_FA1R
+  ldr r2, =CAN_FA1R_FACT0
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
 
   bx lr
