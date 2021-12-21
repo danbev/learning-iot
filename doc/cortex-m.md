@@ -1369,8 +1369,8 @@ specify a mask for the standard filter mode then it would start at bit 17 if
 
 I'm not mistaken. So we would have to shift the mask:
 ```assembly
-.equ CAN_F0R1_IDENT, 7 << 17     /* Identifier                              */
-.equ CAN_F0R2_MASK, 7 << 17      /* Filter mask, allow all identifiers      */
+.equ CAN_F0R1_IDENT, 7 << 21     /* Identifier                              */
+.equ CAN_F0R2_MASK, 7 << 21      /* Filter mask, allow all identifiers      */
 ```
 
 We also have to configure the FIFO for this filter where messages that pass the
