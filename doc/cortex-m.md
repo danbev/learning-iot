@@ -1336,7 +1336,7 @@ A one in the mask will include that bit in the filter, and a zero will ignore
 that bit. So we could set the mask register to all zeros and all messages would
 pass through (be copied into SRAM, the selected FIFO queue).
 
-Filter bank registers:
+Filter bank Mask mode registers example:
 ```
                  +------- FB0_R1
 Filter Bank 0    +------- FB0_R2
@@ -1346,13 +1346,13 @@ FB0_R1 Identifier Register
   31             24   21        16               7               0
    |             |     |         |               |               |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  |0|0|0|0|0|0|0|0|1|0|1| | | | | | | | | | | | | | | | | | | | | |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                  |     |         |               |               |
 FB0_R2 Mask Register   |         |               |               |
    |             |     |         |               |               |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  |0|0|0|0|0|0|0|0|1|1|1| | | | | | | | | | | | | | | | | | | | | |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                  |     |         |               |               |
                  |     |         |               |               |
@@ -1371,6 +1371,40 @@ I'm not mistaken. So we would have to shift the mask:
 .equ CAN_F0R1_IDENT, 7 << 21     /* Identifier                              */
 .equ CAN_F0R2_MASK, 7 << 21      /* Filter mask, allow all identifiers      */
 ```
+
+There is also a second mode called `List` mode in which case the second register
+is not a mask register but instead a second identifier register:
+Filter bank List mode registers example:
+```
+                 +------- FB0_R1
+Filter Bank 0    +------- FB0_R2
+(List mode)
+
+FB0_R1 Identifier Register
+  31             24   21        16               7               0
+   |             |     |         |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |0|0|0|0|0|0|0|0|1|0|1| | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |     |         |               |               |
+FB0_R2 Identifier Register       |               |               |
+   |             |     |         |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  | | | | | | | | |1|1|0| | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |     |         |               |               |
+                 |     |         |               |               |
+Field mappings   |     |         |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   STDID[10:3]   | STDID[2:0]    | EXID[12:5]    |EXID[4:0]IDE|RTR|0
+                   EX[17:13|
+```
+This allows for specifying two identifier values to be checked. The incoming
+messages identifier will be checked againt register 1 and if it matches exactly
+is will be allowed to pass. If it does not match it will be matched against
+register 2.
 
 We also have to configure the FIFO for this filter where messages that pass the
 filter are copied into:
