@@ -1406,6 +1406,42 @@ messages identifier will be checked againt register 1 and if it matches exactly
 is will be allowed to pass. If it does not match it will be matched against
 register 2.
 
+One thing to note is that with configuring filters we can check the `IDE` field
+to see if the identifier is standard or extended. This field will be 0 for a
+standard 11-bit identifier and 1 for a 29-bit identifier.
+
+Each message that passes the filter will be added to the FIFO queue and made
+available to an application via a collection of registers referred to as a
+mailbox. There are two such mailboxes for received messages FIFO0 and FIFO1:
+```
+CAN_RI0R   Receive Identifer 0 Register             0x1B0
+bit 31:21 STID
+bit 2     IDE
+bit 1     RTR
+
+CAN_RDT0R  Receive Data length and Time 0 Register  0x1B4
+bit 15:8  FMI Filter Match index
+
+CAN_RDL0R  Receive Data Low 0 Register              0x1B8
+
+CAN_RDH0R  Receive Data High 0 Register             0x1BC
+```
+Notice the `Filter Match Index (FMI)` which is added when a filter matches and
+identifies the filter that matched. Without this an application would have to
+search through all messages and compare the STID to find message of a certain
+type. But with the FMI the application can just match that field and know that
+a particular filter matched that message. If the filter in question is in mask
+mode then the application still needs to search through the STID, as the STID
+could be different, but that is still a smaller number than having to search all
+the messages. While I don't expect the mailbox to be able to hold a huge numder
+of messages it might be that this kind of seaching would have to be done so
+fequently that is still impacts the system, and also might take more energy.
+```
+Filter Bank 0 32-bit Mask  Filter nr: 0
+Filter Bank 1 32-bit List  Filter nr: 1, 2
+Filter Bank 3 16-bit List  Filter nr: 3, 4, 5, 6
+```
+
 We also have to configure the FIFO for this filter where messages that pass the
 filter are copied into:
 ```
@@ -1417,4 +1453,9 @@ The message passing through this filter will be stored in the specified FIFO.
   0: Filter assigned to FIFO 0
   1: Filter assigned to FIFO 1
 ```
+When a message has been accepted by a filter it will be copied into the
+configured FIFO. This affects the registers used for the mailbox, so the
+registers used for the mailbox will be either CAN_RI0R or CAN_RI1R and likewise
+for the other register that make up the mailboxes (see above for details).
+
 
