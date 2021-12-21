@@ -43,8 +43,8 @@ Controller Area Network (CAN) Controller.
 .equ CAN_FM1R_MASK_MODE, 0 << 0  /* Filter Mask mode                        */
 .equ CAN_FM1R_LIST_MODE, 1 << 0  /* Filter List mode                        */
 .equ CAN_FA1R_FACT0, 1 << 0      /* Activate Filter 0                       */
-.equ CAN_F0R1_IDENT, 0x0000      /* Identifier                              */
-.equ CAN_F0R2_MASK, 0x0000       /* Filter mask, allow all identifiers      */
+.equ CAN_F0R1_IDENT, 7 << 21     /* Identifier (currently ignored)          */
+.equ CAN_F0R2_MASK, 0x0000 << 0  /* Filter mask, allow all identifiers      */
 .equ CAN_FFA1R_FFA0, 0 << 0      /* FIFO 0 for Filter 0                     */
 
 .global start
