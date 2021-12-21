@@ -1246,3 +1246,142 @@ Bits 7:0 SCLL[7:0]: SCL low period (master mode)
 This field is used to generate the SCL low period in master mode
 
 ```
+
+### Controller Area Network (CAN)
+
+#### Filters
+Filters can be configured so that only CAN bus messages that are of interest
+are actually received and the rest ignored. The messages that are accepted are
+copied into SRAM (a FIFO queue).
+
+To configure filters one first as to enter init mode for them by setting
+`FINIT` in CAN_FMR (offset 0x200).
+
+There is a concept of filter banks, where a bank consists of two 32 bit
+registers. There are 14 such filter banks. These filters are enabled by setting
+one of the values in CAN_FA1R:
+```
+CAN Filter Activation Register
+Offset: 0x21C
+
+Bits 13:0 FACTx: Filter active
+The software sets this bit to activate Filter x. To modify the Filter x
+registers (CAN_FxR[0:7]), the FACTx bit must be cleared or the FINIT bit of
+the CAN_FMR register must be set.
+  0: Filter x is not active
+  1: Filter x is active
+```
+After selecting a filter bank we need to set the mode for this filter:
+```
+CAN Filter Mode Register (CAN_FM1R)
+Offset: 0x204
+
+Bits 13:0 FBMx: Filter mode
+Mode of the registers of Filter x.
+  0: Two 32-bit registers of filter bank x are in Identifier Mask mode.
+  1: Two 32-bit registers of filter bank x are in Identifier List mode.
+```
+The choice here decides how the two registers that make up the filter back
+are used. 
+```
+Filter bank i` Register x (CAN_FiRx) (i=0..13, x = 1,2)
+Offsets: 0x240 to 0x2AC
+
+CAN_F0R1
+CAN_F0R2
+CAN_F1R1
+CAN_F2R2
+CAN_F2R1
+...
+CAN_F13R2
+CAN_F13R1
+```
+So we have an offset for each of the 14 filter banks, and each bank has two
+32-bit registers.
+```
+.equ CAN_F0R1_OFFSET, 0x240
+.equ CAN_F0R2_OFFSET, 0x248
+```
+And depending on the choice of Mask or List mode these register will be
+interpreted differently. If we Mask filter mode has been configured then the
+first register (FBxR1) is the identifier register, and the second (RBxR2) is
+the mask register.
+
+Now, when using standard identifiers the number of bits used is 11 and if
+extended identifiers are used then they can be 29 bits. The identifier register
+(FB0_R1) should contain the expected value for the bit positions that the mask
+specifies. Lets say we have something like this:
+```
+identifier register:00000000101 
+      mask register:00000000111
+```
+In this case only the the three right most bits will be compared by this filter
+the rest can be anything and will not matter. The identifier register values
+specify that values that are expected for the incoming messages identifier to
+be. So the incoming messages identitifer field will be compared to the value
+in the identifer register. 
+```
+ message identifier:10101010111
+identifier register:00000000101 
+      mask register:00000000111
+```
+The above message would be rejected/droppped (not copies into SRAM).
+Whereas the following message would pass through the filter:
+```
+ message identifier:10101010101
+identifier register:00000000101 
+      mask register:00000000111
+```
+A one in the mask will include that bit in the filter, and a zero will ignore
+that bit. So we could set the mask register to all zeros and all messages would
+pass through (be copied into SRAM, the selected FIFO queue).
+
+Filter bank registers:
+```
+                 +------- FB0_R1
+Filter Bank 0    +------- FB0_R2
+(Mask mode)
+
+FB0_R1 Identifier Register
+  31             24              16              7               0
+   |             |               |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |               |               |               |
+FB0_R2 Mask Register             |               |               |
+   |             |               |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |               |               |
+                 |               |               |
+Field mappings   |               |               |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   STDID[10:3]   | STDID[2:0]    | EXID[12:5]    |EXID[4:0]IDE|RTR|0
+                   EX[17:13|
+```
+The field mapping shows the mapping of the register positions and how the match
+up with the fields in the CAN message format. And notice that if we want to
+specify a mask for the standard filter mode then it would start at bit 17 if
+
+I'm not mistaken. So we would have to shift the mask:
+```assembly
+.equ CAN_F0R1_IDENT, 7 << 17     /* Identifier                              */
+.equ CAN_F0R2_MASK, 7 << 17      /* Filter mask, allow all identifiers      */
+```
+
+We also have to configure the FIFO for this filter where messages that pass the
+filter are copied into:
+```
+CAN Filter FIFO Assignement Register (CAN_FFA1R)
+Offset: 0x214
+
+Bits 13:0 FFAx: Filter FIFO assignment for filter x
+The message passing through this filter will be stored in the specified FIFO.
+  0: Filter assigned to FIFO 0
+  1: Filter assigned to FIFO 1
+```
+
