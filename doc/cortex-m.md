@@ -1343,20 +1343,20 @@ Filter Bank 0    +------- FB0_R2
 (Mask mode)
 
 FB0_R1 Identifier Register
-  31             24              16              7               0
-   |             |               |               |               |
+  31             24   21        16               7               0
+   |             |     |         |               |               |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 |               |               |               |
-FB0_R2 Mask Register             |               |               |
-   |             |               |               |               |
+                 |     |         |               |               |
+FB0_R2 Mask Register   |         |               |               |
+   |             |     |         |               |               |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 |               |               |
-                 |               |               |
-Field mappings   |               |               |
+                 |     |         |               |               |
+                 |     |         |               |               |
+Field mappings   |     |         |               |               |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1365,8 +1365,7 @@ Field mappings   |               |               |
 ```
 The field mapping shows the mapping of the register positions and how the match
 up with the fields in the CAN message format. And notice that if we want to
-specify a mask for the standard filter mode then it would start at bit 17 if
-
+specify a mask for the standard filter mode then it would start at bit 21 if
 I'm not mistaken. So we would have to shift the mask:
 ```assembly
 .equ CAN_F0R1_IDENT, 7 << 21     /* Identifier                              */
