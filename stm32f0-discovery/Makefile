@@ -61,7 +61,7 @@ can-c.elf : can-c.o can.o delay.o blue-led.o
 	objcopy -O ihex $@ $@.hex
 	#
 	#
-# SPI loopback example (no external transceiver required)
+# CAN loopback example (no external transceiver required)
 can-loopback.elf : can-c.o can.o delay.o blue-led.o
 	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
