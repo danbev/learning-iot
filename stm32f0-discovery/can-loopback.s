@@ -18,11 +18,13 @@ Controller Area Network (CAN) Controller.
 .equ CAN_FFA1R_OFFSET, 0x214    /* Filter FIFO Assignment Register          */
 
 .equ CAN_RI0R_OFFSET, 0x1B0     /* Receive Identifier 0 Register            */
+.equ CAN_RF0R_OFFSET, 0x0C      /* FIFO Receive 0 Register                  */
+.equ CAN_RDL0R_OFFSET, 0x1B8    /* Receive Data FIFO Low 0 Register         */
 
-.equ CAN_TI0R_OFFSET, 0x180     /* Transmit Identifier 0 Register           */
-.equ CAN_TDT0R_OFFSET, 0x184    /* Transmit Data length Time 0 Register     */
-.equ CAN_TDL0R_OFFSET, 0x188    /* Transmit Data Low 0 Register             */
-.equ CAN_TDH0R_OFFSET, 0x18C    /* Transmit Data High 0 Register            */
+.equ CAN_TI0R_OFFSET, 0x180     /* Transmit Mailbox Identifier 0 Register   */
+.equ CAN_TDT0R_OFFSET, 0x184    /* Transmit Mailbox Data Time 0 Register    */
+.equ CAN_TDL0R_OFFSET, 0x188    /* Transmit Mailbox Data Low 0 Register     */
+.equ CAN_TDH0R_OFFSET, 0x18C    /* Transmit Mailbox Data High 0 Register    */
 
 .equ CAN_F0R1_OFFSET, 0x240
 .equ CAN_F0R2_OFFSET, 0x248
@@ -40,6 +42,8 @@ Controller Area Network (CAN) Controller.
 .equ CAN_FFA1R, CAN_BASE + CAN_FFA1R_OFFSET
 
 .equ CAN_RI0R, CAN_BASE + CAN_RI0R_OFFSET
+.equ CAN_RF0R, CAN_BASE + CAN_RF0R_OFFSET
+.equ CAN_RDL0R, CAN_BASE + CAN_RDL0R_OFFSET
 
 .equ CAN_TI0R, CAN_BASE + CAN_TI0R_OFFSET
 .equ CAN_TDT0R, CAN_BASE + CAN_TDT0R_OFFSET
@@ -60,6 +64,12 @@ Controller Area Network (CAN) Controller.
 .equ CAN_F0R2_MASK, 0x0000 << 0  /* Filter mask, allow all identifiers      */
 .equ CAN_FFA1R_FFA0, 0 << 0      /* FIFO 0 for Filter 0                     */
 .equ CAN_TSR_TME0, 1 << 26       /* Transmit Mailbox 0 Empty                */
+.equ CAN_TI0R_IDE, 0 << 2        /* Identifier extension                    */
+.equ CAN_TI0R_TXRQ, 1 << 0       /* Transmit request                        */
+.equ CAN_TDT0R_DCL, 1 << 0       /* Data Code Length                        */
+.equ CAN_TI0R_ID, 1 << 21        /* Identifier                              */
+.equ CAN_RF0R_FMP0, 3 << 0       /* Receive FIFO Messsage Pending           */
+.equ CAN_RF0R_RFOM0, 1 << 5      /* Release the output mailbox ofthe  FIFO  */
 
 .equ CAN_RI0R_STID_MASK, 0xFFE000 /* Recieve Identifier 0 Standard Id Mask   */
 /* 1111 1111 1110 0000 0000 0000
@@ -185,7 +195,66 @@ wait_inak:
   cmp r0, r2
   bne mailbox_0_not_empty
 
+  /* Set standard message type */
+  ldr r1, =CAN_TI0R
+  ldr r2, =CAN_TI0R_IDE
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set the message length */
+  ldr r1, =CAN_TDT0R
+  ldr r2, =CAN_TDT0R_DCL
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set the message */
+  ldr r1, =CAN_TDL0R
+  ldr r2, ='A'
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Set the identifier */ 
+  ldr r1, =CAN_TI0R
+  ldr r2, =CAN_TI0R_ID
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  /* Request transmission of the mailbox. This bit is cleared by hardware
+     when the mailbox becomes empty */
+  ldr r1, =CAN_TI0R
+  ldr r2, =CAN_TI0R_TXRQ
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  bl delay
+
+  /* Receive the can message (recall we are using the loopback) */
+  ldr r1, =CAN_RF0R
+  ldr r2, =CAN_RF0R_FMP0
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #0x00
+  beq no_message_recieved
+
+  /* Read the message into r0. TODO: use UART to send out the messag */
+  ldr r1, =CAN_RDL0R
+  ldr r0, [r1]
+
+  ldr r1, =CAN_RF0R
+  ldr r2, =CAN_RF0R_RFOM0
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
   bx lr
 
 mailbox_0_not_empty:
+  b .
+
+no_message_recieved:
   b .
