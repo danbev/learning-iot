@@ -9,9 +9,6 @@ Controller Area Network (CAN) Controller.
 .equ CAN_TSR_OFFSET, 0x08       /* Transmit Status Register                 */
 .equ CAN_ESR_OFFSET, 0x18       /* Error Status Register                    */
 .equ CAN_BTR_OFFSET, 0x1C       /* Bit Timing Register                      */
-.equ CAN_TI0R_OFFSET, 0x180     /* TX Identifier register                   */
-.equ CAN_TDT0R_OFFSET, 0x184    /* TX Data length control register          */
-.equ CAN_TDL0R_OFFSET, 0x188    /* TX Data low register                     */
 .equ CAN_FMR_OFFSET, 0x200      /* Filter Master Register                   */
 .equ CAN_FM1R_OFFSET, 0x204     /* Filter Mode Register                     */
 .equ CAN_FA1R_OFFSET, 0x21C     /* Filter Activation Register               */
