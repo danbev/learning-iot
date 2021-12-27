@@ -84,6 +84,9 @@ Vector_Table:
 start:
   bl can_init
   bl can_controller_init
+  bl can_send 
+  bl delay
+  bl can_receive 
   b .
 
 can_controller_init:
@@ -183,7 +186,10 @@ wait_inak:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+  
+  bx lr
 
+can_send:
   /* Check that the Transmit 0 mailbox is empty */
   ldr r1, =CAN_TSR
   ldr r2, =CAN_TSR_TME0
@@ -225,9 +231,10 @@ wait_inak:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+ 
+  bx lr
 
-  bl delay
-
+can_receive:
   /* Receive the can message (recall we are using the loopback) */
   ldr r1, =CAN_RF0R
   ldr r2, =CAN_RF0R_FMP0
