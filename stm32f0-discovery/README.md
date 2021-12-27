@@ -20,6 +20,9 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [I2C controller](./i2c-c.s)
 1. [I2C peripheral](./i2c-p.s)
 1. [CAN loopback](./can-loopback.s)
+1. [SysTick timer](./systick.s)
+1. [SysTick timer using interrupt](./systickint.s)
+1. [Timer](./tim2.s)
 
 ### LED background info
 
