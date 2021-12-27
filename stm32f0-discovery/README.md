@@ -1,7 +1,7 @@
 ### Assembly stm32 examples
 This document contains notes the assembly language examples that I've written
 to learn and explore various concepts related to microcontrolers, like LEDs,
-UART, SPI, CAN, Timers. The board I'm using is stm32f0-discovery:
+UART, SPI, I2C, CAN, Timers. The board I'm using is stm32f0-discovery:
 
 [Product documentation](https://www.st.com/en/evaluation-tools/32f072bdiscovery.html#documentation)  
 [User Manual](https://www.st.com/resource/en/user_manual/um1690-discovery-kit-for-stm32f0-series-microcontrollers-with-stm32f072rb-stmicroelectronics.pdf)
@@ -15,6 +15,11 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [User button](./led_button.s)
 1. [UART Transmit](#uart-transmit-example)
 1. [UART Receive](#uart-receive-example)
+1. [SPI controller](./spi-c.s)
+1. [SPI peripheral](./spi-p.s)
+1. [I2C controller](./i2c-c.s)
+1. [I2C peripheral](./i2c-p.s)
+1. [CAN loopback](./can-loopback.s)
 
 ### LED background info
 
