@@ -52,7 +52,7 @@ Controller Area Network (CAN) Controller.
 .equ CAN_BTR_LBKM, 1 << 30       /* Loopback mode                           */
 .equ CAN_BTR_TS2, 2 << 20        /* TODO:                                   */
 .equ CAN_BTR_TS1, 3 << 16        /* TODO:                                   */
-.equ CAN_BTR_BRP, 3 << 16        /* Baud Rate Prescalar                     */
+.equ CAN_BTR_BRP, 5 << 0         /* Baud Rate Prescalar                     */
 .equ CAN_FMR_INIT, 1 << 0        /* Filter init mode                        */
 .equ CAN_FM1R_MASK_MODE, 0 << 0  /* Filter Mask mode                        */
 .equ CAN_FM1R_LIST_MODE, 1 << 0  /* Filter List mode                        */
