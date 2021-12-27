@@ -1,6 +1,7 @@
 ### Assembly stm32 examples
-So the goal of this example is to turn on a LED on the bord. The board I'm using
-is stm32f0-discovery:
+This document contains notes the assembly language examples that I've written
+to learn and explore various concepts related to microcontrolers, like LEDs,
+UART, SPI, CAN, Timers. The board I'm using is stm32f0-discovery:
 
 [Product documentation](https://www.st.com/en/evaluation-tools/32f072bdiscovery.html#documentation)  
 [User Manual](https://www.st.com/resource/en/user_manual/um1690-discovery-kit-for-stm32f0-series-microcontrollers-with-stm32f072rb-stmicroelectronics.pdf)
