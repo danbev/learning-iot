@@ -96,19 +96,13 @@ can_controller_init:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =CAN_MCR
+  ldr r1, =CAN_MSR
   ldr r2, =CAN_MSR_INAK
 wait_inak_set:
   ldr r0, [r1]
   and r0, r0, r2
   cmp r0, r2
   bne wait_inak_set
-
-  ldr r1, =CAN_MCR
-  ldr r2, =CAN_MCR_INRQ
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
 
   /* Exit sleep mode */
   ldr r1, =CAN_MCR
@@ -137,7 +131,7 @@ wait_inak_set:
   bic r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =CAN_MCR
+  ldr r1, =CAN_MSR
   ldr r2, =CAN_MSR_INAK
 wait_inak:
   ldr r0, [r1]
