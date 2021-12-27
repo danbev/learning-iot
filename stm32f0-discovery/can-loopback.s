@@ -209,9 +209,7 @@ wait_inak:
   /* Set the message */
   ldr r1, =CAN_TDL0R
   ldr r2, ='A'
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
+  str r2, [r1]
 
   /* Set the identifier */ 
   ldr r1, =CAN_TI0R
