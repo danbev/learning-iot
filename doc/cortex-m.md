@@ -1504,3 +1504,63 @@ no wire are required for the pins.
 
 This example can be found in
 [can-loopback.s](../stm32f0-discovery/can-loopback.s).
+
+#### Bit time
+Is the time taken to transfer a single bit.
+```
+Bit Time = 1/CAN bus speed
+
+         = 1/8000000 = 0.000000125
+                     = 0.125 micro seconds
+```
+So to transfer a single bit that will take 0.125 micro seconds.
+
+#### Time Quanta (TQ)
+Is a fixed unit of time derived from the oscillator period.
+The length of a time quanta
+```
+tq = Baud Rate Prescalar (BRP) / System Clock)
+```
+For example if we have a system clock of 8MHz a baud rate prescalare of 5 that
+would give us a tq of:
+```
+tq = 5/8000000 = 0.000000625
+```
+Each tq will then be 0.625 micro seconds.
+
+
+#### Bit timing
+The time it takes to transfer a single bit is called the bit time, and each
+such bit transferred on the bus is divided segements. Each of these segments are
+made up of an integer unit of time called Time Quanta (TQ):
+```
+<--------------------------One Bit-------------------------------->
++-------------+-------------------+---------------+---------------+
+|Sync Segment |Propagation Segment|Phase Segment 1|Phase Segment 2|
++-------------+-------------------+---------------+---------------+
+|     TQ      | TQ | TQ| TQ | TQ  |   TQ  |   TQ  ↑   TQ  |   TQ  |
++-------------+----+----+----+----+----+----+-----|----+----+-----+
+  ↑                                               |
+One time quantum                              Sampling point
+```
+The Sync segment is a bit time that is used to synchronize the nodes on the bus.
+This is a fixed time of 1 time quanta (tq). An edge (falling or raising) is
+expected to lie within this segment and if that does not happen this is called
+an edge phase error.
+
+If the edge is within the sync segement e=0 which is what happens when
+everything is working as expected.
+
+If the edge lies before the sync segment then e>0. This can be compensated for
+by lengthening phase segment 1. How much to lengthen this segment by is
+determined by value of Resynchronization Jump Width (SJW) which can be between
+1 and 4 tq. I think this is called resynchronization.
+
+If the edge comes after the sync segment then e<0. This can be compensated for
+byt shortening the lenght of phase segment 2. I think this is also called
+resynchronization.
+
+
+The Propagation segment is for compensating delays on the bus line and can be
+between 1tq to 8 tq.
+
