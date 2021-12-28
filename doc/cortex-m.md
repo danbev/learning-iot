@@ -1252,9 +1252,9 @@ This field is used to generate the SCL low period in master mode
 #### Filters
 Filters can be configured so that only CAN bus messages that are of interest
 are actually received and the rest ignored. The messages that are accepted are
-copied into SRAM (a FIFO queue).
+copied a FIFO queue.
 
-To configure filters one first as to enter init mode for them by setting
+To configure filters one first has to enter init mode for them by setting
 `FINIT` in CAN_FMR (offset 0x200).
 
 There is a concept of filter banks, where a bank consists of two 32 bit
@@ -1368,8 +1368,8 @@ up with the fields in the CAN message format. And notice that if we want to
 specify a mask for the standard filter mode then it would start at bit 21 if
 I'm not mistaken. So we would have to shift the mask:
 ```assembly
-.equ CAN_F0R1_IDENT, 7 << 21     /* Identifier                              */
-.equ CAN_F0R2_MASK, 7 << 21      /* Filter mask, allow all identifiers      */
+.equ CAN_F0R1_IDENT, 7 << 21
+.equ CAN_F0R2_MASK, 7 << 21
 ```
 
 There is also a second mode called `List` mode in which case the second register
@@ -1458,4 +1458,50 @@ configured FIFO. This affects the registers used for the mailbox, so the
 registers used for the mailbox will be either CAN_RI0R or CAN_RI1R and likewise
 for the other register that make up the mailboxes (see above for details).
 
+#### Transmission
+Similar to receiving there are mailboxes for trasmitting which are also a
+collection of registers.
 
+Transmit Identifer register (CAN_TIxR)
+Offset: 0x180
+```
+Bits 31:21 STID[10:0]/EXID[28:18]: Standard identifier or extended identifier
+The standard identifier or the MSBs of the extended identifier (depending on the
+IDE bit value).
+
+Bit 20:3 EXID[17:0]: Extended identifier
+The LSBs of the extended identifier.
+
+Bit 2 IDE: Identifier extension
+This bit defines the identifier type of message in the mailbox.
+  0: Standard identifier.
+  1: Extended identifier.
+So we don't need to specify this unless we want to be explicit about it.
+
+Bit 1 RTR: Remote transmission request
+  0: Data frame
+  1: Remote frame
+
+Bit 0 TXRQ: Transmit mailbox request
+Set by software to request the transmission for the corresponding mailbox.
+Cleared by hardware when the mailbox becomes empty.
+```
+
+Transmit Data lenght and control Time stamp register (CAN_TDTxR)
+Offset: 0x180 (0), 0x194 (1), 0x1A4 (2)
+
+Bits 3:0 DLC[3:0]: Data length code
+This field defines the number of data bytes a data frame contains or a remote
+frame request. A message can contain from 0 to 8 data bytes, depending on the
+value in the DLC field.
+```
+
+#### Loopback
+It is possible to test CAN using a loopback where the transmitter is looped
+back to the receiver and one does not require to have external transceivers and
+no wire are required for the pins.
+
+![CAN Loopback example image](./can-loopback.jpg "CAN Loopback example image")
+
+This example can be found in
+[can-loopback.s](../stm32f0-discovery/can-loopback.s).
