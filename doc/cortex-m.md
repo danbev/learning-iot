@@ -1485,7 +1485,6 @@ Bit 1 RTR: Remote transmission request
 Bit 0 TXRQ: Transmit mailbox request
 Set by software to request the transmission for the corresponding mailbox.
 Cleared by hardware when the mailbox becomes empty.
-```
 
 Transmit Data lenght and control Time stamp register (CAN_TDTxR)
 Offset: 0x180 (0), 0x194 (1), 0x1A4 (2)
