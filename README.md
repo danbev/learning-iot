@@ -485,7 +485,7 @@ Both of these programs are flashed onto STM32F072B-Discovery boards and
 connected using PB6 (SCL) and PB7(SDA).
 
 
-![I2C example](./doc/i2c-example.jpg "Example of I2C communication")
+![I2C example](./doc/img/i2c-example.jpg "Example of I2C communication")
 
 ```console
 $ minicom --baudrate 115200 --device /dev/ttyUSB0
@@ -1011,28 +1011,28 @@ with such an NPN transistor:
 For this example I used as button switch which is connected to the base of the
 transistor:
 
-![NPN transistor circuit with switch off](./doc/npn-off.jpg "NPN Transistor with switch off")
+![NPN transistor circuit with switch off](./doc/img/npn-off.jpg "NPN Transistor with switch off")
 
 So without a current flowing through the base and the emitter there is no
 current flowing though the transistor. Pressing the button will cause a current
 to flow:
 
-![NPN transistor circuit with switch on](./doc/npn-on.jpg "NPN Transistor with switch on")
+![NPN transistor circuit with switch on](./doc/img/npn-on.jpg "NPN Transistor with switch on")
 
 
 So that is how a NPN Bipolar Junction transistor works and how we can hook it
 up physically. We can use two such transistors:
 
-![AND GATE both off](./doc/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
+![AND GATE both off](./doc/img/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
 
 Now, pressing just the left button no current will flow:
-![AND GATE left on](./doc/npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
+![AND GATE left on](./doc/img/npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
 
 And, pressing just the right button no current will flow:
-![AND GATE left on](./doc/npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
+![AND GATE left on](./doc/img/npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
 
 But pressing both and current will flow:
-![AND GATE right on](./doc/npn-and-gate-on.jpg "NPN Transistors as AND gate on")
+![AND GATE right on](./doc/img/npn-and-gate-on.jpg "NPN Transistors as AND gate on")
 
 Notice that what we have created here is a AND gate:
 ```
@@ -2360,7 +2360,7 @@ Notice that we are randomly reading 01/00.
 
 Now if we connect a pull-up resistor:
 
-![Pull-up resistor example circuit](./doc/pull-up.jpg "Example circuit for pull-up resistor")
+![Pull-up resistor example circuit](./doc/img/pull-up.jpg "Example circuit for pull-up resistor")
 
 And run the example we get:
 ```console
@@ -2404,7 +2404,7 @@ Below is an example which can be used with
 [pull-up.s](stm32f0-discovery/pull-up.s) to show what using a pull-down
 resistor might look like:
 
-![Pull-down resistor example circuit](./doc/pull-down.jpg "Example circuit for pull-down resistor")
+![Pull-down resistor example circuit](./doc/img/pull-down.jpg "Example circuit for pull-down resistor")
 
 And if we run this example the output will be:
 ```console

@@ -236,9 +236,9 @@ case it is a 8 MHz clock.
 This is an example in [stm32f0-discovery/mco.s](../stm32f0-discovery/mco.s)
 which allow an oscilloscope to be connected to PA8 and see the frequency:
 
-![MCO image1](./mco1.jpg "MCO example image 1")
+![MCO image1](./img/mco1.jpg "MCO example image 1")
 Here we can see that we are running at 8Mhz:
-![MCO image2](./mco2.jpg "MCO example image 2")
+![MCO image2](./img/mco2.jpg "MCO example image 2")
 
 ### Timer vs Clock
 If the source of the clock is internal, like RC or PLL then it is called a
@@ -548,7 +548,7 @@ sensor:
    | | |
 ```
 
-![Sensor example](./sensor.jpg "Sensor example")
+![Sensor example](./img/sensor.jpg "Sensor example")
 
 ### Touch Sensing Controller (TSC)
 Address: 0x40024000
@@ -849,7 +849,7 @@ signal was the same all the time regardless of the data being sent, it almost
 looked like a clock signal where it should have been sending the character `A`
 so 100001 (high low low low low low high). This is what the signal looks like
 when using SPI2.
-![SPI signal image](./spi-signal.jpg "Example of SPI signal")
+![SPI signal image](./img/spi-signal.jpg "Example of SPI signal")
 
 #### SPI Control Register 1 (SPIx_CR1)
 Offset: 0x00
@@ -913,7 +913,7 @@ a character (currently `A`) to [spi-p.s](../stm32f0-discovery/spi-p.s) which is
 the peripheral. The peripheral then uses UART to send that character out which
 can be displayed using minicom.
 
-![SPI Example image](./spi-example.jpg "SPI Example image")
+![SPI Example image](./img/spi-example.jpg "SPI Example image")
 
 ### Inter-integrated circuit (I²C)
 * Standard Mode (Sm) up to 100kHz
@@ -1500,7 +1500,7 @@ It is possible to test CAN using a loopback where the transmitter is looped
 back to the receiver and one does not require to have external transceivers and
 no wire are required for the pins.
 
-![CAN Loopback example image](./can-loopback.jpg "CAN Loopback example image")
+![CAN Loopback example image](./img/can-loopback.jpg "CAN Loopback example image")
 
 This example can be found in
 [can-loopback.s](../stm32f0-discovery/can-loopback.s).
