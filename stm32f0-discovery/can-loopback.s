@@ -1,5 +1,5 @@
 /*
-Controller Area Network (CAN) Controller.
+Controller Area Network (CAN) Controller loopback example.
 */
 .thumb
 .text
@@ -31,7 +31,6 @@ Controller Area Network (CAN) Controller.
 .equ CAN_MCR, CAN_BASE + CAN_MCR_OFFSET
 .equ CAN_MSR, CAN_BASE + CAN_MSR_OFFSET
 .equ CAN_TSR, CAN_BASE + CAN_TSR_OFFSET
-.equ CAN_ESR, CAN_BASE + CAN_ESR_OFFSET
 .equ CAN_BTR, CAN_BASE + CAN_BTR_OFFSET
 .equ CAN_FMR, CAN_BASE + CAN_FMR_OFFSET
 .equ CAN_FM1R, CAN_BASE + CAN_FM1R_OFFSET
@@ -269,6 +268,10 @@ can_receive:
   /* Read the message into r0. TODO: use UART to send out the data */
   ldr r1, =CAN_RDL0R
   ldr r0, [r1]
+
+  /* The identifier is located in the left most bits */
+  ldr r2, =CAN_RI0R
+  ldr r3, [r2]
 
   ldr r1, =CAN_RF0R
   ldr r2, =CAN_RF0R_RFOM0
