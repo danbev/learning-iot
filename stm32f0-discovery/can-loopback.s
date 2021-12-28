@@ -89,6 +89,7 @@ Vector_Table:
   .word     start + 1
 
 start:
+  bl uart_init
   bl can_init
   bl can_controller_init
   bl can_send 
@@ -265,13 +266,18 @@ can_receive:
   cmp r0, #0x00
   beq no_message_recieved
 
-  /* Read the message into r0. TODO: use UART to send out the data */
+  /* Read the message into r0 and send using UART */
   ldr r1, =CAN_RDL0R
   ldr r0, [r1]
+  bl uart_write_char
 
   /* The identifier is located in the left most bits */
+  /* 111000000000000000000000 */
   ldr r2, =CAN_RI0R
-  ldr r3, [r2]
+  ldr r0, [r2]
+  lsr r0, r0, #21
+  add r0, #48
+  bl uart_write_char
 
   ldr r1, =CAN_RF0R
   ldr r2, =CAN_RF0R_RFOM0
