@@ -44,7 +44,7 @@ Controller Area Network (CAN) Controller.
 .equ CAN_MCR_INRQ, 1 << 0        /* Initialization mode request             */
 .equ CAN_MCR_SLEEP, 1 << 1       /* Sleep mode                              */
 .equ CAN_MSR_INAK, 1 << 0        /* Initialization acknowledgement          */
-.equ CAN_BTR_LBKM, 1 << 30       /* Loopback mode                           */
+.equ CAN_BTR_LBKM, 0 << 30       /* Loopback mode                           */
 .equ CAN_BTR_TS2, 2 << 20        /* TODO:                                   */
 .equ CAN_BTR_TS1, 3 << 16        /* TODO:                                   */
 .equ CAN_BTR_BRP, 5 << 0         /* Baud Rate Prescalar                     */
