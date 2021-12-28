@@ -1821,7 +1821,7 @@ Lets say we have a signal that frequency of 200Hz. And recall that frequency
 is the number of waves that pass a fixed place in a given amount of time (in
 Hertz this is per second.
 
-![Frequancy image](./frequency.png "Frequency image")
+![Frequancy image](./doc/img/frequency.png "Frequency image")
 
 So the more waves that complete the higher the frequency. These waves are
 shorter and the lower frequency waves are longer.
