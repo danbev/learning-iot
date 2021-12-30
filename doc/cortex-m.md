@@ -1560,7 +1560,17 @@ If the edge comes after the sync segment then e<0. This can be compensated for
 byt shortening the lenght of phase segment 2. I think this is also called
 resynchronization.
 
-
 The Propagation segment is for compensating delays on the bus line and can be
 between 1tq to 8 tq.
 
+For stm32 there are only three segments, the SYNC_SEG as explained above and
+then Bit segment 1 (BS1), and Bit segment 2 (BS2).
+BS1 includes the propagation segment and phase segment 1 as explained above. The
+value of BS1 is programmable and can be between 1 and 16 tq. This value defines
+the location of the sampling point. So if we wanted 4 tq for the propatagion
+segment and two for phase segment 1 we would set BS1 = 6 I think. Like mentioned
+above this value can be automaically lengthened.
+
+BS2 defines the location of the transmit point and represents phase segment 2
+above. This value can be between 1 and 8 tq. Like mentioned above this can be
+automatically shortened.
