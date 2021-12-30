@@ -13,6 +13,7 @@ Controller Area Network (CAN) Controller.
 .equ CAN_FM1R_OFFSET, 0x204     /* Filter Mode Register                     */
 .equ CAN_FA1R_OFFSET, 0x21C     /* Filter Activation Register               */
 .equ CAN_FFA1R_OFFSET, 0x214    /* Filter FIFO Assignment Register          */
+.equ CAN_ESR_OFFSET, 0x18        /* Error Status Register                    */
 
 .equ CAN_TI0R_OFFSET, 0x180     /* Transmit Mailbox Identifier 0 Register   */
 .equ CAN_TDT0R_OFFSET, 0x184    /* Transmit Mailbox Data Time 0 Register    */
@@ -26,6 +27,7 @@ Controller Area Network (CAN) Controller.
 .equ CAN_MCR, CAN_BASE + CAN_MCR_OFFSET
 .equ CAN_MSR, CAN_BASE + CAN_MSR_OFFSET
 .equ CAN_TSR, CAN_BASE + CAN_TSR_OFFSET
+.equ CAN_ESR, CAN_BASE + CAN_ESR_OFFSET
 .equ CAN_BTR, CAN_BASE + CAN_BTR_OFFSET
 .equ CAN_FMR, CAN_BASE + CAN_FMR_OFFSET
 .equ CAN_FM1R, CAN_BASE + CAN_FM1R_OFFSET
@@ -45,8 +47,8 @@ Controller Area Network (CAN) Controller.
 .equ CAN_MCR_SLEEP, 1 << 1       /* Sleep mode                              */
 .equ CAN_MSR_INAK, 1 << 0        /* Initialization acknowledgement          */
 .equ CAN_BTR_LBKM, 0 << 30       /* Loopback mode                           */
-.equ CAN_BTR_TS2, 2 << 20        /* TODO:                                   */
-.equ CAN_BTR_TS1, 3 << 16        /* TODO:                                   */
+.equ CAN_BTR_TS1, 4 << 16        /* Time Segment 1 (prop seg+phase 1 seg)   */
+.equ CAN_BTR_TS2, 2 << 20        /* Time Segment 2 (phase 2 segment)        */
 .equ CAN_BTR_BRP, 5 << 0         /* Baud Rate Prescalar                     */
 .equ CAN_FMR_INIT, 1 << 0        /* Filter init mode                        */
 .equ CAN_FM1R_MASK_MODE, 0 << 0  /* Filter Mask mode                        */
@@ -70,10 +72,15 @@ Vector_Table:
   .word     start + 1
 
 start:
+  bl led_init
   bl can_init
   bl can_controller_init
+send_loop:
+  bl turn_led_on
   bl can_send 
-  b .
+  bl delay
+  bl turn_led_off
+  b send_loop
 
 can_controller_init:
   ldr r1, =CAN_MCR
@@ -100,6 +107,7 @@ wait_inak_set:
   ldr r1, =CAN_BTR
   ldr r2, =#0x0000
   str r2, [r1]
+
   /* Set loopback mode */
   ldr r1, =CAN_BTR
   ldr r2, =CAN_BTR_LBKM
@@ -122,6 +130,7 @@ wait_inak_set:
 
   ldr r1, =CAN_MSR
   ldr r2, =CAN_MSR_INAK
+  ldr r7, =CAN_ESR
 wait_inak:
   ldr r0, [r1]
   and r0, r0, r2
@@ -182,6 +191,8 @@ wait_inak:
   bx lr
 
 can_send:
+  ldr r6, =CAN_TSR
+  ldr r7, =CAN_ESR
   /* Check that the Transmit 0 mailbox is empty */
   ldr r1, =CAN_TSR
   ldr r2, =CAN_TSR_TME0
@@ -190,9 +201,11 @@ can_send:
   cmp r0, r2
   bne mailbox_0_not_empty
 
+/*
   ldr r1, =CAN_TI0R
   ldr r2, =0x0000
   str r2, [r1]
+*/
 
   /* Set standard message type */
   ldr r1, =CAN_TI0R
@@ -231,6 +244,7 @@ can_send:
   ldr r4, =CAN_MSR
   ldr r5, =CAN_TDL0R
   ldr r6, =CAN_TSR
+  ldr r7, =CAN_ESR
  
   bx lr
 
