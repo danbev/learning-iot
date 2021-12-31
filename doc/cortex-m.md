@@ -1574,3 +1574,21 @@ above this value can be automaically lengthened.
 BS2 defines the location of the transmit point and represents phase segment 2
 above. This value can be between 1 and 8 tq. Like mentioned above this can be
 automatically shortened.
+
+#### Troubleshooting CAN
+When trying to figure out if the CAN bus is functioning one thing to keep in
+mind is that when initializing the CAN bus we need to wait for the INAK(
+Initialization Acknowledgement) bit to cleared by the hardware which indicates
+the synchronization with the CAN Bus. This is done by monitoring a sequence of
+11 consecutive recessive bits on the CAN RX signal. So if we are able to move
+past this point I think this indicates that at least the pin configuration is
+correct. Does that also mean that BR1/BR2 and BRP (Baud Rate Prescalar) are
+correct?
+
+To check the bus itself we can use an oscilloscope to check CAN_H and CAN_L
+which when the bus is idle is about 2.5 V which is what we would expect.
+be set by the hardware:
+
+![CAN Bus High/Low image](./img/can-bus-hl.jpg "CAN Bus High/Low Example")
+
+
