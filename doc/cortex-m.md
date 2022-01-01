@@ -1612,13 +1612,10 @@ the oscilloscope:
 
 ![CAN_TX signal image](./img/can-tx-signal.jpg "CAN TX signal image")
 
-I initially did not notice this signal.
-So, there is a signal that is sent from the MCU to the transceiver, actually
-to the second transceiver so the signal is going through the tranceiver that
-the controller is connected to. Could the issue be with the peripheral, the
-CAN receiver in this case?
+I initially did not notice this signal but there is a signal on the controller
+MCU pin.
 
-
+The error I'm seeing in TSR is:
 ```console
 (gdb) x/xt $r6
 0x40006408:	00011001000000000000000000001000
@@ -1626,6 +1623,4 @@ CAN receiver in this case?
 Bit 4 is `TERR0` which stands for Transmission error of mailbox 0.
 Does this indicate that MCU was not able to transmit the message to the
 transceiver?
-
-Hmm, I notice that I'm able to remove the resistor and the same result as above.
 
