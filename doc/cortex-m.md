@@ -1515,6 +1515,19 @@ Bit Time = 1/CAN bus speed
 ```
 So to transfer a single bit that will take 0.125 micro seconds.
 
+#### Baud Rate Prescalar
+The system clock on my board is by default 8MHz and the Baud Rate Prescalar
+(BRP) is used to scale this clock value. So instead of having a clock cycle
+(for CAN that is) of 8000000 we can scale this. For example by two:
+```
+BRP = 2
+Clock cycle = 8000000/2 = 4000000
+         = 1/4000000 = 0.00000025
+                     = 0.25 micro seconds
+```
+So to transfer a single bit that will take 0.25 micro seconds.
+
+
 #### Time Quanta (TQ)
 Is a fixed unit of time derived from the oscillator period.
 The length of a time quanta
@@ -1583,12 +1596,31 @@ the synchronization with the CAN Bus. This is done by monitoring a sequence of
 11 consecutive recessive bits on the CAN RX signal. So if we are able to move
 past this point I think this indicates that at least the pin configuration is
 correct. Does that also mean that BR1/BR2 and BRP (Baud Rate Prescalar) are
-correct?
+correct? And does this mean that the bus is terminated correctly?
 
 To check the bus itself we can use an oscilloscope to check CAN_H and CAN_L
 which when the bus is idle is about 2.5 V which is what we would expect.
 be set by the hardware:
 
 ![CAN Bus High/Low image](./img/can-bus-hl.jpg "CAN Bus High/Low Example")
+
+By using the oscillocope we can also check CAN_TX which is idles high:
+![CAN_TX Idel High image](./img/can-tx-idle-high.jpg "CAN TX Idle High image")
+
+When I step through the code and the sending there is nothing happening on
+CAN_TX.
+
+The issue I'm currently looking into is that I'm able to get past the
+initialization set but sending fails.
+Now, if we send something the first step would be to see some type of "action"
+on the CAN_TX pin/wire.
+
+```console
+(gdb) x/xt $r6
+0x40006408:	00011001000000000000000000001000
+```
+Bit 4 is `TERR0` which stands for Transmission error of mailbox 0.
+Does this indicate that MCU was not able to transmit the message to the
+transceiver?
 
 
