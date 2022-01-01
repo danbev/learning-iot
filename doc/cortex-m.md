@@ -1607,13 +1607,17 @@ be set by the hardware:
 By using the oscillocope we can also check CAN_TX which is idles high:
 ![CAN_TX Idel High image](./img/can-tx-idle-high.jpg "CAN TX Idle High image")
 
-When I step through the code and the sending there is nothing happening on
-CAN_TX.
+Now, if we send something the first step would be to see some the signal using
+the oscilloscope:
 
-The issue I'm currently looking into is that I'm able to get past the
-initialization set but sending fails.
-Now, if we send something the first step would be to see some type of "action"
-on the CAN_TX pin/wire.
+![CAN_TX signal image](./img/can-tx-signal.jpg "CAN TX signal image")
+
+I initially did not notice this signal.
+So, there is a signal that is sent from the MCU to the transceiver, actually
+to the second transceiver so the signal is going through the tranceiver that
+the controller is connected to. Could the issue be with the peripheral, the
+CAN receiver in this case?
+
 
 ```console
 (gdb) x/xt $r6
@@ -1623,4 +1627,5 @@ Bit 4 is `TERR0` which stands for Transmission error of mailbox 0.
 Does this indicate that MCU was not able to transmit the message to the
 transceiver?
 
+Hmm, I notice that I'm able to remove the resistor and the same result as above.
 
