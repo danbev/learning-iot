@@ -28,10 +28,16 @@ Controller Area Network (CAN)
 .equ GPIO_PORTA_ENABLE, 1 << 17
 .equ GPIO_PORTB_ENABLE, 1 << 18
 
-.equ GPIOB_MODER_11, 2 << 16         /* PB11 CAN_RX */
-.equ GPIOB_MODER_12, 2 << 18         /* PB12 CAN_TX */
-.equ GPIOB_AFRH_PB11_AF4, 4 << 0
-.equ GPIOB_AFRH_PB12_AF4, 4 << 4
+.equ GPIOB_MODER_8, 2 << 16         /* PB8 CAN_RX */
+.equ GPIOB_MODER_9, 2 << 18         /* PB9 CAN_TX */
+.equ GPIOB_AFRH_PB8_AF4, 4 << 0
+.equ GPIOB_AFRH_PB9_AF4, 4 << 4
+
+.equ GPIOA_MODER_11, 2 << 22
+.equ GPIOA_MODER_12, 2 << 24
+.equ GPIOA_AFRH_PA11_AF4, 4 << 12
+.equ GPIOA_AFRH_PA12_AF4, 4 << 16
+
 
 .global can_init, CAN_BASE
 
@@ -55,15 +61,29 @@ can_init:
   str r0, [r1]
 
   ldr r1, =GPIOB_MODER
-  ldr r2, =(GPIOB_MODER_11 + GPIOB_MODER_12)
+  ldr r2, =(GPIOB_MODER_8 + GPIOB_MODER_9)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
 
   ldr r1, =GPIOB_AFRH
-  ldr r2, =(GPIOB_AFRH_PB11_AF4 + GPIOB_AFRH_PB12_AF4)
+  ldr r2, =(GPIOB_AFRH_PB8_AF4 + GPIOB_AFRH_PB9_AF4)
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+
+/*
+  ldr r1, =GPIOA_MODER
+  ldr r2, =(GPIOA_MODER_11 + GPIOA_MODER_12)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+
+  ldr r1, =GPIOA_AFRH
+  ldr r2, =(GPIOA_AFRH_PA11_AF4 + GPIOA_AFRH_PA11_AF4)
+  ldr r0, [r1]
+  orr r0, r0, r2
+  str r0, [r1]
+*/
 
   bx lr
