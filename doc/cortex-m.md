@@ -1661,3 +1661,15 @@ Bit 4 is `TERR0` which stands for Transmission error of mailbox 0.
 Does this indicate that MCU was not able to transmit the message to the
 transceiver?
 
+After trying to rule things out I took a closer look at UART and the peripheral
+and the issue was that I was relying on the power that USB connection provides
+which is 3.3V. But I was using the 5V pin to connect to the CAN tranceiver
+which is what it requires. So instead I connected the controller 5V to the
+breadboard and it supplies the 5V to both tranceivers. With that inplace the
+communication works:
+
+![CAN working image](./img/can-working.jpg "CAN working image")
+
+In this case the controller is sending a single `A` with an identifer `7`. This
+is received by the peripheral and it will pass the data and the identifier using
+UART to that is can be inspected using minicom.
