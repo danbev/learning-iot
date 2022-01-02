@@ -1614,6 +1614,33 @@ other.
 
 ![CAN Bus High/Low 2 image](./img/can-bus-hl2.jpg "CAN Bus High/Low 2 Image")
 
+Looking at the above image we can see that both signals start out idle, where
+both are at 2.5V (each vertical square hight is 1V).
+What we should be looking at is the start of frame bit being 0 bit (remember
+that this is the dominate state). Following that we have the identifier which
+in this case is 00000000111. Next we should have the type of the identifier(
+standard or extended, 1 being standard):
+```
+SOF  Identifier  IDE  R DCL CRC                 ACK  EOF     IFS 
+0    00000000111  1   ?  1  0000 0000 0000 0000 ??   ??????? ???????
+```
+
+One thing I need to keep in mind is that even how the MCU's and transceiver's
+are connected which is not 100% clear when looking at the physical connections:
+```
++------------------+   +------------------+    +------------------+   +-----------------+
+| Controller CAN_TX|---| Transceiver CAN_H|----|CAN_H Transceiver |---|CAN_TX Peripheral|
+|   MCU      CAN_RX|---|             CAN_L|----|CAN_L             |---|CAN_RX   MCU     |
++------------------+   +------------------+    +------------------+   +-----------------+
+```
+In our case we are able to send from the controller to the transceiver, which
+in turn is sending a message onto the CAN bus. But there is nothing happending
+on the peripheral side of things. But we know that the tranceiver connected
+to the peripheral is communicating with the bus. Could it be that that my
+soldering of the RX pin is so poor that it is not actually connected at all?
+I was not able to see any signal on the RX pin of the transceiver which is why
+this could be an option.
+
 By using the oscillocope we can also check CAN_TX which is idles high:
 ![CAN_TX Idel High image](./img/can-tx-idle-high.jpg "CAN TX Idle High image")
 
