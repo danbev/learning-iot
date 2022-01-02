@@ -1604,6 +1604,16 @@ be set by the hardware:
 
 ![CAN Bus High/Low image](./img/can-bus-hl.jpg "CAN Bus High/Low Example")
 
+This is using the NART setting which will cause the message to be retransmitted
+until delivered which is handy for troubleshooting as we can see continous
+singals on the bus. 
+
+Looking closer at the signal on the bus we need to keep in mind that CAN uses
+differential signaling so it is expected that the signals inverses of each
+other.
+
+![CAN Bus High/Low 2 image](./img/can-bus-hl2.jpg "CAN Bus High/Low 2 Image")
+
 By using the oscillocope we can also check CAN_TX which is idles high:
 ![CAN_TX Idel High image](./img/can-tx-idle-high.jpg "CAN TX Idle High image")
 
