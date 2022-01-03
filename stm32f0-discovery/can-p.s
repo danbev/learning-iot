@@ -278,6 +278,6 @@ can_receive:
   str r0, [r1]
 
   bl delay
-  bl turn_led_on
+  bl turn_led_off
 
   b can_receive
