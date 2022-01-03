@@ -3,12 +3,6 @@ This document contains notes the assembly language examples that I've written
 to learn and explore various concepts related to microcontrolers, like LEDs,
 UART, SPI, I2C, CAN, Timers. The board I'm using is stm32f0-discovery:
 
-[Product documentation](https://www.st.com/en/evaluation-tools/32f072bdiscovery.html#documentation)  
-[User Manual](https://www.st.com/resource/en/user_manual/um1690-discovery-kit-for-stm32f0-series-microcontrollers-with-stm32f072rb-stmicroelectronics.pdf)
-
-This board is based on a STM32F072RBT6 so we will need its 
-[reference manual](https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf) as well.
-
 ### Examples
 1. [Blinking LED](./led.s)
 1. [Blinking LED using BSRR](./led_bsrr.s)
@@ -19,12 +13,15 @@ This board is based on a STM32F072RBT6 so we will need its
 1. [SPI peripheral](./spi-p.s)
 1. [I2C controller](./i2c-c.s)
 1. [I2C peripheral](./i2c-p.s)
-1. [CAN loopback](./can-loopback.s)
-1. [CAN controller](./can-c.s)
-1. [CAN peripheral](./can-p.s)
+1. [CAN](./can/README.md)
 1. [SysTick timer](./systick.s)
 1. [SysTick timer using interrupt](./systickint.s)
 1. [Timer](./tim2.s)
+
+### Resources/Documentation
+[Product documentation](https://www.st.com/en/evaluation-tools/32f072bdiscovery.html#documentation)  
+[User Manual](https://www.st.com/resource/en/user_manual/um1690-discovery-kit-for-stm32f0-series-microcontrollers-with-stm32f072rb-stmicroelectronics.pdf)  
+[reference manual](https://www.st.com/resource/en/reference_manual/rm0091-stm32f0x1stm32f0x2stm32f0x8-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 
 ### LED background info
 
