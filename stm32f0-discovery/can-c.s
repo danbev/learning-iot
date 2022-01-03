@@ -196,6 +196,7 @@ can_send:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Set Remote Transmission Request to be Data Frame */
   ldr r1, =CAN_TI0R
   ldr r2, =CAN_TI0R_RTR
   ldr r0, [r1]
