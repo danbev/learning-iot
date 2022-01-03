@@ -31,8 +31,8 @@ Controller Area Network (CAN) Controller.
 .equ CAN_MCR_NART, 1 << 4        /* Autmatic retransmit                     */
 .equ CAN_MSR_INAK, 1 << 0        /* Initialization acknowledgement          */
 .equ CAN_BTR_LBKM, 0 << 30       /* Loopback mode                           */
-.equ CAN_BTR_SJW, 0x1 << 24       /* Loopback mode                           */
-.equ CAN_BTR_TS1, 13 << 16        /* Time Segment 1 (prop seg+phase 1 seg)   */
+.equ CAN_BTR_SJW, 0x1 << 24      /* ReSynchronization Jump Width            */
+.equ CAN_BTR_TS1, 13 << 16       /* Time Segment 1 (prop seg+phase 1 seg)   */
 .equ CAN_BTR_TS2, 2 << 20        /* Time Segment 2 (phase 2 segment)        */
 .equ CAN_BTR_BRP, 6 << 0         /* Baud Rate Prescalar                     */
 .equ CAN_TSR_TME0, 1 << 26       /* Transmit Mailbox 0 Empty                */
