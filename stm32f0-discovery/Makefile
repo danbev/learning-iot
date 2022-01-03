@@ -57,16 +57,6 @@ spi-c.elf : spi-c.o spi.o delay.o blue-led.o
 spi-c.o: spi-c.s
 	$(AS) $(ASFLAGS) $< -asghl=$*.lst -o $@
 
-# CAN Controller which sends data to the CAN bus.
-can-c.elf : can-c.o can.o delay.o blue-led.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
-	objcopy -O ihex $@ $@.hex
-
-# CAN peripheral which is the receiver of CAN messages.
-can-p.elf : can-p.o can.o delay.o blue-led.o uart-tx.o
-	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
-	objcopy -O ihex $@ $@.hex
-
 %.elf : %.o blue-led.o delay.o
 	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
