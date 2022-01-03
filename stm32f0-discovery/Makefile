@@ -74,12 +74,6 @@ can-p.elf : can-p.o can.o delay.o blue-led.o uart-tx.o
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -asghl=$*.lst -o $@
 
-util/delay.o: $(TOP)/util/delay.s
-	$(AS) $(ASFLAGS) $< -asghl=$(TOP)/util/delay.lst -o util/$@
-
-led/blue-led.o: $(TOP)/led/blue-led.s
-	$(AS) $(ASFLAGS) $< -asghl=$(TOP)/led/blue-led.lst -o util/$@
-
 clean: 
 	${RM} *.elf *.o *.elf.map *.lst *.hex *.map
 
