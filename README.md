@@ -2239,7 +2239,7 @@ event. A timer is used to generate a delay.
 
 But we know that the microprocessor is capable of a huge number of clock ticks
 per second, so if we have a counter based on that it would generate a very
-large number. For this reason the microcontrolller provides a feature called
+large number. For this reason the microcontroller provides a feature called
 prescaling which is a way for the counter to skip a certain number of
 microcontroller clock ticks. So one could set the prescaler value to something
 like 256 and that could cause the counter to only count/increment every time
@@ -3254,8 +3254,8 @@ Low signal  +---------------------------|---+-----------
 ```
 The resistors at both ends are terminating resistors. To connect a
 microcontroller to the bus a transciever is needed. So to connect two boards
-we will need two 120Ω resistors and two transceivers. I've ordered two
-MCP-2551 CAN modules. 
+we will need two 120Ω resistors and two transceivers. I've got two MCP-2551
+CAN modules. 
 
 There is no chip select wire like in SPI, and also there is no address like we
 find in I²C.
@@ -3276,7 +3276,7 @@ Low  |      \       /        \
 ```
 Dominant state is when the lines are pulled apart, and recessive is when the
 lines are pulled together.
-Recessive state the state when the bus is idle and notice that the state is
+Recessive state is the state when the bus is idle and notice that the state is
 a logic 1 in this case and a dominant state would be logic 0.
 This means that only on CAN Mode (transciever + mcu in our case) can force CAN-
 HI to 0 by using a logic AND:
