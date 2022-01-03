@@ -83,7 +83,6 @@ send_loop:
   bl can_send 
   bl delay
   bl turn_led_off
-  //b send_loop
   b .
 
 can_controller_init:
@@ -108,13 +107,12 @@ wait_inak_set:
   bic r0, r0, r2
   str r0, [r1]
 
-/*
+  /* Set No Automatic Retransmission */
   ldr r1, =CAN_MCR
   ldr r2, =CAN_MCR_NART
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
-*/
 
   ldr r1, =CAN_BTR
   ldr r2, =#0x0000
