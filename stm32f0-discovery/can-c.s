@@ -83,11 +83,13 @@ wait_inak_set:
   str r0, [r1]
 
   /* Set No Automatic Retransmission */
+/*
   ldr r1, =CAN_MCR
   ldr r2, =CAN_MCR_NART
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+*/
 
   /* Clear Bit Timing Register */
   ldr r1, =CAN_BTR
