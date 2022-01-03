@@ -155,52 +155,6 @@ wait_inak:
   cmp r0, r2
   beq wait_inak
 
-/*
-  ldr r1, =CAN_FMR
-  ldr r2, =CAN_FMR_INIT
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_FM1R
-  ldr r2, =CAN_FM1R_MASK_MODE
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_FS1R
-  ldr r2, =(CAN_FS1R_FSC0 + CAN_FS1R_FSC1)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_FFA1R
-  ldr r2, =(CAN_FFA1R_FFA0 + CAN_FFA1R_FFA1)
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_F0R0
-  ldr r2, =CAN_F0R0_IDENT
-  str r2, [r1]
-
-  ldr r1, =CAN_F0R1
-  ldr r2, =CAN_F0R1_MASK
-  str r2, [r1]
-
-  ldr r1, =CAN_FA1R
-  ldr r2, =CAN_FA1R_FACT0
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
-  ldr r1, =CAN_FMR
-  ldr r2, =CAN_FMR_INIT
-  ldr r0, [r1]
-  bic r0, r0, r2
-  str r0, [r1]
-*/
-  
   bx lr
 
 can_send:
