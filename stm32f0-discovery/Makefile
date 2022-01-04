@@ -2,6 +2,8 @@ AS=arm-none-eabi-as
 LD=arm-none-eabi-ld
 ASFLAGS=-mcpu=cortex-m0 -mthumb -g 
 
+VPATH = ../led
+
 pull-up.elf : pull-up.o uart-tx.o delay.o
 	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
