@@ -4,7 +4,7 @@ ASFLAGS=-mcpu=cortex-m0 -mthumb -g
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_DIR := $(dir $(MAKEFILE_PATH))
 
-VPATH = led timer
+VPATH = $(MAKEFILE_DIR)led $(MAKEFILE_DIR)timer $(MAKEFILE_DIR)uart
 
 pull-up.elf : pull-up.o uart-tx.o delay.o
 	$(LD) -T linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
