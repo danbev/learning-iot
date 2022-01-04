@@ -82,3 +82,35 @@ Flash the program:
 > reset run
 ```
 This example will blink an LED with a certain time interval.
+
+### Micro controller Clock Output (MC0) Example
+This example allows an oscilloscope to be connected to PA8 and see the
+frequency of the clock:
+
+#### Building
+```console
+$ make mco.elf
+```
+
+#### Flash and Run
+Start openocd:
+```console
+$ make openocd
+```
+
+Start a telnet session:
+```console
+$ telnet localhost 4444
+```
+
+Flash the program:
+```console
+> reset halt 
+> flash write_image erase mco.elf.hex
+> reset run
+```
+
+![MCO image1](../../doc/img/mco1.jpg "MCO example image 1")
+
+Here we can see that we are running at 8Mhz:
+![MCO image2](../../doc/img/mco2.jpg "MCO example image 2")
