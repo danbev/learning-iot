@@ -136,4 +136,4 @@ Open On-Chip Debugger
 > reset run
 ```
 
-![External Led example](./img/led-extarnal.jpg "Example of external led example")
+![External Led example](./img/led-external.jpg "Example of external led example")
