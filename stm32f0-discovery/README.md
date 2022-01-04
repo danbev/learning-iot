@@ -1,7 +1,6 @@
 ### Assembly stm32 examples
-This document contains notes the assembly language examples that I've written
-to learn and explore various concepts related to microcontrolers, like LEDs,
-UART, SPI, I2C, CAN, Timers. The board I'm using is stm32f0-discovery:
+This directory contains assembly language examples that used learn and explore
+various concepts related to stm32f0-discovery.
 
 ### Examples
 1. [LED](./led/README.md)
