@@ -5,7 +5,7 @@ This directory contains assembly language examples related to SPI.
 ### SPI Controller/Peripheral example
 This example for consists of two discovery boards connected to each other,
 where [spi-c.s](./spi-c.s) is the controller which sends a character
-(currently `A`) to [spi-p.s](../spi-p.s) which is the peripheral. The peripheral
+(currently `A`) to [spi-p.s](./spi-p.s) which is the peripheral. The peripheral
 then uses UART to send that character out which can be displayed using minicom.
 
 #### Building
