@@ -40,13 +40,6 @@ Some additional information about Arm version can be found
 [here](https://github.com/danbev/learning-assembly/tree/master/arm#arm-versions).
 
 
-### Controller Area Network (CAN)
-TODO:
-
-
-### Real Time Operating Systems (RTOS)
-TODO:
-
 ### Serial communication
 Is the process of transmitting one bit of data at a time. Think of this as being
 one wire and the bits flow through it.
