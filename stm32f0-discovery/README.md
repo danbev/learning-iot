@@ -4,11 +4,11 @@ to learn and explore various concepts related to microcontrolers, like LEDs,
 UART, SPI, I2C, CAN, Timers. The board I'm using is stm32f0-discovery:
 
 ### Examples
-1. [CAN](./can/README.md)
+1. [LED](./led/README.md)
+1. [UART](./uart/README.md)
 1. [SPI](./spi/README.md)
 1. [I2C](./i2c/README.md)
-1. [UART](./uart/README.md)
-1. [LED](./led/README.md)
+1. [CAN](./can/README.md)
 1. [SysTick timer](./systick.s)
 1. [SysTick timer using interrupt](./systickint.s)
 1. [Timer](./tim2.s)
