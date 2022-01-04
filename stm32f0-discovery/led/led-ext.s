@@ -1,4 +1,4 @@
-/* Pull-up resistor example */
+/* LED external example */
 .thumb
 .text
 

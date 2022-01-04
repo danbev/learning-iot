@@ -112,3 +112,28 @@ Open On-Chip Debugger
 ```
 
 ![Blue Led example](./img/blue-led.jpg "Example of blue led blinking")
+
+#### External LED example
+This example similar to the previous examples but instead of using the LED on
+the discovery board it uses an external LED.
+
+### Building
+```console
+$ make led-ext.elf
+```
+
+### Flashing
+Start openocd:
+```console
+$ make openocd
+```
+Start a telnet session:
+```console
+$ telnet localhost 4444
+Open On-Chip Debugger
+> reset halt
+> flash write_image erase led-ext.hex
+> reset run
+```
+
+![External Led example](./img/led-extarnal.jpg "Example of external led example")
