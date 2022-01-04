@@ -1,8 +1,10 @@
 
 include ../Makefile
 
+VPATH = ../uart
+
 # SPI Peripheral, uses UART to write received data.
-spi-p.elf : spi-p.o spi.o ../uart-tx.o ../delay.o ../blue-led.o
+spi-p.elf : spi-p.o spi.o uart-tx.o ../delay.o ../blue-led.o
 	$(LD) -T ../linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 

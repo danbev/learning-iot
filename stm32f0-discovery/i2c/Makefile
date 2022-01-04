@@ -1,6 +1,8 @@
 
 include ../Makefile
 
+VPATH = ../uart
+
 i2c.elf : i2c.o
 	$(LD) -T ../linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $<
 	objcopy -O ihex $@ $@.hex
@@ -9,7 +11,7 @@ i2c.o: i2c.s
 	$(AS) $(ASFLAGS) $< -asghl=$*.lst -o $@
 
 # I2C Peripheral, uses UART to write received data. 
-i2c-p.elf : i2c-p.o i2c.o ../uart-tx.o ../delay.o ../blue-led.o
+i2c-p.elf : i2c-p.o i2c.o uart-tx.o ../delay.o ../blue-led.o
 	$(LD) -T ../linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 

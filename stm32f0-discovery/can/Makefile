@@ -1,9 +1,9 @@
 
 include ../Makefile
-
+VPATH = ../uart
 
 # CAN loopback example (no external transceiver required).
-can-loopback.elf : can-loopback.o can.o ../delay.o ../blue-led.o ../uart-tx.o
+can-loopback.elf : can-loopback.o can.o ../delay.o ../blue-led.o uart-tx.o
 	$(LD) -T ../linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
 	
@@ -13,6 +13,6 @@ can-c.elf : can-c.o can.o ../delay.o ../blue-led.o
 	objcopy -O ihex $@ $@.hex
 
 # CAN peripheral which is the receiver of CAN messages.
-can-p.elf : can-p.o can.o ../delay.o ../blue-led.o ../uart-tx.o
+can-p.elf : can-p.o can.o ../delay.o ../blue-led.o uart-tx.o
 	$(LD) -T ../linker_script.ld --cref -Map $@.map -nostartfiles -o $@ $^
 	objcopy -O ihex $@ $@.hex
