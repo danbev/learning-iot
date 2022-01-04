@@ -111,7 +111,7 @@ Open On-Chip Debugger
 > reset run
 ```
 
-![Blue Led example](./blue-led.jpg "Example of blue led blinking")
+![Blue Led example](./img/blue-led.jpg "Example of blue led blinking")
 
 #### Building
 ```console
