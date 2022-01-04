@@ -2332,7 +2332,7 @@ Gnd
 So when this circuit is open the pin will be read as 5V (on). When it is closed
 it will be read as Gnd (off). But it will not be random on/off.
 
-[pull-up.s](stm32f0-discovery/pull-up.s) is an example of what can happen if
+[pull-up.s](stm32f0-discovery/misc/pull-up.s) is an example of what can happen if
 we have GPIO pin in input mode and the type as open-drain with out any pull-up
 or pull-down resistors
 ```console
@@ -2393,7 +2393,7 @@ lines like SPI and UART (there is a one-to-one connection, compare this with
 I²C which can one controller can be connected to multiple peripherals).
 
 Below is an example which can be used with
-[pull-up.s](stm32f0-discovery/pull-up.s) to show what using a pull-down
+[pull-up.s](stm32f0-discovery/misc/pull-up.s) to show what using a pull-down
 resistor might look like:
 
 ![Pull-down resistor example circuit](./doc/img/pull-down.jpg "Example circuit for pull-down resistor")
