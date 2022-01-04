@@ -4,7 +4,7 @@ This directory contains assembly language examples related to I2C.
 ### I2C Controller/Peripheral example
 This example for consists of two discovery boards connected to each other,
 where [i2c-c.s](./i2c-c.s) is the controller which sends a character
-(currently `A`) to [i2c-p.s](../i2c-p.s) which is the peripheral. The peripheral
+(currently `A`) to [i2c-p.s](./i2c-p.s) which is the peripheral. The peripheral
 then uses UART to send that character out which can be displayed using minicom.
 
 #### Building
