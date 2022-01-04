@@ -132,7 +132,7 @@ Start a telnet session:
 $ telnet localhost 4444
 Open On-Chip Debugger
 > reset halt
-> flash write_image erase led-ext.hex
+> flash write_image erase led-ext.elf.hex
 > reset run
 ```
 
