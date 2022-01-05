@@ -22,7 +22,7 @@ lower levels when learning new concepts and then working upwards from there
 as needed.
 
 ### Examples for various microcontroller/boards
-1. [stm32f0-Discovery](./stm32f0-discovery/README.md)
+1. [stm32f0-discovery](./stm32f0-discovery/README.md)
 1. [esp8266](./doc/esp8266.md)
 1. [microbit v2.0](./doc/microbit.md)
 
