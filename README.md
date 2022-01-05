@@ -11,7 +11,8 @@ After that I started to look at using Rust and chose to take one of the assembly
 examples, [led-ext.s](./stm32f0-discovery/led/led-ext.s), and re-write it in
 Rust, first without any external crates,
 [rust-low-level](./rust-low-level/src/main.rs), and then using higher level
-crates, [rust-pac](./rust-pac/src/main.rs).
+crates, [rust-pac](./rust-pac/src/main.rs), and
+[rust-hal](./rust-hal/src/main.rs).
 
 The [doc](./doc) directory contains notes to various notes on topic related
 to microcontrollers and IoT. Currently this document also contains notes but I'm
