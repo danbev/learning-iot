@@ -1,4 +1,4 @@
-### Rust Embedded
+### Rust Low-Level Example
 This project's sole purpose is to understand and explore how Rust can be used
 in the same way as was done in the
 [led-ext.s](../stm32f0-discovery/led/led-ext.s) assembly language example. This
