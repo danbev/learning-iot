@@ -14,7 +14,7 @@ Rust, first without any external crates,
 crates, [rust-pac](./rust-pac/src/main.rs), and
 [rust-hal](./rust-hal/src/main.rs).
 
-The [doc](./doc) directory contains notes to various notes on topic related
+The [doc](./doc) directory contains notes on various topics related
 to microcontrollers and IoT. Currently this document also contains notes but I'm
 in the process of extracting these notes into separate documents.
 
