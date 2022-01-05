@@ -1,0 +1,10 @@
+[package]
+name = "rust-hal"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+cortex-m = "0.7"
+cortex-m-rt = "0.7"
+stm32f0xx-hal = { version = "0.18", features = ["stm32f072"]}
+panic-halt = "0.2.0"
