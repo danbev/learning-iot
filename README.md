@@ -2,10 +2,29 @@
 The sole purpose of this repository is to store notes and code helping me
 learn things related to Internet of Things, but also basic electronics.
 
+### Learning process
+I started out with reading and writing examples in
+[assembly language](./stm32f0-discovery/README.md) to gain a basic understanding
+for how to program a micrcontroller and also understand the development process.
+
+After that I started to look at using Rust and chose to take one of the assembly
+examples, [led-ext.s](./stm32f0-discovery/led/led-ext.s), and re-write it in
+Rust, first without any external crates,
+[rust-low-level](./rust-low-level/src/main.rs), and then using higher level
+crates, [rust-pac](./rust-pac/src/main.rs).
+
+The [doc](./doc) directory contains notes to various notes on topic related
+to microcontrollers and IoT. Currently this document also contains notes but I'm
+in the process of extracting these notes into separate documents.
+
+This process will most likely be an iterative process where I go back to the
+lower levels when learning new concepts and then working upwards from there
+as needed.
+
 ### Examples for various microcontroller/boards
-1. [STM32F0-Discovery](./stm32f0-discovery/README.md)
-1. [ESP8266](./doc/esp8266.md)
-1. [Microbit v2.0](./doc/microbit.md)
+1. [stm32f0-Discovery](./stm32f0-discovery/README.md)
+1. [esp8266](./doc/esp8266.md)
+1. [microbit v2.0](./doc/microbit.md)
 
 ### Microcontroller Unit (MCU)
 Is a very small computer system self contained on an integrated circuit (IC).
