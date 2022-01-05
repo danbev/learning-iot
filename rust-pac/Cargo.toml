@@ -1,0 +1,13 @@
+[package]
+name = "rust-pac"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+panic-halt = "0.2.0"
+cortex-m = "0.6.0"
+cortex-m-rt = "0.6.10"
+
+[dependencies.stm32f0]
+version = "0.14.0"
+features = ["stm32f0x0", "rt"]
