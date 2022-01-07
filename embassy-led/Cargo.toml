@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "embassy-led"
+version = "0.1.0"
+
+[dependencies]
+#embassy = { git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "memory-x", "stm32f030f4"] }
+cortex-m = "0.7.3"
+cortex-m-rt = "0.7.0"
+embedded-hal = "0.2.6"
+embassy = { git = "https://github.com/embassy-rs/embassy.git" }
+embassy-stm32 = { git = "https://github.com/embassy-rs/embassy.git", features = ["memory-x", "stm32f030f4"] }
+panic-halt = "0.2.0"
