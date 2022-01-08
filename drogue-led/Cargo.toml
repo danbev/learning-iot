@@ -1,0 +1,31 @@
+[package]
+edition = "2018"
+name = "drogue-led"
+version = "0.1.0"
+# Use the new feature resolver (2) 
+resolver = "2" 
+
+[dependencies]
+defmt = "0.3"
+defmt-rtt = "0.3"
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+cortex-m-rt = "0.7"
+cortex-m = { version = "0.7", features = ["inline-asm"] }
+heapless = "0.6"
+void = { version = "1", default-features = false }
+rand_core = { version = "0.6", default-features = false }
+
+drogue-device = { git = "https://github.com/drogue-iot/drogue-device.git", features = ["time", "defmt"], default-features = false }
+embassy = { version = "0.1.0", default-features = false, features = [] }
+embassy-stm32 = { version = "0.1.0", default-features = false, features = ["stm32f070rb", "memory-x", "time-driver-tim3"] }
+embassy-traits = { version = "0.1.0" }
+embassy-hal-common = { version = "0.1.0" }
+embedded-hal = { version = "0.2.4", features = ["unproven"] }
+
+panic-halt = "0.2.0"
+
+[patch.crates-io]
+embassy = { git = "https://github.com/embassy-rs/embassy.git", rev = "c8f3ec3fba47899b123d0a146e8f9b3808ea4601" }
+embassy-stm32 = { git = "https://github.com/embassy-rs/embassy.git", rev = "c8f3ec3fba47899b123d0a146e8f9b3808ea4601" }
+embassy-hal-common = { git = "https://github.com/embassy-rs/embassy.git", rev = "c8f3ec3fba47899b123d0a146e8f9b3808ea4601" }
+embassy-traits = { git = "https://github.com/embassy-rs/embassy.git", rev = "c8f3ec3fba47899b123d0a146e8f9b3808ea4601" }
