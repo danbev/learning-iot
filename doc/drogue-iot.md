@@ -19,7 +19,7 @@ pub struct DeviceContext<D: 'static> {
     device: Forever<D>,
     state: AtomicU8,
 ```
-Forever is struct from Embassy and has a static lifetime and can only be
+`Forever` is a struct from Embassy and has a static lifetime and can only be
 written to once so it is good for initialization of things.
 ```rust
 pub struct Forever<T> {
@@ -27,8 +27,8 @@ pub struct Forever<T> {
     t: UnsafeCell<MaybeUninit<T>>,
 }
 ```
-We can configure, mount, and drop a DeviceContext. When we configure we
-are giving the Forever a value:
+We can `configure`, `mount`, and `drop` a DeviceContext. When we configure a
+device are giving the Forever instace (the device) a value:
 ```rust
     DEVICE.configure(MyDevice {
         counter: AtomicU32::new(0),
@@ -37,7 +37,7 @@ are giving the Forever a value:
         p: MyPack::new(),
     });
 ```
-This is done by calling `put` which gives the Forever a value:
+This is done by calling `put` which gives the `Forever` a value:
 ```rust
     pub fn configure(&'static self, device: D) {
         match self.state.fetch_add(1, Ordering::Relaxed) {
@@ -50,12 +50,12 @@ This is done by calling `put` which gives the Forever a value:
         }
     }
 ```
-Note that `self` is an instance of `DeviceContext<hello::MyDevice`:
+Note that `self` is an instance of `DeviceContext<hello::MyDevice>`:
 ```console
 (lldb) expr self
 (drogue_device::kernel::device::DeviceContext<hello::MyDevice> *) $5 = 0x00005555558a90c0
 ```
-And we can see that `state` is of type AtomicU8 which means that it can be
+And we can see that `state` is of type `AtomicU8` which means that it can be
 safely shared between threads. We can see that we have multiple threads:
 ```console
 (lldb) thread list
@@ -64,11 +64,13 @@ Process 775026 stopped
   thread #2: tid = 775029, 0x00007ffff7c8ca8a libpthread.so.0`__futex_abstimed_wait_common64 + 202, name = 'hello'
 ```
 
-`fetch_add` adds to the current value of this atomic integer and returns the
-previous state.
-This is in match so if the previous/current state state is NEW, we will call
-`put` on the Forever giving it a value. And remember that it will also increment
-the value so it will now be 1 which is `CONFIGURED`.
+`fetch_add` adds to the current value (the state field) of this atomic integer
+and returns the previous state.
+
+This is in a match statement so if the previous/current state state is NEW, we
+will call `put` on the Forever giving it a value. And remember that it will also
+increment the value so it will now be 1 which is `CONFIGURED`. And if this has
+already happend the a panic will be raised.
 
 Next we have:
 ```rust
@@ -137,3 +139,36 @@ Logging can be enabled using
 $ RUST_LOG=info cargo test --verbose --  --nocapture
 ```
 
+### Embassy
+Embedded Async is an executor of tasks and also a Hardware Access Layer (HAL). 
+The HAL provides an API to access peripherals like USART, I2C, SPI, CAN etc.
+
+
+#### embassy::main
+This macro can be used in an embassy application and expands to something like:
+```console
+$ cargo rustc --profile=check -- -Zunpretty=expanded
+```
+
+### defmt logging
+Deferred formatter logging can be enabled using the `DEFMT_LOG` environment
+variable:
+```console
+   Compiling defmt-macros v0.3.1
+   Compiling defmt v0.3.0
+   Compiling embassy v0.1.0 (https://github.com/embassy-rs/embassy.git?rev=c8f3ec3fba47899b123d0a146e8f9b3808ea4601#c8f3ec3f)
+   Compiling panic-probe v0.3.0
+   Compiling defmt-rtt v0.3.1
+   Compiling embassy-hal-common v0.1.0 (https://github.com/embassy-rs/embassy.git?rev=c8f3ec3fba47899b123d0a146e8f9b3808ea4601#c8f3ec3f)
+   Compiling embassy-stm32 v0.1.0 (https://github.com/embassy-rs/embassy.git?rev=c8f3ec3fba47899b123d0a146e8f9b3808ea4601#c8f3ec3f)
+   Compiling drogue-device v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/device)
+   Compiling bsp-blinky-app v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/examples/apps/blinky)
+   Compiling stm32f072b-disco-blinky v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/examples/stm32f0/stm32f072b-disco/blinky)
+    Finished dev [optimized + debuginfo] target(s) in 6.16s
+     Running `probe-run --chip STM32F072R8Tx target/thumbv6m-none-eabi/debug/stm32f072b-disco-blinky`
+(HOST) INFO  flashing program (30 pages / 30.00 KiB)
+(HOST) INFO  success!
+────────────────────────────────────────────────────────────────────────────────
+DEBUG In stm32f072b-disco main...
+└─ stm32f072b_disco_blinky::__embassy_main::task::{generator#0} @ blinky/src/main.rs:35
+```
