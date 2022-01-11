@@ -1673,3 +1673,23 @@ communication works:
 In this case the controller is sending a single `A` with an identifer `7`. This
 is received by the peripheral and it will pass the data and the identifier using
 UART to that is can be inspected using minicom.
+
+### STM naming convention
+
+```
+                STM32F072RBTx
+
+STM32           F                          0            72    R           B                  T             x
+
+STM32 = Family  F = Type Foundation     0 Cortex M0    Line  # pins     Flash memory size   Package       Temperature range
+                G = Mainstream          1 Cortex M3          F = 20     B = 128             P = TSOOP      6 = -40 to 85
+                L = Low power           2 Cortex M3          G = 28     C = 256             H = BGA        7 = -40 to 105
+                H = High performace     3 Cortex M4          K = 32     D = 384             U = VFQFPN
+                W = Wireless            4 Cortex M4          T = 36     E = 512             T = LQFP
+                                        5 Cortex M7          S = 44     F = 768             Y = WLCSP
+                                                             C = 48     G = 1024
+                                                             R = 64     8 = 64
+                                                             V = 100    6 = 32
+                                                             Z = 144
+                                                             I = 176
+```
