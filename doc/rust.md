@@ -60,7 +60,34 @@ pub fn with<R>(f: impl FnOnce(CriticalSection) -> R) -> R {
     }
 }
 ```
+The implementation of cortex-m looks like this:
+```rust
+#[no_mangle]
+        unsafe fn _critical_section_acquire() -> u8 {
+            let primask = cortex_m::register::primask::read();
+            cortex_m::interrupt::disable();
+            primask.is_active() as _
+        }
 
+        #[no_mangle]
+        unsafe fn _critical_section_release(token: u8) {
+            if token != 0 {
+                cortex_m::interrupt::enable()
+            }
 
+```
+The above will call the following funtions in `cortext-m`:
+```rust
+#[inline]                                                                       
+pub fn disable() {                                                              
+    call_asm!(__cpsid());                                                       
+} 
 
+#[inline]                                                                       
+pub unsafe fn enable() {                                                        
+    call_asm!(__cpsie());                                                       
+}
+```
+`CPS` is the instruction to Change Processor State (CPS), and `id` is
+interrupt disable, and `ie` is interrupt enable.
 
