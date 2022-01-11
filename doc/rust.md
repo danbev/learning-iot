@@ -36,3 +36,31 @@ crate named [svd2rust](https://docs.rs/svd2rust/latest/svd2rust/) which can
 generate a peripheral API in the Rust language.
 
 
+### critical_section
+This is a struct that is part of the
+[critical_section](https://docs.rs/critical-section/latest/critical_section)
+crate. A critical section means that no interrupts should be enabled that might
+preempt the code that is covered by the critical section.
+
+There is as a function to `aquire` a critical section (which is a kind of token)
+```rust
+pub unsafe fn acquire() -> u8
+```
+
+There is also a function named `with` which will take a closure and before
+executing that closure will aquire a critical_section token, and also release
+it afterwards.
+```rust
+pub fn with<R>(f: impl FnOnce(CriticalSection) -> R) -> R {
+    unsafe {
+        let token = acquire();
+        let r = f(CriticalSection::new());
+        release(token);
+        r
+    }
+}
+```
+
+
+
+
