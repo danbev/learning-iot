@@ -5,7 +5,12 @@ learn things related to Internet of Things, but also basic electronics.
 ### Learning process
 I started out with reading and writing examples in
 [assembly language](./stm32f0-discovery/README.md) to gain a basic understanding
-for how to program a micrcontroller and also understand the development process.
+for how to program a micrcontroller and also implement the most common
+communication protocols,
+[UART](./stm32f0-discovery/uart/README.md),
+[SPI](./stm32f0-discovery/spi/README.md)
+[I2C](./stm32f0-discovery/i2c/README.md) and
+[CAN](./stm32f0-discovery/can/README.md).
 
 After that I started to look at using Rust and chose to take one of the assembly
 examples, [led-ext.s](./stm32f0-discovery/led/led-ext.s), and re-write it in
