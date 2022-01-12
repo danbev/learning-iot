@@ -8,8 +8,8 @@ I started out with reading and writing examples in
 for how to program a micrcontroller and also implement the most common
 communication protocols,
 [UART](./stm32f0-discovery/uart/README.md),
-[SPI](./stm32f0-discovery/spi/README.md)
-[I2C](./stm32f0-discovery/i2c/README.md) and
+[SPI](./stm32f0-discovery/spi/README.md),
+[I2C](./stm32f0-discovery/i2c/README.md), and
 [CAN](./stm32f0-discovery/can/README.md).
 
 After that I started to look at using Rust and chose to take one of the assembly
