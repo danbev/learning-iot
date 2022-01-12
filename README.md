@@ -13,7 +13,7 @@ Rust, first without any external crates,
 [rust-low-level](./rust-low-level/src/main.rs), and then using higher level
 crates, [rust-pac](./rust-pac/src/main.rs), and
 [rust-hal](./rust-hal/src/main.rs). This was followed by adding an example
-that uses Embassy, [embassy](./embassy-led/srs/main.rs), and then one that uses
+that uses Embassy, [embassy](./embassy-led/src/main.rs), and then one that uses
 Drogue [drogue-led](./drogue-led/src/main.rs).
 
 The [doc](./doc) directory contains notes on various topics related
