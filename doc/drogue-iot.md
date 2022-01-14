@@ -686,9 +686,9 @@ board which was very easy,
 
 But when I wanted to add an example that uses USART1, [uart-example](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/examples/stm32f0/stm32f072b-disco/uart/src/main.rs), I ran into an issue. What I wanted
 to do is to pass in a configuration object to the Board so that a user can
-specify which UART1 Port/Pins combinations that are available on this board that
+specify which UART1 Port/Pin combinations that are available on this board that
 should be used. So a user can either use `PA9` and `PA10` or `PB6` and `PB7`
-when using USART1 on this board and this was something that I thought would be
+when using USART1 on this board, and this was something that I thought would be
 useful to be able to configure. 
 
 Now, Embassy does have a configuration attribute that can configure the chip
@@ -785,3 +785,11 @@ STM32F072B Discovery Board UART Example
 UART1 Tx: PB6, Rx: PB7 
 ```
 
+Since this suggestion added a second parameter to Board::new all of the existing
+boards would required to be updated and the examples. I've not done that in 
+the above linked branch as I'm not sure if that is a valid change. I'm going to
+ask the Drogue team for some feedback on this before doing anything further.
+Either way it was a good excersice to go through and write these examples.
+
+[drogue-device issue]()
+TODO: add link to issue when created.
