@@ -1,136 +1,37 @@
 ### Drogue Device
 
-The following example code is from device/examples/std/hello:
+### Actor trait
+An Actor has a Message type that it can handle which is specified using an 
+associated type in the trait:
 ```rust
-pub struct MyDevice {
-    counter: AtomicU32,
-    a: ActorContext<'static, MyActor>,
-    b: ActorContext<'static, MyActor>,
-    p: MyPack,
+pub trait Actor: Sized {
+    type Message<'m>: Sized
+    where
+        Self: 'm,                                                                  
+    = ();                                                                          
+```
+Now, my understanding of this is that this is declaring a type named `Message`
+which has a lifetime, `'m`. This type has a bound (a constraint) that it must
+be of type Sized. And it also has a lifetime bound "Self: 'm" which specifies
+that any reference to `Self` will live at least as long as 'm (which notice is
+on the type Message and not on Self. Also is type is given a default value of
+the unit type `()`. 
+
+An Actor will also define a Future type that is returned from its `on_mount`
+function:
+```rust
+    type OnMountFuture<'m, M>: Future<Output = ()>
+    where
+        Self: 'm,
+        M: 'm;
+
+    fn on_mount<'m, M>(&'m mut self, _: Address<Self>, _: &'m mut M) -> Self::OnMountFuture<'m, M>
+    where
+        M: Inbox<Self> + 'm;
 }
-
-static DEVICE: DeviceContext<MyDevice> = DeviceContext::new();
-```
-So in this case we are creating a new instance of DeviceContext with a specific
-type of MyDevice.
-
-```rust
-pub struct DeviceContext<D: 'static> {
-    device: Forever<D>,
-    state: AtomicU8,
-```
-`Forever` is a struct from Embassy and has a static lifetime and can only be
-written to once so it is good for initialization of things.
-```rust
-pub struct Forever<T> {
-    used: AtomicBool,
-    t: UnsafeCell<MaybeUninit<T>>,
-}
-```
-We can `configure`, `mount`, and `drop` a DeviceContext. When we configure a
-device are giving the Forever instace (the device) a value:
-```rust
-    DEVICE.configure(MyDevice {
-        counter: AtomicU32::new(0),
-        a: ActorContext::new(MyActor::new("a")),
-        b: ActorContext::new(MyActor::new("b")),
-        p: MyPack::new(),
-    });
-```
-This is done by calling `put` which gives the `Forever` a value:
-```rust
-    pub fn configure(&'static self, device: D) {
-        match self.state.fetch_add(1, Ordering::Relaxed) {
-            NEW => {
-                self.device.put(device);
-            }
-            _ => {
-                panic!("Context already configured");
-            }
-        }
-    }
-```
-Note that `self` is an instance of `DeviceContext<hello::MyDevice>`:
-```console
-(lldb) expr self
-(drogue_device::kernel::device::DeviceContext<hello::MyDevice> *) $5 = 0x00005555558a90c0
-```
-And we can see that `state` is of type `AtomicU8` which means that it can be
-safely shared between threads. We can see that we have multiple threads:
-```console
-(lldb) thread list
-Process 775026 stopped
-* thread #1: tid = 775026, 0x00005555555b0308 hello`hello::mypack::MyPack::new::h37a13cbcb2b29e39 at mypack.rs:14:9, name = 'hello', stop reason = breakpoint 1.1
-  thread #2: tid = 775029, 0x00007ffff7c8ca8a libpthread.so.0`__futex_abstimed_wait_common64 + 202, name = 'hello'
 ```
 
-`fetch_add` adds to the current value (the state field) of this atomic integer
-and returns the previous state.
-
-This is in a match statement so if the previous/current state state is NEW, we
-will call `put` on the Forever giving it a value. And remember that it will also
-increment the value so it will now be 1 which is `CONFIGURED`. And if this has
-already happend the a panic will be raised.
-
-Next we have:
-```rust
-let (a_addr, b_addr, c_addr) = DEVICE
-        .mount(|device| async move {
-            let a_addr = device.a.mount(&device.counter, spawner);
-            let b_addr = device.b.mount(&device.counter, spawner);
-            let c_addr = device.p.mount((), spawner);
-            (a_addr, b_addr, c_addr)
-        })
-        .await;
-```
-Notice that we are calling `mount` on our DeviceContext instance which is
-typed over MyDevice.
-
-```rust
-pub async fn mount<FUT: Future<Output = R>, F: FnOnce(&'static D) -> FUT, R>(
-        &'static self,
-        f: F,
-    ) -> R {
-        match self.state.fetch_add(1, Ordering::Relaxed) {
-            CONFIGURED => {
-                let device = unsafe { self.device.steal() };
-                let r = f(device).await;
-
-                r
-            }
-            NEW => {
-                panic!("Context must be configured before mounted");
-            }
-            MOUNTED => {
-                panic!("Context already mounted");
-            }
-            val => {
-                panic!("Unexpected state: {}", val);
-            }
-        }
-    }
-```
-Notice that this method takes a closure. Remember that we incremented the state
-previously so it is currently CONFIGURED, and we now increment it again using
-`fetch_add` which as before will return the current value so we will enter
-the CONFIGURED branch of the match statement:
-```console
-(lldb) expr self->state.v.value
-(unsigned char) $11 = '\x01'
-```
-We then get the value of the device and pass that to the closer (so we will
-be back in main.rs in the closure:
-```console
-  38  	    let (a_addr, b_addr, c_addr) = DEVICE
-   39  	        .mount(|device| async move {
--> 40  	            let a_addr = device.a.mount(&device.counter, spawner);
-   41  	            let b_addr = device.b.mount(&device.counter, spawner);
-   42  	            let c_addr = device.p.mount((), spawner);
-   43  	            (a_addr, b_addr, c_addr)
-   44  	        })
-   45  	        .await;
-```
-Next we will call each of the MyDevice struct members `mount` methods.
+### ActorContext
 
 
 ### drogue-tls logging
@@ -142,7 +43,6 @@ $ RUST_LOG=info cargo test --verbose --  --nocapture
 ### Embassy
 Embedded Async is an executor of tasks and also a Hardware Access Layer (HAL).
 The HAL provides an API to access peripherals like USART, I2C, SPI, CAN etc.
-
 
 #### embassy::main
 This macro can be used in an embassy application and expands to something like:
@@ -370,12 +270,6 @@ impl Executor {
         }
     }
 ```
-The `cortex_m::asm::sev()` function will call the assembly instruction sev:
-```rust
-pub fn sev() {
-    call_asm!(__sev())
-}
-```
 Note that `raw::Executor::new` takes two arguments and the `not_send` is a field
 of the "outer" Executor.
 ```rust
@@ -404,7 +298,13 @@ impl Executor {
         }
     }
 ```
-After the executor has been created, embassy_stm32::init is called which takes
+The `cortex_m::asm::sev()` function will call the assembly instruction sev:
+```rust
+pub fn sev() {
+    call_asm!(__sev())
+}
+```
+After the executor has been created, `embassy_stm32::init` is called which takes
 a Config parameter:
 ```rust
 pub fn init(config: Config) -> Peripherals {
@@ -439,6 +339,9 @@ pub fn init(config: Config) -> Peripherals {
 After this `executor.run` will be called which takes a closure as its single
 argument:
 ```rust
+    executor.run(|spawner|
+                     { spawner.must_spawn(__embassy_main(spawner, p)); })
+
 impl Executor {
     ...
     pub fn run(&'static mut self, init: impl FnOnce(Spawner)) -> ! {
@@ -451,7 +354,7 @@ impl Executor {
     }
 }
 ```
-`init` is passed a new instance of Spawner:
+`init` is passed a new instance of Spawner using `self.inner.spawner`:
 ```rust
 pub fn spawner(&'static self) -> super::Spawner {
     super::Spawner::new(self)
@@ -472,8 +375,8 @@ impl Spawner {
     }
 ```
 So a Spawner has pointer to the inner/raw Executor. This new Spawner instance
-is then passed to Executor::init. Below I'm showing the call to run in addition
-to the call to init so that we can see the values more clearly:
+is then passed to `Executor::init`. Below I'm showing the call to run in
+addition to the call to init so that we can see the values more clearly:
 ```rust
     executor.run(|spawner|
                      { spawner.must_spawn(__embassy_main(spawner, p)); })
@@ -524,18 +427,19 @@ fn __embassy_main(spawner: embassy::executor::Spawner, p: Peripherals)
 }
 ```
 First thing to note is that this function returns a SpawnToken and it is
-templated with anything that implements core::future::Future and does not contain
-any non-static references:
+templated with anything that implements `core::future::Future` and does not
+contain any non-static references:
 ```rust
 pub struct SpawnToken<F> {
     raw_task: Option<NonNull<raw::TaskHeader>>,
     phantom: PhantomData<*mut F>,
 }
 ```
-Next, we have the definition of a function named task that is async, so actually
-executing this function would return a Future (which we will see shortly). But
-also notice that we are creating a closure `move || task(spawner, p)` and it is
-this closure that is being passed into the `spawn_pool` function.
+Next, we have the definition of a function named `task` that is async, so
+actually executing this function would return a Future (which we will see
+shortly). But also notice that we are creating a closure
+`move || task(spawner, p)` and it is this closure that is being passed into the
+`spawn_pool` function.
 
 Next, we have the creation of a `TaskStorage` instance.
 ```rust
@@ -627,9 +531,15 @@ So we will be calling Executor::spawn (in src/executor/raw/mod.rs):
         }
     }
 ```
+The above call to `critical_section::with`  will execute the closure passed to
+it but it will first aquire a critical section token, which is a section where
+the code will not be preemted), then execute the closure, and afterwards
+release the critical section token.
+
 If the task was enqueued then the signal_fn function will be called with the
 signal_ctx passed into it. This will then wake up any core that issued a wait
 for a signal.
+
 The `executor.run` function will never return and looks like this:
 ```rust
     loop {
@@ -667,10 +577,11 @@ impl<B: BlinkyBoard> BlinkyDevice<B> {
       /// in a non-BSP example.
       pub async fn mount(&'static self, spawner: Spawner, components: BlinkyConfiguration<B>) {
           defmt::info!("BlinkyDevice mount...");
-          let led = self
+          let led_address = self
               .led
               .mount(spawner, actors::led::Led::new(components.led));
-          let app = self.app.mount(spawner, BlinkyApp::new(led));
+
+          let app = self.app.mount(spawner, BlinkyApp::new(led_address));
           self.button.mount(
               spawner,
               actors::button::Button::new(components.control_button, app.into()),
@@ -683,7 +594,7 @@ impl<B: BlinkyBoard> BlinkyDevice<B> {
       pub control_button: B::ControlButton,
   }
 ```
-The first thing that happens is that the ActorContext's mount function for the
+The first thing that happens is that the ActorContext's `mount` function for the
 `led` field will be called, passing in the spawner.
 ```rust
 pub fn mount<S: ActorSpawner>(&'static self, spawner: S, actor: A) -> Address<A> {
@@ -739,12 +650,14 @@ Looking at `actor.on_mount` the Actor passed in is of type `actors::led::Led` in
         }
     }
 ```
-So when this OnMountFuture is run later it will call inbox.next().await until
-there is a message available in this Actors inbox. This value will be matched
-against on of the LedMessage enum values and stored in `new_state`. This will
-then be compared with the current state and if they are different depending on
-the value the led will be turned on or off. And notice that this is in a loop
-so it will again call `inbox.next().await` and yield.
+Notice that `on_mount` returns a future and that this future will be passed
+to `spawner.span` later in `ActorSpawner'. So when this OnMountFuture is run
+later it will call inbox.next().await until there is a message available in this
+Actors inbox. This value will be matched against on of the LedMessage enum
+values and stored in `new_state`. This will then be compared with the current
+state and if they are different depending on the value the led will be turned
+on or off. And notice that this is in a loop so it will again callx
+ `inbox.next().await` and yield.
 
 So note that this function returns a Future which will then be passed to
 `spawner.spawn(task, future)` where spawner is of type ActorSpawner:
@@ -761,3 +674,114 @@ impl ActorSpawner for Spawner {
 ```
 
 Notice also that `mount` returns an address.
+
+
+### STM32F072 Discovery Board
+To understand drogue-device better I wanted to add a board specific package
+(BSP) for the board I'm using at the moment.
+
+I started out by adding an example that uses the LEDs and the user button on the
+board which was very easy,
+[blinky-example](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/examples/stm32f0/stm32f072b-disco/blinky/src/main.rs).
+
+But when I wanted to add an example that uses USART1, [uart-example](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/examples/stm32f0/stm32f072b-disco/uart/src/main.rs), I ran into an issue. What I wanted
+to do is to pass in a configuration object to the Board so that a user can
+specify which UART1 Port/Pins combinations available on this board. So a user
+can either use `PA9` and `PA10` or `PB6` and `PB7` when using USART1 on this
+boardand this was something that I thought would be useful to be able to
+configure. 
+
+Now, Embassy does have a configuration attribute that can configure the chip
+and this can be specified:
+```rust
+#[embassy::main(config = "config()")]
+```
+But as far as I understand this is only to configure Embassy and not something
+that is available to a Board implementation. After trying out different things I
+came up with the suggestion to add an associated type to
+[Board trait](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/device/src/bsp/mod.rs#L8):
+```rust
+/// A board capable of creating itself using peripherals.
+pub trait Board: Sized {
+    type Peripherals;
+    type Config;
+
+    fn new(peripherals: Self::Peripherals, config: Option<Self::Config>) -> Self;
+}
+```
+The `Config` type is new here and indended to allows a Board implementation to
+optionally have a Configuration of a type specifically for that board, for
+example 
+[Stm32f072bDisco](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/device/src/bsp/boards/stm32f0/stm32f072b_disco.rs#L53-L57):
+```rust
+impl Board for Stm32f072bDisco<'_> {
+    type Peripherals = embassy_stm32::Peripherals;
+    type Config = Stm32f072bDiscoConfig;
+
+    fn new(p: Self::Peripherals, config: Option<Self::Config>) -> Self {
+        let usart1 = match config {
+            None => None,
+            Some(board_config) => match board_config.uart_config {
+                UartConfig::Uart1PortA => Some(Uart::new(
+                    p.USART1,
+                    p.PA10,
+                    p.PA9,
+                    NoDma,
+                    NoDma,
+                    Config::default(),
+                )),
+                UartConfig::Uart1PortB => Some(Uart::new(
+                    p.USART1,
+                    p.PB7,
+                    p.PB6,
+                    NoDma,
+                    NoDma,
+                    Config::default(),
+                )),
+            },
+        };
+        ...
+```
+
+This configuration can then be used by an application like this:
+```rust
+#[embassy::main(config = "config()")]
+async fn main(_spawner: embassy::executor::Spawner, p: Peripherals) {
+    let board_config = BoardConfig { uart_config: Uart1PortB};
+    let mut usart1 = BSP::new(p, Some(board_config)).0.usart1.unwrap();
+
+    usart1.bwrite_all(b"STM32F072B Discovery Board UART Example\r\n").unwrap();
+    usart1.bwrite_all(Stm32f072bDisco::uart_description(&board_config.uart_config)).unwrap();
+}
+```
+
+To run the uart example first start minicom in a terminal:
+```console
+$ minicom --baudrate 115200 --device /dev/ttyUSB0
+```
+
+Next run the uart example:
+```console
+$ cd drogue-device/examples/stm32f0/stm32f072b-disco/uart
+$ cargo run
+    Finished dev [optimized + debuginfo] target(s) in 0.12s
+     Running `probe-run --chip STM32F072R8Tx /home/danielbevenius/work/drougue/drogue-device/examples/stm32f0/stm32f072b-disco/target/thumbv6m-none-eabi/debug/stm32f072b-disco-uart`
+(HOST) INFO  flashing program (24 pages / 24.00 KiB)
+(HOST) INFO  success!
+────────────────────────────────────────────────────────────────────────────────
+```
+
+And in the minicom terminal the following output should be displayed:
+```console
+Welcome to minicom 2.7.1
+
+OPTIONS: I18n 
+Compiled on Jan 26 2021, 00:00:00.
+Port /dev/ttyUSB0, 05:36:23
+
+Press CTRL-A Z for help on special keys
+
+STM32F072B Discovery Board UART Example
+UART1 Tx: PB6, Rx: PB7 
+```
+
