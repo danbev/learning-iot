@@ -686,10 +686,10 @@ board which was very easy,
 
 But when I wanted to add an example that uses USART1, [uart-example](https://github.com/danbev/drogue-device/blob/stm32f072-discovery-board/examples/stm32f0/stm32f072b-disco/uart/src/main.rs), I ran into an issue. What I wanted
 to do is to pass in a configuration object to the Board so that a user can
-specify which UART1 Port/Pins combinations available on this board. So a user
-can either use `PA9` and `PA10` or `PB6` and `PB7` when using USART1 on this
-boardand this was something that I thought would be useful to be able to
-configure. 
+specify which UART1 Port/Pins combinations that are available on this board that
+should be used. So a user can either use `PA9` and `PA10` or `PB6` and `PB7`
+when using USART1 on this board and this was something that I thought would be
+useful to be able to configure. 
 
 Now, Embassy does have a configuration attribute that can configure the chip
 and this can be specified:
