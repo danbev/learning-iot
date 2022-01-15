@@ -30,6 +30,19 @@ This is called Two-Wire Inteface in nRF so the register names will be TWI1 etc.
 ### EasyDMA
 TODO:
 
+### Memory configuration
+If an application does not use a SoftDevice or a Master Boot Record then the
+Flash memory should be 0x0.
+
+How do I know if the application uses a SoftDevice?  
+For a bare-metal assembly example where I'm not using anything except a linker
+script that I've written if there anything reason why I should not use 0x0 as
+the origin of the Flash memory?
+No, I don't think so.
+
+When using a SoftDevice the linker would need to have access to the SoftDevice
+object file during the linking, and the linker script would have to have memory
+configuration and section for it.
 
 ### SoftDevice
 A SoftDevice is a wireless protocol stack that complements an nRF5 Series System
@@ -39,3 +52,5 @@ SoftDevices are a closed source C binary written by Nordic for their
 microcontrollers that sits at the bottom of flash and is called first on
 startup. The softdevice then calls your application or bootloader or whatever
 is sitting directly after it in flash.
+
+So this will affect the linker-script and the origin of flash memory.
