@@ -3348,4 +3348,35 @@ signaling of the circuits discussed so far, we have two conductors
 ### Differential Signaling
 TODO:
 
+### Memory in Microcontrollers
+The program we write is stored in non-volatile (volatile means likely to change
+but in this case it is negated so is not likely to change) memory, that means
+that even if the power goes down the program still remains in this memory chip.
+
+The program is stored in Flash memory (non-volatile).
+Data memory uses SRAM (Volatile) or EEPROM(non-volatile).
+
+#### Read Only Memory (ROM)
+Is a one time programmable memory chips. So it programmed during production
+and after that it cannot change. After this point the program cannot be changed.
+
+#### Programmable Read Only Memory (PROM)
+Is also a one-time programmable memory like ROM but using a device called a
+programmer it can be written to again (programmed). So I think this means that
+instead of having to write to the chip during production it can be done at a
+later stage. But it can only be programmed once.
+
+#### Erasable and Programmable Read Only Memory E(PROM)
+In this case the contents can be erased using UV rays and the chip can be
+re-programmed/re-written.
+
+#### Electrically Erasable and Programmable Read Only Memory (EEPROM)
+Similar to EPROM but uses electrical voltage to erase.
+With this technology it is possible to read, write, or erase a particular byte
+or word of data at a time (or 8 or 16 bits at a time). This is what makes it a
+little slow.
+
+#### Flash
+Is a type of EEPROM which is programmed and erased in large blocks in stead of
+bytes/words.
 
