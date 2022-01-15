@@ -1,8 +1,16 @@
 MEMORY
 {
-    FLASH_SOFTDEVICE (rx) : ORIGIN = 0x00001000, LENGTH = 0x00023000
-    FLASH (rx) : ORIGIN = 0x24000, LENGTH = 0x6CA00
-    SRAM_SOFTDEVICE (rwx) : ORIGIN = 0x20000000, LENGTH = 0x0005C10
+    /*
+     * nRF5233 has 512 kB (128 pages of 4 kB) of flash memory
+     *
+     * First in flash memory is the SoftDevice binary which provides the nRF
+     * wireless protocol stack which is called SoftDevice.
+     */
+    /*FLASH_SOFTDEVICE (rx) : ORIGIN = 0x00001000, LENGTH = 23k*/
+    /*FLASH (rx) : ORIGIN = 0x24000, LENGTH = 0x6CA00*/
+    FLASH (rx) : ORIGIN = 0x0, LENGTH = 0x6CA00
+    /* 128 kB of RAM memory */
+    /*SRAM_SOFTDEVICE (rwx) : ORIGIN = 0x20000000, LENGTH = 0x0005C10*/
     RAM (rwx) :  ORIGIN = 0x20005C11, LENGTH = 0x9D6F
 }
 
