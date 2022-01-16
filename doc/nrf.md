@@ -54,3 +54,25 @@ startup. The softdevice then calls your application or bootloader or whatever
 is sitting directly after it in flash.
 
 So this will affect the linker-script and the origin of flash memory.
+
+### Peripherals
+Each peripheral is assigned a block of 0x1000 (4096) bytes of address space. So
+that gives 4096 x 8 = 32768, providing 1024, 32 bit registers. 
+
+```
+0x40000000 ID = 0   1073741824
+0x40001000 ID = 1   1073741824 + 4096    = 1073745920  = 0x40001000
+0x40002000 ID = 2   1073741824 + 2*4096  = 1073750016  = 0x40002000
+   ...
+0x4001F000 ID = 31  1073741824 + 31*4096 = 1073868800  = 0x40001F00
+```
+Most peripherals have an enable register that is used to enable the peripheral
+in question. For example, lets take GPIO P0:
+```
+ID  Base Address
+0   0x50000000
+```
+The pins available for each port are PIN0 to PIN31 and each pin can be
+configured using the PIN_CNF[n].
+
+
