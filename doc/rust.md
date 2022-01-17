@@ -91,3 +91,11 @@ pub unsafe fn enable() {
 `CPS` is the instruction to Change Processor State (CPS), and `id` is
 interrupt disable, and `ie` is interrupt enable.
 
+
+### stm32-pac
+While I've still not gone through how the generation of code from device/board
+definitions work I think the output can be found in project that uses a
+specific device/board. For example:
+```
+target/thumbv6m-none-eabi/debug/build/stm32-metapac-90e38e1398aeeae0/out/src/chips/stm32f070rb/pac.rs
+```
