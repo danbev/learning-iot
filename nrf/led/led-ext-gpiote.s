@@ -6,10 +6,12 @@
 
 .equ GPIOTE_BASE, 0x40006000
 .equ GPIOTE_TASKOUT_OFFSET, 0x000
+.equ GPIOTE_TASKSET_OFFSET, 0x030
 .equ GPIOTE_CONFIG_OFFSET, 0x510
 
 .equ GPIOTE_CONFIG_R, GPIOTE_BASE + GPIOTE_CONFIG_OFFSET
 .equ GPIOTE_TASKOUT, GPIOTE_BASE + GPIOTE_TASKOUT_OFFSET
+.equ GPIOTE_TASKSET, GPIOTE_BASE + GPIOTE_TASKSET_OFFSET
 
 .equ CONFIG_MODE, 3 << 0       /* Task mode                                  */
 .equ CONFIG_PSEL, 2 << 8       /* Select Pin 2 (P0.02) Pin 0 on the microbit */
@@ -54,8 +56,9 @@ start:
   orr r0, r0, r2
   str r0, [r1]
 
-  /* Set TASKOUT[0] */
-  ldr r1, =GPIOTE_TASKOUT
+  /* Set TASKOUT[0] or TASKSET to turn on the LED */
+  //ldr r1, =GPIOTE_TASKOUT
+  ldr r1, =GPIOTE_TASKSET
   ldr r2, =TASKOUT_VALUE
   ldr r0, [r1]
   orr r0, r0, r2
