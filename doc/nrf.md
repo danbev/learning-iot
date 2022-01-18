@@ -75,4 +75,29 @@ ID  Base Address
 The pins available for each port are PIN0 to PIN31 and each pin can be
 configured using the PIN_CNF[n].
 
+Peripherals are controlled by the CPU writing config registers and task
+registers. When a peripheral wants to signal that something has occurred it will
+write to the event register.
 
+### Task registers
+Task are registers as are events. Writing to a task register will start some
+task (what ever that might mean to some module in the system that is interested
+(reads the task register value).
+
+### Event registers
+The events register are like status registers
+and reading a `1` means that a particular event has occurred. The event can be
+cleared by writing `0`.
+
+### General Purpose I/0 Task and Events (GPIOTE)
+Is a way of accessing GPIO pins using tasks and events. So a GPIOTE channel
+would be associated with a pin and we can enable it so that when a state change
+occurs a task will automatically created.
+
+How this works is that we configure a register named CONFIG[n] (where n is
+between 0 and 7) and specify which port/pin to connect (the channel?) to.
+There are more options that can be configured and there is an example in
+[led-external-gpiote.s](../nrf/led/led-external-gpiote.s) which shows the other
+options available. After this we can write to this channel (I'm really not sure
+if I'm using the right terminology here but hopefully this makes sense just the
+same) using the register `TASKS_OUT[n]` or `TASKS_SET[n]`.
