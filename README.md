@@ -2754,8 +2754,32 @@ TODO:
 TODO:
 
 
-### Spread spectrum
-TODO:
+### Spread spectrum Frequency Hopping (FHSS)
+Is where the sender and receiver switch between narrowband frequencies. Both
+the receiver and sender know the squence to switch between. So the sender will
+send for a short burst on the current channel, and then both switch to the
+next frequency for the next. Each channel is used for a short time and the odds
+that another sender/receiver using the same channel is low.
+Data signals are difficult to intercept as the frequency hopping pattern is not
+known.
+
+This was first invented in the second world war to get around the problem of
+radio jamming of torpedo and their controllers. Radio jamming is when too many
+competing signals are being transmitted over the same frequency. Actress Hedy
+Lamarr came up with the idea of when a wavelegth was jammed, enough information
+could still be sent by changing the frequence (hop) up or down.
+After the was it was realised the frequency jamming is not just for miltary
+usages but radio, tv and other wireless communication also experiences jamming.
+And its not just jamming but also makes the communiction more robost to noise
+and interference.
+
+Related to IoT is that very little computation power is requrired to send or
+receive signals over the spread spectrum. And also in IoT deployments one migth
+have a large number of sensors all outputting conflicting radion signals.
+
+There are variations of FHSS, for example LoRa uses a system known as Chirp
+Spread Spectrum (CSS).
+
 
 ### Capacitors
 Is a component that is capable of storing electric charge, like a battery but it
