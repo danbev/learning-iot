@@ -11,3 +11,7 @@ clean:
 .PHONY openocd:
 openocd:
 	openocd -f interface/cmsis-dap.cfg -f target/nrf52.cfg
+
+.PHONY openocd_jlink:
+openocd_jlink: 
+	openocd -c 'interface jlink; transport select swd; source [find target/nrf52.cfg]'
