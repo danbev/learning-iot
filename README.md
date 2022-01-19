@@ -2138,7 +2138,7 @@ Transport protocol group
   +--------------------------------------------------------------------------+
   |   |                         |            |                               |
   |   |                  +-------------+ +---------------+                   |
-  |   |                  |     L2CAP   | |  control      |                   |
+  |   |                  |     L2CAP   |→|  control      |                   |
   |   |                  +-------------+ +---------------+                   |
   |   |                         |            |            +-------------+    |
   |   |                         |            |            |link manager |    |
@@ -2168,6 +2168,9 @@ the Frequency Hopping Spread Spectrum (FHSS) and specifies the frequency
 based upon the masters bluetooth device address, and the timing based upon
 the masters clock.
 
+L2CAP can use the control layer to control layer which can interact with the
+link manager to perform actions.
+
 
 #### Link Manager
 These negotiate the properites of the connection using the Link Manager
@@ -2177,9 +2180,50 @@ modes). The concept of master/slave does not propagate higher up than this
 layer.
 
 Uses the Industrial Scientific, and Medical (ISM) radio band.
+```
+2.4 GHz ISM -> 2,400.0 - 2,483.5
+Lower Guard Band (LGB): 2.0
+Upper Guard Band:(UGB) 3.5
+
+Channels:
+0   =  2,400.0 + 2.0    = 2,402.0
+1   =  2,402.0 + 1      = 2,403.0
+2   =  2,402.0 + 2      = 2,404.0
+...
+78  =  2,402.0 + 78     = 2,480.0
+79  =  2,480.0 + 3.5    = 2,483.5
+```
+So this gives 79 1MHz channels which are the channels used for FHSS which hops
+at 1600/second (which should give 625 micro seconds per hop).
+
+
 Uses Time Division Multiplexing (TDM) where the master has time slots where it
 communicates with slaves. It is after each such time slot that the frequency
 hopping takes place.
+
+
+Connection States:
+```
+           +-----------------------------+
+           |                             ↓
+      +----------+   +----------+   +---------+
+      | standby  |--→| inquery  |--→| page    |---------+
+      +----------+   +----------+   +---------+         |
+                                                        |
+                                                        ↓
+                                                 +------------+
+                                                 |  connected |
+                                                 +------------+
+```
+Inquery state is where a device learns about the identity of other devices.
+These other devices must be in a inquiry-scan state so that they can respond
+to the inquery.
+
+The page state is where a device explicitly invites another device to join the
+piconet whose master is inviting the device. The other device must be in a
+page-scan state listening and able to respond to.
+
+If the device is already know the inquery stage can be skipped.
 
 The data format between the master and the slave (after the connection step
 has been performed):
