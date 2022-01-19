@@ -2096,9 +2096,126 @@ Protocol stack:
 +---------------------------------------------------------------+
 ```
 
-### BlueTooth
-Peer-to-peer connection over relatively short ranges. These devices normally
-do not require much power so fairly low power consumption.
+### BlueTooth (classic)
+Short range, low power, low datarate.
+Was created in the late 80, early 90 by Ericson Mobile where the goal was to
+create a wireless headset + serial link. This was a IEEE standard 802.15.1 but
+this is now managed by the BlueTooth Special Interest Group (SIG) which has
+members like Ericsson, Intel, Nokia, Toshiba, IBM, MicroSoft, Lenova, Apple.
+
+The name `BlueTooth` I heard comes from a Danish king named Harald Blåtand
+Gormsen who united the tribes of Denmark into a single kingdom, and the logo
+is rune skrift of his initials H and B.
+
+One master and up to 7 active slaves in what is referred to as a piconet. But a
+piconet can have up to 255 parked slaves.
+
+Baseband modes in the connected state:
+* active
+  The slave is actively listening for transmissions. Consumes most power.
+* sniff
+  The slave becomes active periodically which allows a method reduced power
+  consumption
+
+* hold
+  The slave stops listening entierly for a specific time interval. Also reduces
+  power consuption.
+
+* park
+  The slave maintains sync with the master but is no longer considered active.
+  There can only be 7 active slaves in a piconet and this is a way to enable
+  slaves outside of the currently active 7 to participate. There still needs to
+  be a sync using a beaconing scheme. Also reduces power consumption.
+
+Baseband mode in the un-connected state:
+* standby
+
+
+Transport protocol group
+```
+   Audio applications         Data applications
+      ↓                         ↓            ↓
+  +--------------------------------------------------------------------------+
+  |   |                         |            |                               |
+  |   |                  +-------------+ +---------------+                   |
+  |   |                  |     L2CAP   | |  control      |                   |
+  |   |                  +-------------+ +---------------+                   |
+  |   |                         |            |            +-------------+    |
+  |   |                         |            |            |link manager |    |
+  |   |                         |            |            +-------------+    |
+  |   ↓                         ↓            ↓                               |
+  | +-------------------------------------------------------------------+    |
+  | |                          baseband                                 |    |
+  | +-------------------------------------------------------------------+    |
+  |                             ↓                                            |
+  | +-------------------------------------------------------------------+    |
+  | |                          radio                                    |    |
+  | +-------------------------------------------------------------------+    |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
+
+```
+Audio applications require treated with high priority bypasses the the
+intermediate transport layers and goes directly to the baseband layer.
+
+#### Logical Link Control and Adapation protocol (L2CAP)
+Trafic from data applications are routed through this layer which takes care
+of things like frequency hops, the message wire format, segmentation of larger
+packets and reassembling them on the receiving side.
+
+Transmits packets within the 2.4Ghz band. The master is the party that controls
+the Frequency Hopping Spread Spectrum (FHSS) and specifies the frequency
+based upon the masters bluetooth device address, and the timing based upon
+the masters clock.
+
+
+#### Link Manager
+These negotiate the properites of the connection using the Link Manager
+Protocol (LMP). They take care of device pairing and they also support power
+control by negotiating the low activity baseband modes (see above for the
+modes). The concept of master/slave does not propagate higher up than this
+layer.
+
+Uses the Industrial Scientific, and Medical (ISM) radio band.
+Uses Time Division Multiplexing (TDM) where the master has time slots where it
+communicates with slaves. It is after each such time slot that the frequency
+hopping takes place.
+
+The data format between the master and the slave (after the connection step
+has been performed):
+```
+  +-------------+------------+--------------------------+
+  | access code |   header   |       payload            |
+  +-------------+------------+--------------------------+
+    72 bits        54 bits           0-2744 bits
+```
+This is the amount of data that can be sent in a single time slot.
+
+Access code portion:
+```
+  +---------+------------------------+--------+
+  |preamble |   synchronization      |trailer |
+  +---------+------------------------+--------+
+    4 bits          64 bits
+
+```
+The synchronization bits are derived from the masters id.
+
+Header portion:
+```
+  +--------+---------+---+----+----+-------------------+
+  |am-addr |  type   |flo|arqn|seqn| header error check|
+  +--------+---------+---+----+----+-------------------+
+      3         4      1   1    1            8
+
+am-addr = Active Member Address. 1 master plus 7 slaves so 3 bits to specify
+          which member this packet is to/from.
+type    = 12 types of data packets, and 4 control types.
+arqn    = Ack bit?
+seqn    = Sequence bit.
+
+```
+
 
 ### BlueTooth Low Energy (BLE)
 TODO:
