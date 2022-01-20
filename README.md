@@ -2225,6 +2225,25 @@ page-scan state listening and able to respond to.
 
 If the device is already know the inquery stage can be skipped.
 
+#### BlueTooth Device Address (BD_ADDR)
+This is a 48-bit address electronically "engraved" on each device and is
+globally unique amoung bluetooth devices.
+```
+    Lower Address Part  Upper Address Part  Non-Significant Address Part
+         (LAP)               (UAP)            (NAP) 
+            ↓                   ↓               ↓
+  +----------------------+------------+----------------+
+  |                      |            |                |
+  +----------------------+------------+----------------+
+          24 bits            8 bits         16
+```
+The UAP and NAP are provided/assigned by a number authority and represent the
+organization unique identfier (OUI).
+
+For devices to be able to communicate they all have to transmit and receive
+using the same frequency (at the same time and with frequency hoping in mind).
+
+
 The data format between the master and the slave (after the connection step
 has been performed):
 ```
@@ -2261,8 +2280,42 @@ seqn    = Sequence bit.
 ```
 
 
+
 ### BlueTooth Low Energy (BLE)
+Is also marketed as BlueTooth Smart and is part of the 4.1 Bluetooth
+specification. BLE is completely focused on low power and was originally
+designed by Nokia as Wibree and their focus was on designing a radio standard
+with the lowest possible power consumption, low cost, low bandwidth, low power
+low complexity. It was designed to be an extensible framework for data exhange.
+
+The on-the-air wire protocol the upper protocol layers, and the application
+layers are different for BLE which makes it incompatible with Bluetooth classic.
+
+The bluetooth specification 4.0 and above specifcy two wireless technologies:
+* Bluetooth Basic Rate/Enhanced Data Rate (BR/EDR) or classic Bluetooth.
+* Bluetooth Low Energy (BLE)
+
+There are also two configurations where one is named single mode which is a
+device that implements BLE. Such a device can communicate with other single mode
+devices and dual-mode devices but not with devices that only support BR/EDR.
+
+The we have dual-mode which implements both BR/EDR and BLE which can communicate
+with any Bluetooth device.
+
+#### Boadcasting
+There are two was of communication, broadcasting or connections.
+With broadcasting data is sent out to any scanning device in listening range.
+This is one way communication and the sender is called the broadcaster and
+the listeners are called observers. The message that the broadcaster sends are
+called `advertising` packets and the observer repeatadly scans the preset
+frequenies to receive any of these advertising packets.
+Broadcasting is the only way to send data to multiple devices at once.
+The advertising packet contains a 31 bit payload but it is possible to have an
+optional `Scan Response` to allow for 62 bytes.
+
+#### Connections
 TODO:
+
 
 ### WiFi Direct
 Is  a peer-to-peer connection and and does not need a wifi access point. It uses
