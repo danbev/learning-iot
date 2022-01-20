@@ -2314,8 +2314,127 @@ The advertising packet contains a 31 bit payload but it is possible to have an
 optional `Scan Response` to allow for 62 bytes.
 
 #### Connections
-TODO:
+Are a periodic permanent exchange of packets between two devices. Like in
+Bluetooth classic we have two roles, Central (master), and Peripheral (slave).
+A Central device will scan for `connectable advertising` packets on preset
+frequencies and one a connection is established the Central manages timing and
+initiates the periodic data exchange.
 
+The Perhipheral sends connectable advertising packets periodically and accepts
+incoping packets.
+
+```
+                        conn adv    +--------------+
+   +-----------+      <-------------| Peripheral 1 |
+   | Central   |                    +--------------+
+   +-----------+        conn adv    +--------------+
+                      <-------------| Peripheral 2 |
+ scans frequencies                  +--------------+
+
+
+                 connection request +--------------+
+   +-----------+------------------->| Peripheral 1 |
+   | Central   |                    +--------------+
+   +-----------+
+
+```
+In Bluetooth classic before version 4.1 there was a limit that a peripheral
+could only be connected to one central but this is not the case anymore.
+
+With connections there is greater control of the fields or properties through
+the usage of additional protocol layers like Generic Attribute Profile (GATT)
+
+#### Physical Layer
+Uses the Industrial Scientific, and Medical (ISM) radio band.
+```
+2.4 GHz ISM -> 2,400.0 - 2,483.5
+Lower Guard Band (LGB): 2.0
+Upper Guard Band:(UGB) 3.5
+
+Channels:
+```
+    =  2,402.0 <--+
+0   =  2,404.0    |
+1   =  2,406.0    |
+2   =  2,408.0    |
+...               |
+    =  2,426.0 <-----+
+...               |  |
+36  =  2,478.0    |  |
+37  =  -----------+  |
+38  =  --------------+
+39  =  2,480.0
+
+```
+Channel 37, 38, and 39 are used for advertising to set up connections and send
+broadcast data.
+```
+channel = (curr_channel + hop) mod 37
+```
+The value of `hop` is communicated when the connection is established so it is
+different for each new connection.
+The modulation used is Gaussian Frequency Shift Keying (GFSK).
+
+#### GAP
+The topmost control layer and specifies how devices perform things like device
+discovery, connections, security establishment.
+
+#### Attribute Protocol (ATT)
+Is simple client/server protocol for interacting with attributes of a device.
+An attribute handle which is an Universal Unique Identifer (UUID) is used to
+identify an attribute, for example for reading or writing a value. So a client
+would issue a read request and specify the UUID for that particular attribute
+and it would get back attribute value. A client can get a list of attributes
+that a server has.
+TODO: add example of using ATT.
+
+#### Security Manager (SM)
+Is both a protocol and a number of security algorithms.
+
+Pairing is the process where a temp encryption key is generated so that an
+encrypted secure link can be switched to. This key is not stored and not reused.
+
+Bonding is a sequence of pairing followed by the generation and exchange of
+permanent keys which are stored in non-volotile memory (so this is an example
+of what non-volatile memory can be used for). With these setup there is not
+need to go through this bonding process again.
+
+Encryption Re-establishment uses the keys from a previous bonding to establish
+a secure connection using those keys (does not have to go through the bonding
+again).
+
+```
+  Central                            Peripheral
++----------------------------------------------------------+
+|                   Bonding                                |
+| +------------------------------------------------------+ |
+| |                 Pairing                              | |
+| |                                                      | |
+| |           Feature exchange                           | |
+| |          <------------------------>                  | |
+| |  STK gen                             STK gen         | |
+| |             encrypted with STK                       | |
+| |          <------------------------>                  | |
+| |                                                      | |
+| +------------------------------------------------------+ |
+| +------------------------------------------------------+ |
+| |            Key Distribution                          | |
+| +------------------------------------------------------+ |
+|                                                          |
++----------------------------------------------------------+
+```
+So with the feature exchange that information is/could be sent in clear text
+allowing an attacher to intercept the message and find out the data used in the
+key generation. This type of pairing algorithm is called `Just Works`.
+
+`Passkey Display` can also be used where one of the peers randomally generates
+a 6-digit passkey and the other side is asked to enter it.
+
+`Out Of Bound (OOB)` this way additional data is transferred outside of BLE,
+like Near Field Communication (NFC).
+
+Security Keys:
+* Encryption Information (Long Term Key (LTK)) and Master Information (EDIV, Rand)
 
 ### WiFi Direct
 Is  a peer-to-peer connection and and does not need a wifi access point. It uses
