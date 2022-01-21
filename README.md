@@ -2460,6 +2460,29 @@ still have low power consuption for the devices.
 
 Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 
+#### BLE Blinky Example
+Up until this point I've just been reading and I'm finding this a little
+abstract so I wanted to take a look at an example to help my understanding and
+that I can follow. For this I needed to install JLink and
+nrf-command-line-tools.
+
+Run the nrf BLE Blinky example:
+```console
+$ cd nRF5_SDK_17.1.0_ddde560/examples/ble_peripheral/ble_app_blinky/pca10040/s132/armgcc
+$ make flash_softdevice
+$ make flash
+```
+Now we can use `nrf-connect` which is a mobil app and I'm using it on my iphone
+and the name of the adverisment is `Nordic_Blinky`. So this is a peripheral
+which is sending out advertisements which is indicated by LED1 coming on.
+When we press the `Connect` button we will be paired and bonded with central
+which is the nrf-connect app if I'm understanding things correctly.
+
+This peripheras has a service that it is advertising named `Nordic LED and
+Button Service`. In the attribute table we can find an attribute named
+`Blinky LED State` which is `Read and Write`. If we press on the up arrow we
+can send a new value. For example write a Bool value of true will turn on
+LED3.
 
 ### RS-232
 Recommended Standard 232.
