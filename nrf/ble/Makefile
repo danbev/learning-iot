@@ -264,7 +264,7 @@ ble_p: ASMFLAGS += -D__STACK_SIZE=8192
 LIB_FILES += -lc -lnosys -lm
 
 
-.PHONY: default help
+.PHONY: default help pre
 
 # Default target - first one defined
 default: ble_p
@@ -297,3 +297,31 @@ flash_softdevice:
 
 erase:
 	nrfjprog -f nrf52 --eraseall
+
+pre:
+	#arm-none-eabi-gcc -E -I$(INC_FOLDERS) main.c
+	arm-none-eabi-gcc -E -I$(SDK_ROOT)/components/libraries/util \
+		-I$(SDK_ROOT)/modules/nrfx/mdk \
+		-I$(SDK_ROOT)/components/softdevice/s132/headers \
+		-I$(SDK_ROOT)/components/ble/common \
+		-I$(SDK_ROOT)/components/ble/ble_services/ble_lbs \
+		-I$(SDK_ROOT)/components/ble/nrf_ble_gatt \
+		-I$(SDK_ROOT)/components/ble/nrf_ble_qwr \
+		-I$(SDK_ROOT)/components/libraries/experimental_section_vars \
+		-I$(SDK_ROOT)/components/libraries/pwr_mgmt \
+		-I$(SDK_ROOT)/components/libraries/log \
+		-I$(SDK_ROOT)/components/libraries/log/src \
+		-I$(SDK_ROOT)/components/boards \
+		-I$(SDK_ROOT)/components/libraries/timer \
+		-I$(SDK_ROOT)/components/libraries/button \
+		-I$(SDK_ROOT)/modules/nrfx \
+		-I$(SDK_ROOT)/modules/nrfx/hal \
+		-I$(SDK_ROOT)/modules/nrfx/templates \
+		-I$(SDK_ROOT)/modules/nrfx/templates/nRF52840 \
+		-I$(SDK_ROOT)/modules/nrfx/drivers/include \
+		-I$(SDK_ROOT)/config/nrf52840/config \
+		-I$(SDK_ROOT)/integration/nrfx/legacy \
+		-Iconfig \
+		-I$(SDK_ROOT)/components/softdevice/common  main.c
+
+
