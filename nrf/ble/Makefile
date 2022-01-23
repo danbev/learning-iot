@@ -324,4 +324,5 @@ pre:
 		-Iconfig \
 		-I$(SDK_ROOT)/components/softdevice/common  main.c
 
-
+openocd: 
+	openocd -c 'interface jlink; transport select swd; source [find target/nrf52.cfg]'
