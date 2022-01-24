@@ -283,7 +283,7 @@ include $(TEMPLATE_PATH)/Makefile.common
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
-.PHONY: flash flash_softdevice erase
+.PHONY: flash flash_softdevice erase mergehex
 
 flash: default
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_p.hex
@@ -294,6 +294,13 @@ flash_softdevice:
 	@echo Flashing: s132_nrf52_7.2.0_softdevice.hex
 	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex --sectorerase
 	nrfjprog -f nrf52 --reset
+
+mergehex: ble_p.hex 
+	mergehex -m $(OUTPUT_DIRECTORY)/ble_p.hex $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex  -o $(OUTPUT_DIRECTORY)/merged_ble_p.hex
+
+flash_merged: mergehex
+	@echo Flashing: $(OUTPUT_DIRECTORY)/merged_ble_p.hex
+	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/merged_ble_p.hex --sectorerase
 
 erase:
 	nrfjprog -f nrf52 --eraseall
