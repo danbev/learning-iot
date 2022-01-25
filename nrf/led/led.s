@@ -28,15 +28,11 @@
 .equ GPIO_DIRSET_x, 1 << PIN
 .equ GPIO_OUTSET_x, 1 << PIN      /* Is active low   */
 
-.global led_init, led_turn_on, led_turn_off
+.global led_init
+.global led_turn_on
+.global led_turn_off
 
 led_init:
-  ldr r1, =GPIO_CNFx_R
-  ldr r2, =GPIO_CNFx_DIR
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
-
   ldr r1, =GPIO_CNFx_R
   ldr r2, =GPIO_CNFx_DRIVE
   ldr r0, [r1]
