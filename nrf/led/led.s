@@ -5,6 +5,7 @@
 .equ GPIO_BASE, 0x50000000
 .equ GPIO_OUT_OFFSET, 0x504
 .equ GPIO_OUTSET_OFFSET, 0x508
+.equ GPIO_OUTCLR_OFFSET, 0x50C
 .equ GPIO_DIRSET_OFFSET, 0x518
 .equ GPIO_CNF_OFFSET, 0x700
 
@@ -14,6 +15,7 @@
 
 .equ GPIO_OUT_R, GPIO_BASE + GPIO_OUT_OFFSET
 .equ GPIO_OUTSET_R, GPIO_BASE + GPIO_OUTSET_OFFSET
+.equ GPIO_OUTCLR_R, GPIO_BASE + GPIO_OUTCLR_OFFSET
 .equ GPIO_CNFx_R, GPIO_BASE + GPIO_CNF_OFFSET + PIN_x
 .equ GPIO_DIRSET_R, GPIO_BASE + GPIO_DIRSET_OFFSET
 
@@ -24,8 +26,7 @@
 .equ GPIO_CNFx_SENSE, 0 << 16
 
 .equ GPIO_DIRSET_x, 1 << PIN
-.equ GPIO_OUTSET_x_ON, 0 << PIN      /* Is active low   */
-.equ GPIO_OUTSET_x_OFF, 1 << PIN
+.equ GPIO_OUTSET_x, 1 << PIN      /* Is active low   */
 
 .global led_init, led_turn_on, led_turn_off
 
@@ -63,10 +64,11 @@ led_turn_on:
   orr r0, r0, r2
   str r0, [r1]
 
-  ldr r1, =GPIO_OUTSET_R
-  ldr r2, =GPIO_OUTSET_x_ON
+  /* Writing 1 will set the pin low */
+  ldr r1, =GPIO_OUTCLR_R
+  ldr r2, =GPIO_OUTSET_x
   ldr r0, [r1]
-  orr r0, r0, r2
+  and r0, r0, r2
   str r0, [r1]
   
   bx lr
@@ -78,8 +80,9 @@ led_turn_off:
   orr r0, r0, r2
   str r0, [r1]
 
+  /* Writing 1 will set the pin high */
   ldr r1, =GPIO_OUTSET_R
-  ldr r2, =GPIO_OUTSET_x_OFF
+  ldr r2, =GPIO_OUTSET_x
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
