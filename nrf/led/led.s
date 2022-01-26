@@ -31,6 +31,7 @@
 .global led_init
 .global led_turn_on
 .global led_turn_off
+.global led_toggle
 
 led_init:
   ldr r1, =GPIO_CNFx_R
@@ -50,8 +51,10 @@ led_init:
   ldr r0, [r1]
   orr r0, r0, r2
   str r0, [r1]
+  push {lr}
+  bl led_turn_off
 
-  bx lr
+  pop {pc}
 
 led_turn_on:
   ldr r1, =GPIO_DIRSET_R
@@ -84,4 +87,20 @@ led_turn_off:
   str r0, [r1]
   
   bx lr
+
+led_toggle:
+  push {lr}
+  ldr r1, =GPIO_OUT_R
+  ldr r2, =GPIO_OUTSET_x
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, r2
+  bne led_toggle_off
+  bl led_turn_on
+  pop {pc}
+
+led_toggle_off:
+  push {lr}
+  bl led_turn_off
+  pop {pc}
 
