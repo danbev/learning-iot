@@ -56,10 +56,10 @@ transmission:
 ![UART Transmit oscilloscope image](./img/uart-tx-osc.jpg "UART TX oscilloscope image")
 
 Notice that the signal is at 5V to start with when there is no trasmission and
-these is then a start bit. This is followed by the first bit of the data which
+then a start bit. The start bit is followed by the first bit of the data which
 is high which represents a 1, this is then followed by 5 low signals, and
 finally another high signal which produces `1000001` which is 41h, 65d, and
-1000001b:
+1000001b and the the stop bit:
 ![UART Transmit oscilloscope image 2](./img/uart-tx-osc2.jpg "UART TX oscilloscope image 2")
 
 
