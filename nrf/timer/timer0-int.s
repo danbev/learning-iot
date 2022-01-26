@@ -49,32 +49,32 @@
 
 .global start
 
-Vector_Table:                   
-  .word     0x20002000          // 0 Initial Stack Pointer value 
-  .word     start + 1           // 1 Reset                       
-  .word     null_handler + 1    // 2 Non Maskable Interrupt      -14
-  .word     null_handler + 1    // 3 Hard Fault                  -13
-  .word     null_handler + 1    // 4 Memory Fault                -12
-  .word     null_handler + 1    // 5 Bus Fault                   -11
-  .word     null_handler + 1    // 6 Usage Fault                 -10
-  .word     null_handler + 1    // 7 Reserved                    
-  .word     null_handler + 1    // 8 Reserved                    
-  .word     null_handler + 1    // 9 Reserved                    
-  .word     null_handler + 1    // 10 Reserved                   
-  .word     null_handler + 1    // 11 SVCall                     -5
-  .word     null_handler + 1    // 12 Reserved for debug         
-  .word     null_handler + 1    // 13 Reserved                   
-  .word     null_handler + 1    // 14 PendSV                     -2
-  .word     null_handler + 1    // 15 SysTick                    -1
-  .word     null_handler + 1    // 16 IRQ0                       0
-  .word     null_handler + 1    // 17 IRQ1                       1
-  .word     null_handler + 1    // 18 IRQ2                       2
-  .word     null_handler + 1    // 19 IRQ3                       3
-  .word     null_handler + 1    // 20 IRQ4                       4
-  .word     null_handler + 1    // 21 IRQ5                       5
-  .word     null_handler + 1    // 22 IRQ6                       6
-  .word     null_handler + 1    // 23 IRQ7                       7
-  .word     timer0_handler + 1  // 24 IRQ8                       8
+Vector_Table:                   // Exception Nr  Handler               IRQ Nr
+  .word     0x20002000          // 0             Initial SP value
+  .word     start + 1           // 1             Reset
+  .word     null_handler + 1    // 2             Non Maskable Interrupt -14
+  .word     null_handler + 1    // 3             Hard Fault             -13
+  .word     null_handler + 1    // 4             Memory Fault           -12
+  .word     null_handler + 1    // 5             Bus Fault              -11
+  .word     null_handler + 1    // 6             Usage Fault            -10
+  .word     null_handler + 1    // 7             Reserved
+  .word     null_handler + 1    // 8             Reserved
+  .word     null_handler + 1    // 9             Reserved
+  .word     null_handler + 1    // 10            Reserved
+  .word     null_handler + 1    // 11            SVCall                  -5
+  .word     null_handler + 1    // 12            Reserved for debug
+  .word     null_handler + 1    // 13            Reserved
+  .word     null_handler + 1    // 14            PendSV                  -2
+  .word     null_handler + 1    // 15            SysTick                 -1
+  .word     null_handler + 1    // 16            IRQ0                     0
+  .word     null_handler + 1    // 17            IRQ1                     1
+  .word     null_handler + 1    // 18            IRQ2                     2
+  .word     null_handler + 1    // 19            IRQ3                     3
+  .word     null_handler + 1    // 20            IRQ4                     4
+  .word     null_handler + 1    // 21            IRQ5                     5
+  .word     null_handler + 1    // 22            IRQ6                     6
+  .word     null_handler + 1    // 23            IRQ7                     7
+  .word     timer0_handler + 1  // 24            IRQ8                     8
 
 
 null_handler:
