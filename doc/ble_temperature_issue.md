@@ -76,6 +76,8 @@ Caused by:
                the backtrace may be incomplete.
 (HOST) ERROR the program panicked
 ```
+The interrupt priorites are set in the `config` function:
+```rust
 fn config() -> Config {
     let mut config = embassy_nrf::config::Config::default();
     config.gpiote_interrupt_priority = Priority::P2;
