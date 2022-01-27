@@ -8,7 +8,7 @@ $ probe-rs-cli download s113_nrf52_7.3.0_softdevice.hex --chip nRF52833_xxAA --f
 
 Then we can build and flash the example:
 ```console
-env RUST_LOG=info cargo run --verbose
+$ env RUST_LOG=info cargo run --verbose
 (HOST) INFO  flashing program (15 pages / 60.00 KiB)
 (HOST) INFO  success!
 ────────────────────────────────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ that there are certain restrictions that the Softdevice places on hardware
 periperals: https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsds_s132%2FSDS%2Fs1xx%2Fsd_resource_reqs%2Fhw_block_interrupt_vector.html
 
 Notice that `TEMP` is restricted. But it is used in this example via usage
-of the MicrobitBoard in  device/src/bsp/boards/nrf52/microbit.rs. The example
+of the MicrobitBoard in device/src/bsp/boards/nrf52/microbit.rs. The example
 in this case uses examples/apps/ble/src/microbit.rs which contains a
 TemperatureMonitor which uses the Softdevice to interact with the TEMP
 periperal
@@ -164,6 +164,8 @@ periperal
             TemperatureMonitor::new(self.sd, &self.server.temperature),
 ```
 
-A suggestion for a workaround is to conditionaly compile the microbit Board so
-that when when bsp+microbit+ble feature is specified then the TEMP field will
-not be used since it is considered restricted when a the Softdevice is in use.
+A suggestion for a workaround is to conditionally compile the Microbit board so
+that when when `bsp+microbit+ble` feature is specified then the `temp` field
+will not be used since it is considered restricted when a the Softdevice is in
+use. 
+
