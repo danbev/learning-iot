@@ -2096,11 +2096,11 @@ Protocol stack:
 +---------------------------------------------------------------+
 ```
 
-### BlueTooth (classic)
-Short range, low power, low datarate.
+### BlueTooth (Basic Rate/Enhanced Data Rate (BR/EDR) (classic)
+Short range, low power, low datarate. Point-to-point.
 Was created in the late 80, early 90 by Ericson Mobile where the goal was to
 create a wireless headset + serial link. This was a IEEE standard 802.15.1 but
-this is now managed by the BlueTooth Special Interest Group (SIG) which has
+is now managed by the BlueTooth Special Interest Group (SIG) which has
 members like Ericsson, Intel, Nokia, Toshiba, IBM, MicroSoft, Lenova, Apple.
 
 The name `BlueTooth` I heard comes from a Danish king named Harald Blåtand
@@ -2113,6 +2113,7 @@ piconet can have up to 255 parked slaves.
 Baseband modes in the connected state:
 * active
   The slave is actively listening for transmissions. Consumes most power.
+
 * sniff
   The slave becomes active periodically which allows a method reduced power
   consumption
@@ -2155,7 +2156,7 @@ Transport protocol group
   +--------------------------------------------------------------------------+
 
 ```
-Audio applications require treated with high priority bypasses the the
+Audio applications require being treated with high priority which bypasses the
 intermediate transport layers and goes directly to the baseband layer.
 
 #### Logical Link Control and Adapation protocol (L2CAP)
@@ -2170,7 +2171,6 @@ the masters clock.
 
 L2CAP can use the control layer to control layer which can interact with the
 link manager to perform actions.
-
 
 #### Link Manager
 These negotiate the properites of the connection using the Link Manager
@@ -2196,11 +2196,9 @@ Channels:
 So this gives 79 1MHz channels which are the channels used for FHSS which hops
 at 1600/second (which should give 625 micro seconds per hop).
 
-
 Uses Time Division Multiplexing (TDM) where the master has time slots where it
 communicates with slaves. It is after each such time slot that the frequency
 hopping takes place.
-
 
 Connection States:
 ```
@@ -2276,12 +2274,10 @@ am-addr = Active Member Address. 1 master plus 7 slaves so 3 bits to specify
 type    = 12 types of data packets, and 4 control types.
 arqn    = Ack bit?
 seqn    = Sequence bit.
-
 ```
 
-
-
 ### BlueTooth Low Energy (BLE)
+Broadcast. One to many.
 Is also marketed as BlueTooth Smart and is part of the 4.1 Bluetooth
 specification. BLE is completely focused on low power and was originally
 designed by Nokia as Wibree and their focus was on designing a radio standard
@@ -2483,6 +2479,10 @@ Button Service`. In the attribute table we can find an attribute named
 `Blinky LED State` which is `Read and Write`. If we press on the up arrow we
 can send a new value. For example write a Bool value of true will turn on
 LED3.
+
+### BLE Mesh
+Is a network allowing BLE Many-to-many communication.
+TODO: 
 
 ### RS-232
 Recommended Standard 232.
