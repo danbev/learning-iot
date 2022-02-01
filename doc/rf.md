@@ -63,7 +63,7 @@ see/read our signal with the intended amplitude but instead the amplitude will
 be from the amplitude of the noise signal peak to our signals peak. This is
 called the Signal to Noice Ratio (SNR).
 
-### Basic Pules
+### Basic Pules techniques
 
 #### Not-Return-to-Zero (NRZ)
 This is when during one clock cycle the pulse does not go down to zero:
@@ -123,6 +123,53 @@ Amplitude
    |       T₁
 
 ```
+
+### Pulse shapings techniques
+
+#### Unipolar
+```
+ Bit     Level
+  1  ---> +a 
+  0  ---> 0
+```
+
+#### Polar
+```
+ Bit     Level
+  1  ---> +a 
+  0  ---> -a
+```
+
+#### Bipolar
+Is also sometimes referred to as Pseudo Ternary Code.
+```
+ Bit     Level
+  1  ---> +a, -a 
+  0  ---> 0
+```
+This might not be clear but for bits of 1s the amplitude is alternating. So the
+first 1 could be +3.3 and the second 1 could be -3.3.
+
+Now, this would looks something like this:
+```
+    Bits    1        1        1 
+
+Amplitude
+       ^
+       |
+    +A |---------+        +---------
+       |         |        |
+       |         |        |
+       +------------------------------> time
+       |         |        |
+       |         |        |
+    -A |         +--------+
+       |       
+       |
+
+```
+
+
 
 
 
