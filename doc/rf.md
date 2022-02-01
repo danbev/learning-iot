@@ -55,9 +55,76 @@ called absorbtion. The wavelenght/frequency is the same but some of the
 amplitude (power) will have been absorbed.
 
 ### Noise
-Is an unwanted random signal that gets added to our wanted (random) signal. This
-is called white noise because is contains all the frequenecies (think about
-white light which contain all the visual light frequencies).
+Is an unwanted random signal that gets added to our wanted (random) signal. So,
+we have are signal that has a specific wave lenght/frequency. It also has an
+amplitude. So the noise signal will also have same wave length/frequency but
+with a different amplitude compared to our signal. So the receiver will not
+see/read our signal with the intended amplitude but instead the amplitude will
+be from the amplitude of the noise signal peak to our signals peak. This is
+called the Signal to Noice Ratio (SNR).
+
+### Basic Pules
+
+#### Not-Return-to-Zero (NRZ)
+This is when during one clock cycle the pulse does not go down to zero:
+```
+Amplitude
+   ^
+   |
+   --------+
+   |       |
+   |       |
+   +-------|----> time
+   0       T₁
+```
+So the amplitude is fixed.
+
+#### Return-to-Zero (RZ)
+This is when during one clock cycle the pulse does go down to zero:
+```
+Amplitude
+   ^
+   |
+   ----+
+   |   |
+   |   |
+   +---|---|----> time
+   0       T₁
+```
+So for half of the duration the amplitude will be high, and then go down to
+zero for the rest of the duration.
+
+#### Manchester
+In this case there is a transistion from high to low, or low to high during
+each duration:
+```
+Amplitude
+   ^
+   |
+   ----+
+   |   |
+   |   |
+   +---|---|----> time
+   |   |   |
+   |   |   |
+   |   +---+
+   |       T₁
+
+
+   ^
+   |
+   |   ----+
+   |   |
+   |   |
+   +---|---|----> time
+   |   |   
+   |   |   
+   +---+
+   |       T₁
+
+```
+
+
 
 
 ### Decibel (dB)
