@@ -221,6 +221,25 @@ Is really just a rearrangement of a sequence of data and is used in wireless
 communication to remove long sequences of ones and zeros.
 
 
+### Amplitude Shift Keying
+This is where we take a digital message and multiply it with our high frequency
+carrier signal, and vary the amplitude of the carrier signal depending on the
+digital message values 0 or 1.
+For example, it might be the case where the amplitude is 0 for a 0, and the
+amplitude 1 one is whatever the amplitude of the carrier signal. So the bits
+1010 would be transmitted as a pulse with an amplitude of the carriers signal, 
+followed by a pulse of zero amplitude and so on.
+
+### Frequency Shift Keying
+This is where we take a digital message and multiply it with our high frequency
+carrier signal, and vary the frequency of the carrier signal depending on the
+digital message values 0 or 1.
+
+### Phase Shift Keying
+This is where we take a digital message and multiply it with our high frequency
+carrier signal, and vary the phase of the carrier signal depending on the
+digital message values 0 or 1.
+
 
 ### Decibel (dB)
 This is a unit of measurment but not quite like kg or other units that we are
@@ -302,3 +321,6 @@ track the incoming data clock needs frequent transistions in the signal.
 
 ### Linear Feedback Shift Register (LFSR)
 TODO:
+
+### Baud Rate
+Number of symbols per second.
