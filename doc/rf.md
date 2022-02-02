@@ -132,6 +132,7 @@ Amplitude
   1  ---> +a 
   0  ---> 0
 ```
+Notice that the level is between 0 and a.
 
 #### Polar
 ```
@@ -139,9 +140,13 @@ Amplitude
   1  ---> +a 
   0  ---> -a
 ```
+Notice that the level is between -a to +a. If we compare this with unipolar we
+this would require higher amout of power to send a signal using Polar compared
+to unipolar.
 
 #### Bipolar
-Is also sometimes referred to as Pseudo Ternary Code.
+Is also sometimes referred to as Pseudo Ternary Code or Alternate Marked
+Inversion (AMI):
 ```
  Bit     Level
   1  ---> +a, -a 
@@ -166,11 +171,30 @@ Amplitude
     -A |         +--------+
        |       
        |
-
 ```
 
+#### Transmission efficency
+If we compare Unipolar with Polar we find that Polar will require higher amout
+of power to send a signal.
 
+### Line Coding
+Is the process of converting binary data to a digital signal.
+```
+ Binary data                       Digital Signal
 
+ 0101 0101  ---> Line Coding --->  ^0  1  0  1  0  1   0  1
+                                 3 |  +--+  +--+  +--+  +--+
+                                   |  |  |  |  |  |  |  |  |
+                                   |  |  |  |  |  |  |  |  |
+                                   +--|--|--|--|--|--|--|--|--|--|>
+                                      
+```
+The above is just an example and the actual digital signal depends on the
+line codeing in use.
+
+### Scrambling
+Is really just a rearrangement of a sequence of data and is used in wireless
+communication to remove long sequences of ones and zeros.
 
 
 
@@ -251,3 +275,7 @@ Radio transmission requires the bits to alternate often (why is that?) so
 if we have a series of bit like 1111 1111 1111 1111 that might become an issue.
 On the receiver side the clock synchronizer curuit attempting to recover and
 track the incoming data clock needs frequent transistions in the signal.
+
+
+### Linear Feedback Shift Register (LFSR)
+TODO:
