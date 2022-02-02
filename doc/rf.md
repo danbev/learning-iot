@@ -192,6 +192,30 @@ Is the process of converting binary data to a digital signal.
 The above is just an example and the actual digital signal depends on the
 line codeing in use.
 
+There are few important things with regards to line coding:
+* Signal Level
+Is the number of values (amplitude) that a signal can have. Like it might only
+allow 0 and +a, or perhaps -a and +a, or -a, +a and 0.
+
+* Data Level
+Is the number of values used to represent data. For example binary only requires
+two, 1 and 0.
+
+* Pulse Rate
+Is the number of pulses per second. A pulse is the minimum amount of time
+required to trasmit a symbol.
+
+* Bit Rate
+Is the number of bits per second.
+
+# DC Component
+This is when a line coding has an average voltage greater than 0. For example,i
+if we represent high as 3V and low as -3V then the average is 0 as the high and
+low values will cancel each other out. But if we instead have high as 3V and low
+as 0 then we would have a postive average and this is called a non-zero DC
+component. This is apparently related to errors in the communication but I'm not
+exactly sure how yet.
+
 ### Scrambling
 Is really just a rearrangement of a sequence of data and is used in wireless
 communication to remove long sequences of ones and zeros.
@@ -271,11 +295,10 @@ If the Pₒᵤₜ < Pᵢₙ then box above is an filter and has a `Loss`.
 
 
 ### Whitening
-Radio transmission requires the bits to alternate often (why is that?) so
-if we have a series of bit like 1111 1111 1111 1111 that might become an issue.
+Radio transmission requires the bits to alternate often so if we have a series
+of bit like 1111 1111 1111 1111 that might become an issue.
 On the receiver side the clock synchronizer curuit attempting to recover and
 track the incoming data clock needs frequent transistions in the signal.
-
 
 ### Linear Feedback Shift Register (LFSR)
 TODO:
