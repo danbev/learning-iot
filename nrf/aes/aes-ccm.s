@@ -14,11 +14,14 @@
 .data
 
 ccm_data_struct:
-    .ascii        "test123"  /* AES Key (16 bytes, 128 bits) */
+    .ascii        "bajja"  /* AES Key (16 bytes, 128 bits) */
     .space        9
 
 plain_text:
     .ascii        "hello"
+
+cipher_text:
+    .skip 20
 
 .text
 
@@ -79,11 +82,14 @@ wait_for_end_ksgen:
   cmp r0, r2
   bne wait_for_end_ksgen
 
-  ldr r2, =SCRATCHPTR_R
-
-  /* Set the pointer to the plain_text to be encrypted */
+  /* Set the pointer to the plain-text to be encrypted */
   ldr r1, =INPTR_R
   ldr r2, =plain_text
+  str r2, [r1]
+
+  /* Set the pointer to the encrypted cipher-text */
+  ldr r1, =OUTPTR_R
+  ldr r2, =cipher_text
   str r2, [r1]
 
   /* Start the encryption */
@@ -100,8 +106,8 @@ wait_for_end_crypt:
   cmp r0, r2
   bne wait_for_end_crypt
 
-  /* Encrypted data should be available in the OUTPTR register */
-  ldr r1, =OUTPTR_R
-  ldr r2, =SCRATCHPTR_R
+  /* Encrypted data should be available at the address of OUTPTR */
+  ldr r1, =cipher_text
+  ldr r2, [r1]
 
   bl .
