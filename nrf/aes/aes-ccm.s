@@ -14,17 +14,31 @@
 
 .data
 
+plain_text:
+    .byte         0            // Header
+    .byte         5            // Length in bytes
+    .byte         1            // Reserved for future use
+    .byte         1            // Reserved for future use
+    .ascii        "hello"      // Payload
+
 /* ccm_data_struct will be stored RAM, but the value "bajja\n" will be in the
  flash memory */
 ccm_data_struct:
-    .ascii        "bajja\n"  // AES Key (16 bytes, 128 bits)
-    .space        8
+    .ascii        "0123456789abcedf"  // AES Key (16 bytes, 128 bits)
+    .byte         0                   // Octet 0 of packet counter
+    .byte         0                   // Octet 1 of packet counter
+    .byte         0                   // Octet 2 of packet counter
+    .byte         0                   // Octet 3 of packet counter
+    .byte         0                   // Octet 4 of packet counter ?
+    .byte         0                   // Ignored
+    .byte         0                   // Ignored
+    .byte         0                   // Ignored
+    .byte         0                   // Direction bit?
+    .byte         0,0,0,0,0,0,0,0     // IV
 
-plain_text:
-    .ascii        "hello\n"
 
-cipher_text:
-    .space 20
+packet:
+    .space 64
 
 .text
 
@@ -67,8 +81,6 @@ copy_loop:
   b copy_loop
 
 no_copy:
-  ldr r0, =plain_text
-
   /* Enable AES */
   ldr r1, =ENABLE_R
   ldr r2, =ENABLE
@@ -103,9 +115,9 @@ wait_for_end_ksgen:
   ldr r2, =plain_text
   str r2, [r1]
 
-  /* Set the pointer to the encrypted cipher-text */
+  /* Set the pointer to the packet which will contain the encrypted payload */
   ldr r1, =OUTPTR_R
-  ldr r2, =cipher_text
+  ldr r2, =packet
   str r2, [r1]
 
   /* Start the encryption */
@@ -122,8 +134,14 @@ wait_for_end_crypt:
   cmp r0, r2
   bne wait_for_end_crypt
 
-  /* Encrypted data should be available at the address of OUTPTR */
-  ldr r1, =cipher_text
+  /* Encrypted packet should be available at the address of OUTPTR
+     Header is 5 bits at offset 0
+     Length is a offset 1
+     RFU (Reserved For Future) is at offset 2
+     Payload is at offset 3
+     MIC (tag) is at offset 3+payload length
+   */
+  ldr r1, =packet
   ldr r2, [r1]
 
   bl .
