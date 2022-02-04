@@ -9,24 +9,26 @@
  Check (which is a Message Authentication Code (MAC) but is named MIC instead
  as this is what is used in the Bluetooth specification) field to the message.
 */
+.syntax unified
 .thumb
 
 .data
 
+/* ccm_data_struct will be stored RAM, but the value "bajja\n" will be in the
+ flash memory */
 ccm_data_struct:
-    .ascii        "bajja"  /* AES Key (16 bytes, 128 bits) */
-    .space        9
+    .ascii        "bajja\n"  // AES Key (16 bytes, 128 bits)
+    .space        8
 
 plain_text:
-    .ascii        "hello"
+    .ascii        "hello\n"
 
 cipher_text:
-    .skip 20
+    .space 20
 
 .text
 
 .equ CCM_BASE, 0x4000F000
-
 .equ TASK_KSGEN_R, CCM_BASE + 0x000
 .equ EVENTS_ENDKSGEN_R, CCM_BASE + 0x100
 .equ CNFPTR_R, CCM_BASE + 0x508 
@@ -45,7 +47,6 @@ cipher_text:
 .equ ENCRYPT, 0
 .equ ENABLE, 2
 
-
 .global start
 
 Vector_Table:                   // Exception Nr  Handler               IRQ Nr
@@ -53,6 +54,21 @@ Vector_Table:                   // Exception Nr  Handler               IRQ Nr
   .word     start + 1           // 1             Reset
 
 start:
+  ldr r1, =_end_text    // end of .text segment in Flash memory.
+  ldr r2, =_start_data  // start of .data segment in RAM memory.
+  ldr r3, =_end_data    // end of .data segment in RAM memory.
+
+copy_loop:
+  cmp r2, r3
+  bge no_copy
+
+  ldr r4, [r1], #4
+  str r4, [r2], #4
+  b copy_loop
+
+no_copy:
+  ldr r0, =plain_text
+
   /* Enable AES */
   ldr r1, =ENABLE_R
   ldr r2, =ENABLE
