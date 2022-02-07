@@ -38,3 +38,66 @@ Example writing to the attribute:
 
 The result of writing to the attribute (led turns on)
 ![Led on](./img/ble_p_led_on.jpg "BLE Peripheral Example Write attribute")
+
+
+### Packet capturing with Ubertooth One and Wireshark
+
+```console
+$ ubertooth-btle -f -c /tmp/pipe 
+...
+ystime=1644247698 freq=2402 addr=8e89bed6 delta_t=23.874 ms rssi=-30
+60 25 f6 6a 57 d2 47 ef 03 19 00 00 02 01 06 17 09 42 4c 45 5f 50 65 72 69 70 68 65 72 61 6c 5f 45 78 61 6d 70 6c 65 67 e0 9e 
+Advertising / AA 8e89bed6 (valid)/ 37 bytes
+    Channel Index: 37
+    Type:  ADV_IND
+    AdvA:  ef:47:d2:57:6a:f6 (random)
+    AdvData: 03 19 00 00 02 01 06 17 09 42 4c 45 5f 50 65 72 69 70 68 65 72 61 6c 5f 45 78 61 6d 70 6c 65
+        Type 19
+            00 00
+        Type 01 (Flags)
+           00000110
+               LE General Discoverable Mode
+               BR/EDR Not Supported
+
+        Type 09 (Complete Local Name)
+           BLE_Peripheral_Example
+
+    Data:  f6 6a 57 d2 47 ef 03 19 00 00 02 01 06 17 09 42 4c 45 5f 50 65 72 69 70 68 65 72 61 6c 5f 45 78 61 6d 70 6c 65
+    CRC:   67 e0 9e
+```
+And in wireshark:
+```
+Bluetooth
+    [Source: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+    [Destination: Broadcast (ff:ff:ff:ff:ff:ff)]
+Bluetooth Low Energy Link Layer
+    Access Address: 0x8e89bed6
+    Packet Header: 0x2560 (PDU Type: ADV_IND, ChSel: #2, TxAdd: Random)
+        .... 0000 = PDU Type: 0x0 ADV_IND
+        ...0 .... = Reserved: 0
+        ..1. .... = Channel Selection Algorithm: #2
+        .1.. .... = Tx Address: Random
+        0... .... = Reserved: 0
+        Length: 37
+    Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
+    Advertising Data
+        Appearance: Unknown
+            Length: 3
+            Type: Appearance (0x19)
+            Appearance: Unknown (0x0000)
+        Flags
+            Length: 2
+            Type: Flags (0x01)
+            000. .... = Reserved: 0x0
+            ...0 .... = Simultaneous LE and BR/EDR to Same Device Capable (Host): false (0x0)
+            .... 0... = Simultaneous LE and BR/EDR to Same Device Capable (Controller): false (0x0)
+            .... .1.. = BR/EDR Not Supported: true (0x1)
+            .... ..1. = LE General Discoverable Mode: true (0x1)
+            .... ...0 = LE Limited Discoverable Mode: false (0x0)
+        Device Name: BLE_Peripheral_Example
+            Length: 23
+            Type: Device Name (0x09)
+            Device Name: BLE_Peripheral_Example
+    CRC: 0xe60779
+```
+
