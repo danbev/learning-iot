@@ -221,15 +221,14 @@ Is really just a rearrangement of a sequence of data and is used in wireless
 communication to remove long sequences of ones and zeros.
 
 ### Radio waves
-Are just another form of light (electro matnetic waves) just like light. 
-They travel at the speed of light 300 000 000 meters per second.
+Are just another form of light (electro magnetic waves) just like light.
+They travel at the speed of light, around 300 000 000 meters per second.
 
 Now, electrons in a wire flow with the help of atoms, in the conduction band.
 But radio waves/light waves or electro magnetic waves don't have a wire but
 Electromagnetic waves differ from mechanical waves in that they do not require
-a medium to propagate. 
-This means that electromagnetic waves can travel not only through air and solid
-materials, but also through the vacuum of space.
+a medium to propagate.  This means that electromagnetic waves can travel not
+only through air and solid materials, but also through the vacuum of space.
 
 ### Radio bands
 ```
@@ -257,9 +256,12 @@ Notice that the lower frequency which also means longer wavelengths. When
 sending data this data needs to travel over a signal that oscilates over with
 a wave length. With the modulation techniques discussed later in this doc we
 will see that most of these, if not all, will use the frequency to interpret
-the original signal. If the wavelenght is longer less information is availaible
+the original signal.
+```
+If the wavelength is longer, less information is availaible
 for processing during the same time period compared to a higher frequency. So
 more information can be sent with higher frequencies in the same amount of time.
+```
 
 The general line-of-sight propagation mode can be more thought of as allowing
 one to communicate with something that one could see in the absence of any
@@ -267,8 +269,8 @@ obstacles, that is, something not blocked by the curvature of the Earth or large
 geographic features like mountains.
 
 ### Diffraction
-Like light rays from the sun diffract in the atmosphere so can other types of
-EM waves. This enables them to when they hit the peak of a hill diffract
+Like light rays from the sun diffract in the atmosphere and so can other types
+of EM waves. This enables them when they hit the peak of a hill diffract
 (spread) out into the vallly. This can also happen with walls in ones home
 which happens for 2.4GHz and 5GHz radiation which is what our WiFi routes emit.
 
@@ -288,12 +290,11 @@ lower-frequency radio waves. Radio waves can travel through most nonconductive
 materials,
 
 
-
 ### Modulated Signal
 This example is of a computer sending data over a telephone, like when we used
 modems in the good old days.
 First thing is that a byte will be broken down into separate bits and sent one
-after the other. After that the will be partity bits and perhaps sync bits but
+after the other. After that there will be partity bits and perhaps sync bits but
 that is not important to this section.
 
 The problem is that the telefon line cannot transmit logic levels which might
@@ -303,13 +304,13 @@ is a periodic wave that oscilates.
 
 There are three properties of a sine wave that we can manipulate:
 ```
-y(t) = A(t)     * sin(2π f(t)     + ψ(t))
+y(t) = A(t)     *        sin(2π f(t)     + ψ(t))
      
-       amplitude         frequency  phase
+       amplitude         frequency         phase
 ```
 So amplitude is the max distance of the trough/crest. And frequency is the
 number of cycles per second. Notice that the phase is added so this would be
-the hight of the y axis.
+the higth of the y axis.
 
 ### Amplitude Modulation (AM)
 We start with an input signal which is what we want to send to the reciever.
@@ -325,13 +326,9 @@ Just remember that we start with some signal on a wire and for this to be
 transported as a radio wave it has to be modulated into 30Hz-300GHz frequency
 without loosing the information that the orignal signal represents.
 
-
 ### Frequency Modulation (FM)
 The goal here is similar to AM where we have a signal that we want to send and
-instead of changing the amplitude we change the frequency. For exampl 0 might be 
-represented by a higher frequency (shorter wave lengths), and a 1 by a lower
-frequency (longer frequency).
-
+instead of changing the amplitude we change the frequency.
 
 ### Phase Modulation
 This this case a change in phase could be used to indicate 1 and no change could
@@ -353,7 +350,7 @@ a frequency.
 λ =  -                f = frequency                                             
      f                                                                          
 ```
-Lets say we have a signal that frequency of 200Hz. And recall that frequency
+Lets say we have a signal with a frequency of 200Hz. And recall that frequency
 is the number of waves that pass a fixed place in a given amount of time (in
 Hertz this is per second.
 
@@ -370,15 +367,14 @@ calculate the wave lenght using the formula above:
         200Hz
 ```
 Now, a wave length is the length of one cycle, as in starting from zero going
-up to the amplitude, down to zero, down to the amplitude and back to zero. This
-distance is 1500km?  
+up to the max amplitude, down to zero, down to the amplitude and back to zero.
+This distance is 1500km?  
 So would an antennna that is build to receive such a signal then have to be
 1500km long to receive the complete wave. This does not work and in reality we
 have small devices that have antennas which are much must shorter. What is
 needed is to take this low level fequency and transform it into a higher
 frequency but still retain the same information, and on the other side we take
 this high frequency and transform it back into the lower frequency.
-
 
 And lets take a higher frequency of 3000Hz:
 ```
