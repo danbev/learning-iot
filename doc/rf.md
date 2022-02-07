@@ -220,6 +220,343 @@ exactly sure how yet.
 Is really just a rearrangement of a sequence of data and is used in wireless
 communication to remove long sequences of ones and zeros.
 
+### Radio waves
+Are just another form of light (electro matnetic waves) just like light. 
+They travel at the speed of light 300 000 000 meters per second.
+
+Now, electrons in a wire flow with the help of atoms, in the conduction band.
+But radio waves/light waves or electro magnetic waves don't have a wire but
+Electromagnetic waves differ from mechanical waves in that they do not require
+a medium to propagate. 
+This means that electromagnetic waves can travel not only through air and solid
+materials, but also through the vacuum of space.
+
+### Radio bands
+```
+Name                             Frequency Range       Wavelength Range
+
+ELF (Extremely Low Frequency)    3–30 Hz               100,000–10,000 km
+SLF (Super Low Frequency)        30–300 Hz             10,000–1,000 km
+ULF (Ultra Low Frequency)        300–3000 Hz           1,000–100 km
+VLF (Very Low Frequency)         3–30 kHz              100–10 km
+LF (Low Frequency)               30–300 kHz            10–1 km
+MF (Medium Frequency)            300 kHz–3 MHz         1,000–100 m
+HF (High Frequency)              3–30 MHz              100–10 m
+VHF (Very High Frequency)        30 MHz–300 MHz        10–1 m
+UHF (Ultra High Frequency)       300 MHz–3 GHz         1–0.1 m
+SHF (Super High Frequency)       3 GHz–30 GHz          10–1 cm
+EHF (Extremely High Frequency)   30–300 GHz            10–1 mm
+THF (Tremendously High Frequency)0.3 THz–30 THz        1–0.1 mm
+```
+Radio waves with long wavelengths such as in the bands LF, MF, and HF can
+exploit interesting effects of the Earth’s atmosphere to travel extremely long
+distances. It is possible to reflect waves in these bands off various layers in
+the atmosphere and ionosphere, making intercontinental communications possible. 
+
+Notice that the lower frequency which also means longer wavelengths. When
+sending data this data needs to travel over a signal that oscilates over with
+a wave length. With the modulation techniques discussed later in this doc we
+will see that most of these, if not all, will use the frequency to interpret
+the original signal. If the wavelenght is longer less information is availaible
+for processing during the same time period compared to a higher frequency. So
+more information can be sent with higher frequencies in the same amount of time.
+
+The general line-of-sight propagation mode can be more thought of as allowing
+one to communicate with something that one could see in the absence of any
+obstacles, that is, something not blocked by the curvature of the Earth or large
+geographic features like mountains.
+
+### Diffraction
+Like light rays from the sun diffract in the atmosphere so can other types of
+EM waves. This enables them to when they hit the peak of a hill diffract
+(spread) out into the vallly. This can also happen with walls in ones home
+which happens for 2.4GHz and 5GHz radiation which is what our WiFi routes emit.
+
+### Reflection
+In general, good conductors (such as metal) reflect most of an electromagnetic
+wave’s energy. Other materials like rock reflect some energy, and many
+insulators such as plastics reflect little energy. Areas covered in metal are
+well shielded from electromagnetic radiation, because the metal will reflect
+much of the incoming energy back.
+
+### Absorption
+The energy not reflected by a medium will pass into the medium. Some materials
+allow electromagnetic radiation to pass through them without attenuation (
+gradual loss) better than others. 
+Many materials do not allow visible light to pass at all but do pass
+lower-frequency radio waves. Radio waves can travel through most nonconductive
+materials,
+
+
+
+### Modulated Signal
+This example is of a computer sending data over a telephone, like when we used
+modems in the good old days.
+First thing is that a byte will be broken down into separate bits and sent one
+after the other. After that the will be partity bits and perhaps sync bits but
+that is not important to this section.
+
+The problem is that the telefon line cannot transmit logic levels which might
+use 3.3V for High and 0V for low. We need to change these bits into something
+that can be trasmitted on the frequence of the telefon wire (300-4000Hz) which
+is a periodic wave that oscilates.
+
+There are three properties of a sine wave that we can manipulate:
+```
+y(t) = A(t)     * sin(2π f(t)     + ψ(t))
+     
+       amplitude         frequency  phase
+```
+So amplitude is the max distance of the trough/crest. And frequency is the
+number of cycles per second. Notice that the phase is added so this would be
+the hight of the y axis.
+
+### Amplitude Modulation (AM)
+We start with an input signal which is what we want to send to the reciever.
+The reciever knows the frequency that this signal will be sent. The signal
+is then modulated into a carrier signal where the amplitude will proportional
+to the original signal. For example where the original signal has a higher
+value the amplitude of the carrier signal will be greater, and where the
+original signal value is lower the amplitude will be lower. On the receiving
+side the demodulator will interpret the amplitudes to transform the carrier
+signal into the original senders signal.
+
+Just remember that we start with some signal on a wire and for this to be
+transported as a radio wave it has to be modulated into 30Hz-300GHz frequency
+without loosing the information that the orignal signal represents.
+
+
+### Frequency Modulation (FM)
+The goal here is similar to AM where we have a signal that we want to send and
+instead of changing the amplitude we change the frequency. For exampl 0 might be 
+represented by a higher frequency (shorter wave lengths), and a 1 by a lower
+frequency (longer frequency).
+
+
+### Phase Modulation
+This this case a change in phase could be used to indicate 1 and no change could
+be 0. Visually this would look like break in the curve and it starting over in
+the down instead of up or vice virca.
+
+### Digial signals and frequency
+A digital signal is in a specific state as high or low, 1 or 0. This state is
+represented by a constant non-changing voltage on the wire. Like 0V or 3.3V.
+
+If instead this voltate varies over time we have a signal.
+
+If the voltage is changing is a regular way, periodically way, over time we have
+a frequency.
+
+### Wave length                                                                 
+```                                                                             
+     c                c = speed of light                                        
+λ =  -                f = frequency                                             
+     f                                                                          
+```
+Lets say we have a signal that frequency of 200Hz. And recall that frequency
+is the number of waves that pass a fixed place in a given amount of time (in
+Hertz this is per second.
+
+![Frequancy image](./doc/img/frequency.png "Frequency image")
+
+So the more waves that complete the higher the frequency. These waves are
+shorter and the lower frequency waves are longer.
+
+So if we have a wave of 200Hz, that means 200 cycle per second can
+calculate the wave lenght using the formula above:
+```
+     3 * 10⁸ m/s
+λ =  ----------- = 1.5 * 10⁶ m = 1500 km
+        200Hz
+```
+Now, a wave length is the length of one cycle, as in starting from zero going
+up to the amplitude, down to zero, down to the amplitude and back to zero. This
+distance is 1500km?  
+So would an antennna that is build to receive such a signal then have to be
+1500km long to receive the complete wave. This does not work and in reality we
+have small devices that have antennas which are much must shorter. What is
+needed is to take this low level fequency and transform it into a higher
+frequency but still retain the same information, and on the other side we take
+this high frequency and transform it back into the lower frequency.
+
+
+And lets take a higher frequency of 3000Hz:
+```
+     3 * 10⁸ m/s
+λ =  ----------- = 10⁵m = 100 km
+        3000Hz
+```
+
+How does frequency and data rate relate to each other. The way I'm thinking
+about this at the moment is that we have a carrier wave that is of a certain
+frequency, but there is no change in the wave, like no change to the amplitude
+phase or anything like that so it does not really transport any information, or
+perhaps it transports the same information all the time. But if we can decide
+that a change in amplitute means a logical 1 and another change means logical 0
+then we can send on bit of information per cycle/period. So if we have a 10Hz
+communication channel that would mean 10 bits of information per second?
+
+### Frequency bands
+Take the FM band which is the range of frequencies from 88MHz to 108MHz:
+```
+88MHz         108MHz
+ |-------------|------
+ 
+
+FM broadcast band 88 MHz  (frequency of the electrical current)
+88 miljon cycles per second, 88 000 000Hz
+
+220V       -                -           60Hz (60 cycles per second) 
+         -   -            -   -
+       -      -         -       -
+0V    -------------------------------              
+                -      -          -
+                  -   -             -
+                    -
+```
+
+### What is bandwidth
+TODO:
+
+### Electro magnetic waves
+
+
+Lets say you have two wires with a current running in opposite directions, this
+magnetic fields will cancel each other out so there will be now propagation
+of EM waves.
+
+### Antennas
+Antennas are the interface between the world of electronics and the world of
+electromagnetic radiation. 
+An antenna can transform an alternating current (AC) into a radio wave and vice
+versa.
+
+https://www.youtube.com/watch?v=FWCN_uI5ygY
+
+
+The below notes were take while watching https://www.youtube.com/watch?v=bwreHReBH2A.
+
+Lets say we have a positive charge (+) and a negative charge (-) and we are
+going to move them vertically (but I guess without them being attracted to
+each other):
+```
+     +               -               +
+     |   +       -   ↑   -       +   |
+E    |   |   +   ↑   |   ↑   -   |   |
+     |   ↓   -   |   |   |   +   ↓   |
+     ↓   -       +   |   +       -   ↓
+     -               +               -
+
+-------------------------------------------------------> time
+
+Electro field = vertial arrow
+```
+So the electric field is pointing from the positive to the negative. Notice how
+the electric field goes from negative to 0 to positive. So the value of the
+electricfield starts off negative, then goes up to zero, then changes direction
+and becomes positive instead, and then goes back down to zero etc.
+
+If you look at the diagram above and visualize a curve looking something like
+this:
+```
+                     -                
+                 -       -            
+              -              -        
+     ------------------------------------->
+         -                       -    
+     -                               -
+```
+```
+             Wire with electric current
+     +         +-+ 
+     |         |||
+E    |         |||
+     |         |||
+     ↓         |↓|
+     -         +-+
+```
+Recall that when we have a current there is also an magnetic field generated.
+Remember the right hand rule here, the current is flowing downards so your
+right thumb points in that direction, and you other fingers wrap around the wire
+and that is direction of the magnetic field. So the magnetic field goes around
+the wire in a circle from right to left above, coming out towards us and then
+back behing the wire. We can name this magnetic field B.
+
+Now, in the same way we moved the positive and negative charges up and down, we
+can change the direction of the current, and we can also stop the current flow:
+```
+             Wire with electric current
+               +-+       +-+
+               |||       |↑|
+               |||  +-+  |||
+               |||  +-+  |||
+               |↓|       |||
+               +-+       +-+
+```
+The middle box is supposed to represent zero current. 
+
+```
+                     
+                - -             - -
+              -     -         -     -
+     ------------------------------------->
+      -     -         -     -        -     -
+        - -             - -            - -
+    
+```
+So have the electric field which is doing up and down, and we have the magnetic
+field which is coming out towards us and back into the screen. So try to
+visualize this as the electric field going up and down and the magnetic field
+is on a plane orthogonal to it.
+
+Changing E generates B, and chaging B generates E. This makse the wave and
+causes the continuation of this intraction causing this "wave" to propagate.
+The speed it propagates is the speed of light, 3 * 10⁸m/s.
+
+```
+                                                Metal wire
+                                                  ↓  
+                                                  |  ↑
+                     -                         -  |  |
+                 -       -                  -     |  | I
+              -              -           -        |  |
+     ------------------------------------------>  |  |
+         -                       -     -          |  |
+     -                               -            |  
+```
+So the above is just showing when E is positive but it will soon go down to
+zero and then to negative:
+```
+                                                 Metal wire
+                                                   ↓  
+                                                   |  |
+                               -                   |  |
+       -                   -       -               |  | I
+          -             -              -           |  |
+      -------------------------------------------> |  |
+             -     -                       -       |  ↓
+               -  -                               -  
+```
+Notice that the current (I) switches direction. 
+
+```
+c = 3*10⁸m/s
+```
+But there is a relation ship between c and the frequence and the wavelenght:
+```
+c = frequence * wave length
+c = f * λ
+m   1
+- = - * m
+s   s
+```
+Since c is constant if we increase the frequence then the wave length must
+decrease. And if the wave length increases the frequence must decrease.
+
+The frequency of E is the same as the frequency of B.
+```
+E = cB
+```
 
 ### Amplitude Shift Keying
 This is where we take a digital message and multiply it with our high frequency
