@@ -696,3 +696,69 @@ Gray code is named after Frank Gray and only allows one bit to change:
                                   ↓
 7  111  1 (1 xor 1) (1 xor 1) = 100
 ```
+
+### Bit Rate Error (BER)
+
+Signal with one bit:
+```
+               0       1
+<--|---|---|---*---|---*---|---|---|------->  Voltage
+      -3  -2  -1   0   1   2   3
+```
+So if the amplitude is -1V then that would be read as 0, and if the amplitude
+is +1V that would be 1.
+
+Signal with two bit:
+```
+      00      01      10      11
+<--|---*---|---*---|---*---|---*---|------->  Voltage
+      -3  -2  -1   0   1   2   3
+```
+In this case if the amplitude is -3V then that will be read as 00, and if it
+is -1 then it will be read as 01. So we have one signal that represents two
+bits. Now, if the signal is disturbed, like a -3V signal increases for than 1
+volt this would then read as 00 as it is now read as -1 (or at least in that
+range).
+```                        1           1            N = noise
+Signal Error Rate (SER) =  - P(N>1) +  - P(|N|>1)
+                           2           2
+```
+So that was the error rate for signals but this is not the same for bits.
+Notice in our bits we only have a single bit error between reading -3 and -1,
+and this is also true when reading 1 and 3 there is only one bit error:
+```
+       +-------+       +-------+
+       |       ↓       |       ↓
+      00      01      10      11
+<--|---*---|---*---|---*---|---*---|------->  Voltage
+      -3  -2  -1   0   1   2   3
+```
+So what this means is that if we are reading -3V but there is noise that like
+before increases the signals voltage (I guess that can happen) then instead of
+reading `00` we would read `01`. But notice that only the second bit was
+incorrect in this case, the first was not a bit error.
+And if we received a -1 which increased by noise we would have two bits of error
+as `01` would be read as `10` and both bits have been changed. Now, if the noise
+increased by 2 volts instead that would be read as 3V which be `11` and notice
+that this would only be one bit error as `01` was read as `11`.
+
+And for -1, `01` and 1, `10` we have two bit errors.
+
+The distribution of noise is a gausian distribution (bell shaped) and the
+likelyhood of getting smaller variations are greater than getting the larger.
+
+Now, what if we instead used Gray Code like we introduced earlier in this
+document:
+```
+      00      01      11      10
+<--|---*---|---*---|---*---|---*---|------->  Voltage
+      -3  -2  -1   0   1   2   3
+```
+Notice that we no longer have the two bit error between -1 and 1, and actually
+all neighbouring values only have a single bit error between them now.
+
+```
+            Errors
+BER = --------------------
+      Total Number of bits
+```
