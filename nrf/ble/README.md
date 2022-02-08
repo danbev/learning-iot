@@ -65,8 +65,27 @@ Advertising / AA 8e89bed6 (valid)/ 37 bytes
     Data:  f6 6a 57 d2 47 ef 03 19 00 00 02 01 06 17 09 42 4c 45 5f 50 65 72 69 70 68 65 72 61 6c 5f 45 78 61 6d 70 6c 65
     CRC:   67 e0 9e
 ```
-And in wireshark:
+Open Wireshark, follow the instructions in
+[Wireshark BlueTooth (Ubertooth One) packet capturing](wireshark-bluetooth-\(ubertooth-one\)-packet capturing)
+and then use nrfConnect to connect to the peripheral and then turn on the LED
+and then turn it off, followed by a disconnect. This should provide us with
+some interesting packets to inspect.
+
+Now n wireshark we can specify a display filter using the
+'Access Address/AdvA' above:
 ```
+bluetooth.dst == EF:47:D2:57:6A:F6 or bluetooth.src == EF:47:D2:57:6A:F6
+```
+Before we interact with the peripheral there will be a number of `AVD_IND`s
+in wireshark:
+```
+Frame 1: 70 bytes on wire (560 bits), 70 bytes captured (560 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+    Version: 0
+    Flags: 0x00
+    Header length: 24
+    DLT: 251
+    Reserved: 36750c0000620900fa63050023152200
 Bluetooth
     [Source: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
     [Destination: Broadcast (ff:ff:ff:ff:ff:ff)]
@@ -100,4 +119,7 @@ Bluetooth Low Energy Link Layer
             Device Name: BLE_Peripheral_Example
     CRC: 0xe60779
 ```
+Our phone which is running the nrfConnect app is the controller and the
+periperal is our device running main.c. The peripheral is acting as a
+broadcaster.
 
