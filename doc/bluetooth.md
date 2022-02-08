@@ -2,7 +2,7 @@
 
 ### BlueTooth (Basic Rate/Enhanced Data Rate (BR/EDR) (classic)
 Short range, low power, low datarate. Point-to-point.
-Was created in the late 80, early 90 by Ericson Mobile where the goal was to
+Was created in the late 80, early 90's by Ericson Mobile where the goal was to
 create a wireless headset + serial link. This was a IEEE standard 802.15.1 but
 is now managed by the BlueTooth Special Interest Group (SIG) which has
 members like Ericsson, Intel, Nokia, Toshiba, IBM, MicroSoft, Lenova, Apple.
@@ -11,8 +11,8 @@ The name `BlueTooth` I heard comes from a Danish king named Harald Blåtand
 Gormsen who united the tribes of Denmark into a single kingdom, and the logo
 is rune skrift of his initials H and B.
 
-One master and up to 7 active slaves in what is referred to as a piconet. But a
-piconet can have up to 255 parked slaves.
+One master/controler and up to 7 active slaves/peripherals in what is referred
+to as a piconet. But a piconet can have up to 255 parked slaves.
 
 Baseband modes in the connected state:
 * active
@@ -100,6 +100,9 @@ Channels:
 So this gives 79 1MHz channels which are the channels used for FHSS which hops
 at 1600/second (which should give 625 micro seconds per hop).
 
+For devices to be able to communicate they all have to transmit and receive
+using the same frequency (at the same time and with frequency hoping in mind).
+
 Uses Time Division Multiplexing (TDM) where the master has time slots where it
 communicates with slaves. It is after each such time slot that the frequency
 hopping takes place.
@@ -129,7 +132,7 @@ If the device is already know the inquery stage can be skipped.
 
 #### BlueTooth Device Address (BD_ADDR)
 This is a 48-bit address electronically "engraved" on each device and is
-globally unique amoung bluetooth devices.
+globally unique among bluetooth devices.
 ```
     Lower Address Part  Upper Address Part  Non-Significant Address Part
          (LAP)               (UAP)            (NAP) 
@@ -142,12 +145,9 @@ globally unique amoung bluetooth devices.
 The UAP and NAP are provided/assigned by a number authority and represent the
 organization unique identfier (OUI).
 
-For devices to be able to communicate they all have to transmit and receive
-using the same frequency (at the same time and with frequency hoping in mind).
-
 
 The data format between the master and the slave (after the connection step
-has been performed):
+has been performed) looks like this:
 ```
   +-------------+------------+--------------------------+
   | access code |   header   |       payload            |
@@ -161,7 +161,7 @@ Access code portion:
   +---------+------------------------+--------+
   |preamble |   synchronization      |trailer |
   +---------+------------------------+--------+
-    4 bits          64 bits
+    4 bits          64 bits              4 bits
 
 ```
 The synchronization bits are derived from the masters id.
@@ -360,6 +360,228 @@ still have low power consuption for the devices.
 
 Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 
+### Directed
+Direct advertisements accept connections from any `known` peer.
+
+### Undirected
+Undirected advertisements accept connections from any peer.
+
+### Protocol Data Unit
+These have a specific format in the BLE specification:
+```
+[<Where is it used>_]<When is it used>_<What does it do>_[Version_]<How is it used>
+
+Where is it used:
+Is optional and the default is NONE:
+[<NONE|AUX>_]
+NONE = nothing which is the default and means the primary channelr
+AUX  = is used on the secondary physical channel
+
+When is it used:
+ADV = Normal Advertising
+SYNC = Periodic Advertising
+SCAN = Scanning
+CONNECT = Connecting
+CHAIN = Fragmented data
+LL = Control PDU on the data logical transport?
+BIG =  TODO: Isochronous
+DATA = Reliable data
+CIS = TODO:
+BIS = TODO:
+
+What does it do:
+NONE
+DIRECT = directly connectable
+NONCONN = Non-connectable and non-scannable undirected
+SCAN = Scannable undirected.
+
+Version:
+None = original version of the PDU
+EXT = extended version of the PDU
+
+How is it used:
+IND = An indication that does not require a reply
+REQ = A request that requires a response
+RSP = A response to a request.
+```
+I found that initially when reading documentation and seeing something like
+ADV_IND we can understand that this is an advertisment PDU and that it is used
+as an indication that does not require a reply.
+
+### Advertisement
+As mentioned earler in this document there BLE uses 40 different RF channels
+and of these 40, 3 are called primary advertising channels. These are channels
+37, 38, and 39 and are closen to be furthest away from the WiFi channels.
+These channels are used for `advertisements`, `scan requests`, `scan responses`
+, and `connection requests`.
+
+Advertisements are broadcasted by a peripheral to anyone that is listening. 
+```
+Frame 1: 70 bytes on wire (560 bits), 70 bytes captured (560 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+    Version: 0
+    Flags: 0x00
+    Header length: 24
+    DLT: 251
+    Reserved: 36750c0000620900fa63050023152200
+Bluetooth
+    [Source: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+    [Destination: Broadcast (ff:ff:ff:ff:ff:ff)]
+Bluetooth Low Energy Link Layer
+    Access Address: 0x8e89bed6
+    Packet Header: 0x2560 (PDU Type: ADV_IND, ChSel: #2, TxAdd: Random)
+        .... 0000 = PDU Type: 0x0 ADV_IND
+        ...0 .... = Reserved: 0
+        ..1. .... = Channel Selection Algorithm: #2
+        .1.. .... = Tx Address: Random
+        0... .... = Reserved: 0
+        Length: 37
+    Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
+    Advertising Data
+        Appearance: Unknown
+            Length: 3
+            Type: Appearance (0x19)
+            Appearance: Unknown (0x0000)
+        Flags
+            Length: 2
+            Type: Flags (0x01)
+            000. .... = Reserved: 0x0
+            ...0 .... = Simultaneous LE and BR/EDR to Same Device Capable (Host): false (0x0)
+            .... 0... = Simultaneous LE and BR/EDR to Same Device Capable (Controller): false (0x0)
+            .... .1.. = BR/EDR Not Supported: true (0x1)
+            .... ..1. = LE General Discoverable Mode: true (0x1)
+            .... ...0 = LE Limited Discoverable Mode: false (0x0)
+        Device Name: BLE_Peripheral_Example
+            Length: 23
+            Type: Device Name (0x09)
+            Device Name: BLE_Peripheral_Example
+    CRC: 0xe60779
+```
+
+
+Scan requests are sent by a controller to a specific peripheral:
+```
+Frame 3: 45 bytes on wire (360 bits), 45 bytes captured (360 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+Bluetooth
+    [Source: 6a:4c:3f:c2:d2:18 (6a:4c:3f:c2:d2:18)]
+    [Destination: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+Bluetooth Low Energy Link Layer
+    Access Address: 0x8e89bed6
+    Packet Header: 0x0cc3 (PDU Type: SCAN_REQ, TxAdd: Random, RxAdd: Random)
+        .... 0011 = PDU Type: 0x3 SCAN_REQ
+        ...0 .... = Reserved: 0
+        ..0. .... = Reserved: 0
+        .1.. .... = Tx Address: Random
+        1... .... = Rx Address: Random
+        Length: 12
+    Scanning Address: 6a:4c:3f:c2:d2:18 (6a:4c:3f:c2:d2:18)
+    Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
+    CRC: 0xf1a5d5
+```
+Notice that the `Destination` is specified.
+
+And a scan response would look like this:
+```
+Frame 4: 57 bytes on wire (456 bits), 57 bytes captured (456 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+Bluetooth
+    [Source: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+    [Destination: Broadcast (ff:ff:ff:ff:ff:ff)]
+Bluetooth Low Energy Link Layer
+    Access Address: 0x8e89bed6
+    Packet Header: 0x1844 (PDU Type: SCAN_RSP, TxAdd: Random)
+        .... 0100 = PDU Type: 0x4 SCAN_RSP
+        ...0 .... = Reserved: 0
+        ..0. .... = Reserved: 0
+        .1.. .... = Tx Address: Random
+        0... .... = Reserved: 0
+        Length: 24
+    Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
+    Scan Response Data: 110723d1bcea5f782315deef121223150000
+        Advertising Data
+            128-bit Service Class UUIDs
+                Length: 17
+                Type: 128-bit Service Class UUIDs (0x07)
+                Custom UUID: 00001523-1212-efde-1523-785feabcd123 (Unknown)
+    CRC: 0xfa8da7
+```
+I was a little surprised to see that this is broadcasted instead of being sent
+to the party that issued the scan request.
+
+A connection is initiated by a central by sending a `CONNECT_IND` request
+to a peripheral:
+```
+Frame 532: 67 bytes on wire (536 bits), 67 bytes captured (536 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+Bluetooth
+    [Source: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)]
+    [Destination: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+Bluetooth Low Energy Link Layer
+    Access Address: 0x8e89bed6
+    Packet Header: 0x22c5 (PDU Type: CONNECT_IND, TxAdd: Random, RxAdd: Random)
+        .... 0101 = PDU Type: 0x5 CONNECT_IND
+        ...0 .... = Reserved: 0
+        ..0. .... = Reserved: 0
+        .1.. .... = Tx Address: Random
+        1... .... = Rx Address: Random
+        Length: 34
+    Initiator Address: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)
+    Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
+    Link Layer Data
+        Access Address: 0xaf9aa3a6
+        CRC Init: 0x3bc312
+        Window Size: 3 (3.75 msec)
+        Window Offset: 13 (16.25 msec)
+        Interval: 24 (30 msec)
+        Latency: 0
+        Timeout: 72 (720 msec)
+        Channel Map: ffffffff1f
+            .... ...1 = RF Channel 1 (2404 MHz - Data - 0): True
+            .... ..1. = RF Channel 2 (2406 MHz - Data - 1): True
+            .... .1.. = RF Channel 3 (2408 MHz - Data - 2): True
+            .... 1... = RF Channel 4 (2410 MHz - Data - 3): True
+            ...1 .... = RF Channel 5 (2412 MHz - Data - 4): True
+            ..1. .... = RF Channel 6 (2414 MHz - Data - 5): True
+            .1.. .... = RF Channel 7 (2416 MHz - Data - 6): True
+            1... .... = RF Channel 8 (2418 MHz - Data - 7): True
+            .... ...1 = RF Channel 9 (2420 MHz - Data - 8): True
+            .... ..1. = RF Channel 10 (2422 MHz - Data - 9): True
+            .... .1.. = RF Channel 11 (2424 MHz - Data - 10): True
+            .... 1... = RF Channel 13 (2428 MHz - Data - 11): True
+            ...1 .... = RF Channel 14 (2430 MHz - Data - 12): True
+            ..1. .... = RF Channel 15 (2432 MHz - Data - 13): True
+            .1.. .... = RF Channel 16 (2434 MHz - Data - 14): True
+            1... .... = RF Channel 17 (2436 MHz - Data - 15): True
+            .... ...1 = RF Channel 18 (2438 MHz - Data - 16): True
+            .... ..1. = RF Channel 19 (2440 MHz - Data - 17): True
+            .... .1.. = RF Channel 20 (2442 MHz - Data - 18): True
+            .... 1... = RF Channel 21 (2444 MHz - Data - 19): True
+            ...1 .... = RF Channel 22 (2446 MHz - Data - 20): True
+            ..1. .... = RF Channel 23 (2448 MHz - Data - 21): True
+            .1.. .... = RF Channel 24 (2450 MHz - Data - 22): True
+            1... .... = RF Channel 25 (2452 MHz - Data - 23): True
+            .... ...1 = RF Channel 26 (2454 MHz - Data - 24): True
+            .... ..1. = RF Channel 27 (2456 MHz - Data - 25): True
+            .... .1.. = RF Channel 28 (2458 MHz - Data - 26): True
+            .... 1... = RF Channel 29 (2460 MHz - Data - 27): True
+            ...1 .... = RF Channel 30 (2462 MHz - Data - 28): True
+            ..1. .... = RF Channel 31 (2464 MHz - Data - 29): True
+            .1.. .... = RF Channel 32 (2466 MHz - Data - 30): True
+            1... .... = RF Channel 33 (2468 MHz - Data - 31): True
+            .... ...1 = RF Channel 34 (2470 MHz - Data - 32): True
+            .... ..1. = RF Channel 35 (2472 MHz - Data - 33): True
+            .... .1.. = RF Channel 36 (2474 MHz - Data - 34): True
+            .... 1... = RF Channel 37 (2476 MHz - Data - 35): True
+            ...1 .... = RF Channel 38 (2478 MHz - Data - 36): True
+            ..0. .... = Reserved: False
+            .0.. .... = Reserved: False
+            0... .... = Reserved: False
+        ...0 1000 = Hop: 8
+        001. .... = Sleep Clock Accuracy: 151 ppm to 250 ppm (1)
+    CRC: 0xaa41c4
+```
+
 #### BLE Blinky Example
 Up until this point I've just been reading and I'm finding this a little
 abstract so I wanted to take a look at an example to help my understanding and
@@ -403,8 +625,8 @@ packet switching.
 So we know what connection-less packets are from the above section about it.
 This type is used for general data frames.
 There are two frame types:
-* DM# (Data message?) which contains Forward Error Correction (FEC)
-* DP# (Data ??) which does not provide FEC.
+* DM# (Data Medium Rate?) which contains Forward Error Correction (FEC)
+* DH# (Data High Rate) which does not provide FEC.
 
 The `#` indicates a number of 625 micro seconds each each frame type will take.
 
@@ -528,7 +750,7 @@ And this would look perfectly alright to the receiver. So we need something
 more which is where the message authentication code/message integrity check
 comes into play.
 
-### Wireshark BlueTooth packet capturing
+### Wireshark BlueTooth (Ubertooth One) packet capturing
 ```
 $ mkfifo /tmp/pipe
 ```
