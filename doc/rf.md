@@ -3,7 +3,7 @@ Electromagnetic wave between 1 and 3 GHz.
 
 Recall that wavelength is the distance between a peak/trough of a wave,
 and frequency is the occurance of these waves per time unit (like seconds for
-example). Also that amplitude is the hight/distance of a peak/trough.
+example). Also that amplitude is the height/distance of a peak/trough.
 
 So the same information can be sent using different frequencies, which also
 means that the wave length will be different, but the information is the same.
@@ -333,7 +333,7 @@ instead of changing the amplitude we change the frequency.
 ### Phase Modulation
 This this case a change in phase could be used to indicate 1 and no change could
 be 0. Visually this would look like break in the curve and it starting over in
-the down instead of up or vice virca.
+the down instead of up or vice verca.
 
 ### Digial signals and frequency
 A digital signal is in a specific state as high or low, 1 or 0. This state is
@@ -657,3 +657,42 @@ TODO:
 
 ### Baud Rate
 Number of symbols per second.
+
+### Gray Code
+Is a ordering of a binary numerical such that two successive values differ
+only in one bit. If we take the binary system we have:
+```
+0  000
+     ↓ Only one difference 0->1
+1  001
+    ↓↓ Two differences
+2  010
+     ↓ One difference 0->1
+3  011
+   ↓↓↓ Three differences
+4  100
+     ↓ One difference
+5  101
+    ↓↓ Two differences
+6  110
+     ↓ One difference
+7  111
+```
+Gray code is named after Frank Gray and only allows one bit to change:
+```
+0  000  0 (0 xor 0) (0 xor 0) = 000
+                                  ↓
+1  001  0 (0 xor 0) (0 xor 1) = 001
+                                 ↓
+2  010  0 (0 xor 1) (1 xor 0) = 011
+                                  ↓
+3  011  0 (0 xor 1) (1 xor 1) = 010
+                                ↓
+4  100  1 (1 xor 0) (0 xor 0) = 110
+                                  ↓
+5  101  1 (1 xor 0) (0 xor 1) = 111
+                                 ↓
+6  110  1 (1 xor 1) (1 xor 0) = 101
+                                  ↓
+7  111  1 (1 xor 1) (1 xor 1) = 100
+```
