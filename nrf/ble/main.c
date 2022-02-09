@@ -197,6 +197,7 @@ static void led_write_handler(uint16_t conn_handle,
 
 static void services_init(void) {
   ret_code_t err_code;
+  // Led Button Service init
   ble_lbs_init_t init = {0};
   nrf_ble_qwr_init_t qwr_init = {0};
 
@@ -326,7 +327,7 @@ static void ble_stack_init(void) {
 
   // Configure the BLE stack using the default settings.
   // Fetch the start address of the application RAM.
-  uint32_t ram_start = 0;
+  uint32_t ram_start;
   err_code = nrf_sdh_ble_default_cfg_set(APP_BLE_CONN_CFG_TAG, &ram_start);
   APP_ERROR_CHECK(err_code);
 
@@ -403,7 +404,14 @@ int main(void) {
   advertising_init();
   conn_params_init();
 
-  NRF_LOG_INFO("Blinky example started.");
+  ret_code_t err_code;
+  ble_gap_addr_t addr;
+  err_code = sd_ble_gap_addr_get(&addr);
+  APP_ERROR_CHECK(err_code);
+  NRF_LOG_ERROR("ADDR: %x:%x:%x:%x:%x:%x\n", addr.addr[5], addr.addr[4],
+      addr.addr[3], addr.addr[2], addr.addr[1], addr.addr[0]);
+  NRF_LOG_INFO("BLE_Peripheral example started.");
+
   advertising_start();
 
   for (;;) {
