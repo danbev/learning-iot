@@ -18,6 +18,7 @@
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_pwr_mgmt.h"
+#include "peer_manager.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -392,6 +393,15 @@ static void idle_state_handle(void) {
 }
 
 int main(void) {
+  NRF_LOG_INFO("BLE_Peripheral example started.");
+
+  ret_code_t err_code;
+  uint32_t count = pm_peer_count();
+  NRF_LOG_INFO("Number of peers: %d", count);
+
+  //err_code = pm_peers_delete();
+  //APP_ERROR_CHECK(err_code);
+
   log_init();
   leds_init();
   timers_init();
@@ -404,13 +414,11 @@ int main(void) {
   advertising_init();
   conn_params_init();
 
-  ret_code_t err_code;
   ble_gap_addr_t addr;
   err_code = sd_ble_gap_addr_get(&addr);
   APP_ERROR_CHECK(err_code);
-  NRF_LOG_ERROR("ADDR: %x:%x:%x:%x:%x:%x\n", addr.addr[5], addr.addr[4],
+  NRF_LOG_INFO("ADDR: %x:%x:%x:%x:%x:%x\n", addr.addr[5], addr.addr[4],
       addr.addr[3], addr.addr[2], addr.addr[1], addr.addr[0]);
-  NRF_LOG_INFO("BLE_Peripheral example started.");
 
   advertising_start();
 
