@@ -47,7 +47,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
-  main.c \
+  ble_p.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -306,7 +306,6 @@ erase:
 	nrfjprog -f nrf52 --eraseall
 
 pre:
-	#arm-none-eabi-gcc -E -I$(INC_FOLDERS) main.c
 	arm-none-eabi-gcc -E -I$(SDK_ROOT)/components/libraries/util \
 		-I$(SDK_ROOT)/modules/nrfx/mdk \
 		-I$(SDK_ROOT)/components/softdevice/s132/headers \
@@ -329,7 +328,7 @@ pre:
 		-I$(SDK_ROOT)/config/nrf52840/config \
 		-I$(SDK_ROOT)/integration/nrfx/legacy \
 		-Iconfig \
-		-I$(SDK_ROOT)/components/softdevice/common  main.c
+		-I$(SDK_ROOT)/components/softdevice/common ble_p.c
 
 openocd: 
 	openocd -c 'interface jlink; transport select swd; source [find target/nrf52.cfg]'
