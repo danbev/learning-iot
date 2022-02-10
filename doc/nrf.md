@@ -20,9 +20,10 @@ contains the 64MHz Arm Cortex-M4.
 [nRF52833 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52833_PS_v1.5.pdf)
 
 I've also got a nRF52-DK which has a N52832 SoC:
+
 [nRF52832 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.5.pdf)
+
 The actual number can be found on the chip:
-nrfutil --eraseall
 
 ![nRF52-DK](./img/nrf52-dk.jpg "Image of nRF52-DK")
 
