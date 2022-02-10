@@ -21,6 +21,10 @@ contains the 64MHz Arm Cortex-M4.
 
 I've also got a nRF52-DK which has a N52832 SoC:
 [nRF52832 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.5.pdf)
+The actual number can be found on the chip:
+nrfutil --eraseall
+
+![nRF52-DK](./img/nrf52-dk.jpg "Image of nRF52-DK")
 
 So I'm wondering if the same type of assembly programams that I've written for
 stm32 would work for this device as well. The registers and all that would be
