@@ -27,11 +27,6 @@ The actual number can be found on the chip:
 
 ![nRF52-DK](./img/nrf52-dk.jpg "Image of nRF52-DK")
 
-So I'm wondering if the same type of assembly programams that I've written for
-stm32 would work for this device as well. The registers and all that would be
-totally different but the general process migth be possible is what I'm
-thinking like the linker-script.ld with some modifications and the Makefiles.
-
 
 ### I2C
 This is called Two-Wire Inteface in nRF so the register names will be TWI1 etc.
