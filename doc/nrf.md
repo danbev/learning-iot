@@ -17,12 +17,16 @@ LTE
 The system-on-chip (SoC) that is on the microbit device is a nRF52833, which
 contains the 64MHz Arm Cortex-M4.
 
+[nRF52833 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52833_PS_v1.5.pdf)
+
+I've also got a nRF52-DK which has a N52832 SoC:
+[nRF52832 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.5.pdf)
+
 So I'm wondering if the same type of assembly programams that I've written for
 stm32 would work for this device as well. The registers and all that would be
 totally different but the general process migth be possible is what I'm
 thinking like the linker-script.ld with some modifications and the Makefiles.
 
-[nRF52833 Product Specification](https://infocenter.nordicsemi.com/pdf/nRF52833_PS_v1.5.pdf)
 
 ### I2C
 This is called Two-Wire Inteface in nRF so the register names will be TWI1 etc.
