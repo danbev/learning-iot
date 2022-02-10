@@ -582,6 +582,47 @@ Bluetooth Low Energy Link Layer
     CRC: 0xaa41c4
 ```
 
+This will be followed by a PHY Link Layer feature request:
+```
+Frame 539: 42 bytes on wire (336 bits), 42 bytes captured (336 bits) on interface /tmp/pipe, id 0
+PPI version 0, 24 bytes
+Bluetooth
+Bluetooth Low Energy Link Layer
+    Access Address: 0xaf9aa3a6
+    [Master Address: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)]
+    [Slave Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+    Data Header: 0x090f
+        .... ..11 = LLID: Control PDU (0x3)
+        .... .1.. = Next Expected Sequence Number: 1
+        .... 1... = Sequence Number: 1
+        ...0 .... = More Data: False
+        000. .... = RFU: 0
+        Length: 9
+    Control Opcode: LL_FEATURE_REQ (0x08)
+    Feature Set: 0x00000000000179ff
+        .... ...1 = LE Encryption: True
+        .... ..1. = Connection Parameters Request Procedure: True
+        .... .1.. = Extended Reject Indication: True
+        .... 1... = Slave Initiated Features Exchange: True
+        ...1 .... = LE Ping: True
+        ..1. .... = LE Data Packet Length Extension: True
+        .1.. .... = LL Privacy: True
+        1... .... = Extended Scanner Filter Policies: True
+        .... ...1 = LE 2M PHY: True
+        .... ..0. = Stable Modulation Index - Transmitter: False
+        .... .0.. = Stable Modulation Index - Receiver: False
+        .... 1... = LE Coded PHY: True
+        ...1 .... = LE Extended Advertising: True
+        ..1. .... = LE Periodic Advertising: True
+        .1.. .... = Channel Selection Algorithm #2: True
+        0... .... = LE Power Class 1: False
+        .... ...1 = Minimum Number of Used Channels Procedure: True
+        0000 000. = Reserved: 0
+        Reserved: 0000000000
+    CRC: 0x248aae
+        [Expert Info (Note/Checksum): CRC unchecked, not all data available]
+```
+
 #### BLE Blinky Example
 Up until this point I've just been reading and I'm finding this a little
 abstract so I wanted to take a look at an example to help my understanding and
@@ -708,6 +749,32 @@ BR/EDR Legacy Pairing uses E21 or E22 based on SAFER+.
 Secure Simple Pairing uses SHA-256, HMAC-SHA-256 and P-192 elliptic curve.
 LE Legacy Pairing used AES-CCM
 
+
+## Security
+
+### Temporary Key (TK)
+This is a key used during pairing and its value depends on the pairing method
+in use.
+
+### Short Term Key (STK)
+This key is used for encryption when two devices pair for the first time and
+is generated using 3 pieces of information, the TK, the Srand value which comes
+from the peripheral/slave, and the Mran which comes from the central/master.
+
+
+### Long Term Key (LTK)
+This key is distributed once the inital pairing procedure has encrypted the
+connection.
+
+### Identity Resolving Key (IRK)
+A peer devices identity can be used to track the user of the device and this is
+a measure to avoid such tracking. This works by changing this device address
+so tracking is not possible but to resolve a random device address to a real
+address this key is used.
+TODO: explain how this works.
+
+### Connection Signature Resolving Key (CSRK)
+Used for signature verification to authenticate the sender of a message.
 
 ### AES/CCM (Counter with CBC-MAC)
 Recall that Advanced Encryption Standard (AES) is a symmetric encryption method
