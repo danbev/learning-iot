@@ -76,16 +76,19 @@ BLE_LBS_DEF(m_lbs);
 /* GATT module instance. */
 NRF_BLE_GATT_DEF(m_gatt);
 
-/* Context for the Queued Write module.*/
+/* Context for the Queued Write module. */
 NRF_BLE_QWR_DEF(m_qwr);
 
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
+/* Handle of the current connection. */
+static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
+/* Advertising handle used to identify an advertising set. */
+static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
+/* Buffer for storing an encoded advertising set. */
+static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
+/* Buffer for storing an encoded scan data. */
+static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
 
-static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   /**< Advertising handle used to identify an advertising set. */
-static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];                    /**< Buffer for storing an encoded advertising set. */
-static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];         /**< Buffer for storing an encoded scan data. */
-
-/**@brief Struct that contains pointers to the encoded advertising data. */
+/* Struct that contains pointers to the encoded advertising data. */
 static ble_gap_adv_data_t m_adv_data = {
   .adv_data = {
     .p_data = m_enc_advdata,
@@ -101,7 +104,6 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name) {
   app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
 
-
 static void leds_init(void) {
   bsp_board_init(BSP_INIT_LEDS);
   nrf_gpio_cfg_output(LEDBUTTON_LED2);
@@ -111,7 +113,6 @@ static void timers_init(void) {
   ret_code_t err_code = app_timer_init();
   APP_ERROR_CHECK(err_code);
 }
-
 
 static void gap_params_init(void) {
   ret_code_t err_code;
@@ -160,6 +161,7 @@ static void advertising_init(void) {
   err_code = ble_advdata_encode(&advdata, m_adv_data.adv_data.p_data,
                                 &m_adv_data.adv_data.len);
   APP_ERROR_CHECK(err_code);
+  NRF_LOG_INFO("Encoded Advertisement data %#010x\n", m_adv_data.adv_data.p_data);
 
   err_code = ble_advdata_encode(&srdata, m_adv_data.scan_rsp_data.p_data,
                                 &m_adv_data.scan_rsp_data.len);
@@ -257,12 +259,14 @@ static void advertising_start(void) {
 
 static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
   ret_code_t err_code;
+  NRF_LOG_INFO("ble_evt_handler header.evt_id: %d", p_ble_evt->header.evt_id);
 
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_CONNECTED:
       NRF_LOG_INFO("Connected");
       bsp_board_led_on(CONNECTED_LED);
       bsp_board_led_off(ADVERTISING_LED);
+
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
       APP_ERROR_CHECK(err_code);
@@ -273,6 +277,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
       NRF_LOG_INFO("Disconnected");
       bsp_board_led_off(CONNECTED_LED);
       m_conn_handle = BLE_CONN_HANDLE_INVALID;
+
       err_code = app_button_disable();
       APP_ERROR_CHECK(err_code);
       advertising_start();
@@ -288,9 +293,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context) {
     case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
       {
         NRF_LOG_DEBUG("PHY update request.");
-        ble_gap_phys_t const phys = { .rx_phys = BLE_GAP_PHY_AUTO,
-                .tx_phys = BLE_GAP_PHY_AUTO,
-        };
+        ble_gap_phys_t const phys = { BLE_GAP_PHY_AUTO, BLE_GAP_PHY_AUTO };
         err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
         APP_ERROR_CHECK(err_code);
       }
@@ -398,9 +401,6 @@ int main(void) {
   ret_code_t err_code;
   uint32_t count = pm_peer_count();
   NRF_LOG_INFO("Number of peers: %d", count);
-
-  //err_code = pm_peers_delete();
-  //APP_ERROR_CHECK(err_code);
 
   log_init();
   leds_init();
