@@ -509,13 +509,13 @@ Bluetooth Low Energy Link Layer
 I was a little surprised to see that this is broadcasted instead of being sent
 to the party that issued the scan request.
 
-A connection is initiated by a central by sending a `CONNECT_IND` request
+A connection is initiated by a central by sending a `CONNECT_IND` indication
 to a peripheral:
 ```
-Frame 532: 67 bytes on wire (536 bits), 67 bytes captured (536 bits) on interface /tmp/pipe, id 0
+Frame 345: 67 bytes on wire (536 bits), 67 bytes captured (536 bits)
 PPI version 0, 24 bytes
 Bluetooth
-    [Source: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)]
+    [Source: 6d:a0:03:9e:dd:21 (6d:a0:03:9e:dd:21)]
     [Destination: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
 Bluetooth Low Energy Link Layer
     Access Address: 0x8e89bed6
@@ -526,17 +526,17 @@ Bluetooth Low Energy Link Layer
         .1.. .... = Tx Address: Random
         1... .... = Rx Address: Random
         Length: 34
-    Initiator Address: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)
+    Initiator Address: 6d:a0:03:9e:dd:21 (6d:a0:03:9e:dd:21)
     Advertising Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)
     Link Layer Data
-        Access Address: 0xaf9aa3a6
-        CRC Init: 0x3bc312
+        Access Address: 0x50657b29
+        CRC Init: 0x34ac04
         Window Size: 3 (3.75 msec)
-        Window Offset: 13 (16.25 msec)
+        Window Offset: 8 (10 msec)
         Interval: 24 (30 msec)
         Latency: 0
-        Timeout: 72 (720 msec)
-        Channel Map: ffffffff1f
+        Timeout: 104 (1040 msec)
+        Channel Map: ff07c0ff1f
             .... ...1 = RF Channel 1 (2404 MHz - Data - 0): True
             .... ..1. = RF Channel 2 (2406 MHz - Data - 1): True
             .... .1.. = RF Channel 3 (2408 MHz - Data - 2): True
@@ -548,17 +548,17 @@ Bluetooth Low Energy Link Layer
             .... ...1 = RF Channel 9 (2420 MHz - Data - 8): True
             .... ..1. = RF Channel 10 (2422 MHz - Data - 9): True
             .... .1.. = RF Channel 11 (2424 MHz - Data - 10): True
-            .... 1... = RF Channel 13 (2428 MHz - Data - 11): True
-            ...1 .... = RF Channel 14 (2430 MHz - Data - 12): True
-            ..1. .... = RF Channel 15 (2432 MHz - Data - 13): True
-            .1.. .... = RF Channel 16 (2434 MHz - Data - 14): True
-            1... .... = RF Channel 17 (2436 MHz - Data - 15): True
-            .... ...1 = RF Channel 18 (2438 MHz - Data - 16): True
-            .... ..1. = RF Channel 19 (2440 MHz - Data - 17): True
-            .... .1.. = RF Channel 20 (2442 MHz - Data - 18): True
-            .... 1... = RF Channel 21 (2444 MHz - Data - 19): True
-            ...1 .... = RF Channel 22 (2446 MHz - Data - 20): True
-            ..1. .... = RF Channel 23 (2448 MHz - Data - 21): True
+            .... 0... = RF Channel 13 (2428 MHz - Data - 11): False
+            ...0 .... = RF Channel 14 (2430 MHz - Data - 12): False
+            ..0. .... = RF Channel 15 (2432 MHz - Data - 13): False
+            .0.. .... = RF Channel 16 (2434 MHz - Data - 14): False
+            0... .... = RF Channel 17 (2436 MHz - Data - 15): False
+            .... ...0 = RF Channel 18 (2438 MHz - Data - 16): False
+            .... ..0. = RF Channel 19 (2440 MHz - Data - 17): False
+            .... .0.. = RF Channel 20 (2442 MHz - Data - 18): False
+            .... 0... = RF Channel 21 (2444 MHz - Data - 19): False
+            ...0 .... = RF Channel 22 (2446 MHz - Data - 20): False
+            ..0. .... = RF Channel 23 (2448 MHz - Data - 21): False
             .1.. .... = RF Channel 24 (2450 MHz - Data - 22): True
             1... .... = RF Channel 25 (2452 MHz - Data - 23): True
             .... ...1 = RF Channel 26 (2454 MHz - Data - 24): True
@@ -577,51 +577,44 @@ Bluetooth Low Energy Link Layer
             ..0. .... = Reserved: False
             .0.. .... = Reserved: False
             0... .... = Reserved: False
-        ...0 1000 = Hop: 8
+        ...0 0111 = Hop: 7
         001. .... = Sleep Clock Accuracy: 151 ppm to 250 ppm (1)
-    CRC: 0xaa41c4
+    CRC: 0xf7d17a
+        [Expert Info (Warning/Checksum): Incorrect CRC]
+            [Incorrect CRC]
+            [Severity level: Warning]
+            [Group: Checksum]
 ```
+The payload of CONNECT_IND and AUX_CONNECT_REQ look like this:
+```
+ +-----------------------------------------+---------------------+
+ | Initiator Address | Advertising Address |  Link Layer Data    |
+ +-----------------------------------------+---------------------+
+```
+Notice that `TxAdd` is `1` which means that the initiators device address in
+`Initiator Address` is a random value and not the devices real address. Likewise
+`RxAdd` is also `1` which means that the advertising devices address is also
+random (the `Advertising Address` field).
+The initiator in this case is my phone which is running nrfConnect and the
+advertising device is the nrf52-dk running the
+`examples/ble_central_and_peripheral/experimental/ble_app_multirole_lesc`
+example.
 
-This will be followed by a PHY Link Layer feature request:
-```
-Frame 539: 42 bytes on wire (336 bits), 42 bytes captured (336 bits) on interface /tmp/pipe, id 0
-PPI version 0, 24 bytes
-Bluetooth
-Bluetooth Low Energy Link Layer
-    Access Address: 0xaf9aa3a6
-    [Master Address: 5a:3e:6b:71:17:cc (5a:3e:6b:71:17:cc)]
-    [Slave Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
-    Data Header: 0x090f
-        .... ..11 = LLID: Control PDU (0x3)
-        .... .1.. = Next Expected Sequence Number: 1
-        .... 1... = Sequence Number: 1
-        ...0 .... = More Data: False
-        000. .... = RFU: 0
-        Length: 9
-    Control Opcode: LL_FEATURE_REQ (0x08)
-    Feature Set: 0x00000000000179ff
-        .... ...1 = LE Encryption: True
-        .... ..1. = Connection Parameters Request Procedure: True
-        .... .1.. = Extended Reject Indication: True
-        .... 1... = Slave Initiated Features Exchange: True
-        ...1 .... = LE Ping: True
-        ..1. .... = LE Data Packet Length Extension: True
-        .1.. .... = LL Privacy: True
-        1... .... = Extended Scanner Filter Policies: True
-        .... ...1 = LE 2M PHY: True
-        .... ..0. = Stable Modulation Index - Transmitter: False
-        .... .0.. = Stable Modulation Index - Receiver: False
-        .... 1... = LE Coded PHY: True
-        ...1 .... = LE Extended Advertising: True
-        ..1. .... = LE Periodic Advertising: True
-        .1.. .... = Channel Selection Algorithm #2: True
-        0... .... = LE Power Class 1: False
-        .... ...1 = Minimum Number of Used Channels Procedure: True
-        0000 000. = Reserved: 0
-        Reserved: 0000000000
-    CRC: 0x248aae
-        [Expert Info (Note/Checksum): CRC unchecked, not all data available]
-```
+So following that we have  the Link Layer Data.
+* Access Address
+This is the Asynchronous Connection-Less (ACL) connections address which in
+this case is `0x50657b29`.
+
+One thing to note is that a CONNECT_IND is done on one of the primary
+advertising channels, that is 37, 38, or 39. After this a connection will be
+performed on one of the secondary advertising channels, that is any of the
+channels except the primary channels. So even if we are using ubertooth to
+sniff/listen to one of the primary advertising channels, one ubertooth device
+can only listen to one channel with the default being channel 37, we might not
+see the CONNECT_IND as there is a 1/3 chanse of capturing it. We can try
+multiple times an hope to get lucky or invest in three ubertooth devices and
+listen to all 3 primary channels.
+
 
 #### BLE Blinky Example
 Up until this point I've just been reading and I'm finding this a little
@@ -675,17 +668,7 @@ The `#` indicates a number of 625 micro seconds each each frame type will take.
 This is used for Audio frames. 
 
 
-### Secure And Fast Encryption Routine (SAFER)
-Is a family of block ciphers and was a candidate for AES. It has a block size
-of 128 and it is used for autentication (MIC/MAC) and key generation, but not
-encryption in BlueTooth classic.
-
-### E0
-Is a stream cipher used for encryption in BlueTooth classic.
-
-
-
-### Security
+## Security
 One thing to keep in mind when reading documentation related to BlueTooth
 classic and BlueTooth Low Energy. For versions 4.2 and beyond there is a type
 of connection called Secure Connections or LE Security which uses ECHF. Prior
@@ -749,8 +732,8 @@ BR/EDR Legacy Pairing uses E21 or E22 based on SAFER+.
 Secure Simple Pairing uses SHA-256, HMAC-SHA-256 and P-192 elliptic curve.
 LE Legacy Pairing used AES-CCM
 
+###
 
-## Security
 
 ### Temporary Key (TK)
 This is a key used during pairing and its value depends on the pairing method
@@ -775,6 +758,28 @@ TODO: explain how this works.
 
 ### Connection Signature Resolving Key (CSRK)
 Used for signature verification to authenticate the sender of a message.
+
+### LE Legacy Pairing
+This is used in 4.0 and 4.1 devices and uses a custom key exchange protocol.
+Here the devices exchange a TK and use it to create an STK to encrypt the
+connection.
+```
+ Central      PAIRING_REQ                  Peripheral
+          <------------------------------
+
+
+### BR/EDR Secure Connection Pairing
+
+### LE Secure Connection Pairing
+
+
+### Secure And Fast Encryption Routine (SAFER)
+Is a family of block ciphers and was a candidate for AES. It has a block size
+of 128 and it is used for autentication (MIC/MAC) and key generation, but not
+encryption in BlueTooth classic.
+
+### E0
+Is a stream cipher used for encryption in BlueTooth classic.
 
 ### AES/CCM (Counter with CBC-MAC)
 Recall that Advanced Encryption Standard (AES) is a symmetric encryption method
