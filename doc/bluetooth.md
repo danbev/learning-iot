@@ -605,6 +605,9 @@ So following that we have  the Link Layer Data.
 This is the Asynchronous Connection-Less (ACL) connections address which in
 this case is `0x50657b29`.
 
+* Channel Map
+The channels that have a value of true take part in the channel hopping.
+
 One thing to note is that a CONNECT_IND is done on one of the primary
 advertising channels, that is 37, 38, or 39. After this a connection will be
 performed on one of the secondary advertising channels, that is any of the
