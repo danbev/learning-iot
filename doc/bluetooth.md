@@ -415,6 +415,24 @@ and of these 40, 3 are called primary advertising channels. These are channels
 These channels are used for `advertisements`, `scan requests`, `scan responses`
 , and `connection requests`.
 
+Advertising channels for PDU types:
+```
+ADV_IND            Primary Channel
+ADV_DIRECT_IND     Primary Channel       
+ADV_NOCONN_IND	   Primary Channel
+ADV_EXT_IND        Primary Channel
+ADV_SCAN_IND       Primary Channel
+SCAN_REQ           Primary Channel
+SCAN_RSP           Primary Channel
+CONNECT_IND        Primary Channel
+
+AUX_SCAN_REQ       Secondary Channel
+AUX_SCAN_RSP       Secondary Channel
+AUX_ADV_IND        Secondary Channel
+AUX_CONNECT_REQ    Secondary Channel
+AUX_CONNECT_RSP    Secondary Channel
+```
+
 Advertisements are broadcasted by a peripheral to anyone that is listening. 
 ```
 Frame 1: 70 bytes on wire (560 bits), 70 bytes captured (560 bits) on interface /tmp/pipe, id 0
@@ -619,6 +637,39 @@ multiple times an hope to get lucky or invest in three ubertooth devices and
 listen to all 3 primary channels.
 
 
+
+
+Security Request (AuthReq?):
+```
+Frame 178: 39 bytes on wire (312 bits), 39 bytes captured (312 bits)
+PPI version 0, 24 bytes
+Bluetooth
+Bluetooth Low Energy Link Layer
+    Access Address: 0x5065722d
+    [Master Address: 67:10:3d:cb:b3:5a (67:10:3d:cb:b3:5a)]
+    [Slave Address: ef:47:d2:57:6a:f6 (ef:47:d2:57:6a:f6)]
+    Data Header: 0x0606
+        .... ..10 = LLID: Start of an L2CAP message or a complete L2CAP message with no fragmentation (0x2)
+        .... .1.. = Next Expected Sequence Number: 1
+        .... 0... = Sequence Number: 0
+        ...0 .... = More Data: False
+        000. .... = RFU: 0
+        Length: 6
+    [L2CAP Index: 0]
+    CRC: 0x37d967
+Bluetooth L2CAP Protocol
+    Length: 2
+    CID: Security Manager Protocol (0x0006)
+Bluetooth Security Manager Protocol
+    Opcode: Security Request (0x0b)
+    AuthReq: 0x0d, Secure Connection Flag, MITM Flag, Bonding Flags: Bonding
+        000. .... = Reserved: 0x0
+        ...0 .... = Keypress Flag: False
+        .... 1... = Secure Connection Flag: True
+        .... .1.. = MITM Flag: True
+        .... ..01 = Bonding Flags: Bonding (0x1)
+
+```
 #### BLE Blinky Example
 Up until this point I've just been reading and I'm finding this a little
 abstract so I wanted to take a look at an example to help my understanding and
