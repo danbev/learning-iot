@@ -408,7 +408,7 @@ I found that initially when reading documentation and seeing something like
 ADV_IND we can understand that this is an advertisment PDU and that it is used
 as an indication that does not require a reply.
 
-The package format for all PDU the same header and the payload varies depending
+The packet format for all PDU the same header and the payload varies depending
 on the type specified:
 ```
  +-----------+------------------+
