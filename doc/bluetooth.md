@@ -408,6 +408,21 @@ I found that initially when reading documentation and seeing something like
 ADV_IND we can understand that this is an advertisment PDU and that it is used
 as an indication that does not require a reply.
 
+The package format for all PDU the same header and the payload varies depending
+on the type specified:
+```
+ +-----------+------------------+
+ | Header    | Payload          |
+ +-----------+------------------+
+     |
+     ↓
+ +-------+-----+-------+-------+-------+--------+
+ | Type  | RFU | ChSel | TxAdd | RxAdd | Length |
+ +-------+-----+-------+-------+-------+--------+
+
+RFU = Reserved for Future Use
+```
+
 ### Advertisement
 As mentioned earler in this document there BLE uses 40 different RF channels
 and of these 40, 3 are called primary advertising channels. These are channels
