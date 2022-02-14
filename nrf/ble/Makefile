@@ -323,10 +323,15 @@ default: ble_p
 define HELP_MSG
 
 The following target are available:
+
 ble_p              Build BLE Peripheral example
-ble_c              Build BLE Central example
+pre_ble_p          Show the output genereated by the preprocessor
 flash_ble_p        Flash ble_p example
+
+ble_c              Build BLE Central example
+pre_ble_c          Show the output genereated by the preprocessor
 flash_ble_c        Flash ble_c example
+
 flash_softdevice   Flash the softdevice
 openocd            Start OpenOCD
 
