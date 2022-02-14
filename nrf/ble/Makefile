@@ -329,6 +329,7 @@ ble_c              Build BLE Central example
 flash_ble_p        Flash ble_p example
 flash_ble_c        Flash ble_c example
 flash_softdevice   Flash the softdevice
+openocd            Start OpenOCD
 
 endef
 help:
