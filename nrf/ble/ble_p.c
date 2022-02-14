@@ -40,8 +40,8 @@
 /* A tag identifying the SoftDevice BLE configuration */
 #define APP_BLE_CONN_CFG_TAG            1
 /* The advertising interval (in units of 0.625 ms; this value corresponds to
-   40 ms). */
-#define APP_ADV_INTERVAL                64
+   0.625*1600 = 1000 ms). */
+#define APP_ADV_INTERVAL                1600
 /* The advertising time-out (in units of seconds). When set to 0, we will never
    time out. */
 #define APP_ADV_DURATION                BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED
