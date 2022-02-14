@@ -393,5 +393,41 @@ pre_ble_p:
 		-Iconfig \
 		-I$(SDK_ROOT)/components/softdevice/common ble_p.c
 
+pre_ble_c:
+	arm-none-eabi-gcc -E -I$(SDK_ROOT)/components/libraries/util \
+		-I$(SDK_ROOT)/modules/nrfx/mdk \
+		-I$(SDK_ROOT)/components/softdevice/s132/headers \
+		-I$(SDK_ROOT)/components/ble/common \
+		-I$(SDK_ROOT)/components/ble/ble_services/ble_lbs \
+		-I$(SDK_ROOT)/components/ble/nrf_ble_gatt \
+		-I$(SDK_ROOT)/components/ble/nrf_ble_qwr \
+		-I$(SDK_ROOT)/components/libraries/experimental_section_vars \
+		-I$(SDK_ROOT)/components/libraries/pwr_mgmt \
+		-I$(SDK_ROOT)/components/libraries/log \
+		-I$(SDK_ROOT)/components/libraries/log/src \
+		-I$(SDK_ROOT)/components/boards \
+		-I$(SDK_ROOT)/components/libraries/timer \
+		-I$(SDK_ROOT)/components/libraries/button \
+		-I$(SDK_ROOT)/modules/nrfx \
+		-I$(SDK_ROOT)/modules/nrfx/hal \
+		-I$(SDK_ROOT)/modules/nrfx/templates \
+		-I$(SDK_ROOT)/modules/nrfx/templates/nRF52840 \
+		-I$(SDK_ROOT)/modules/nrfx/drivers/include \
+		-I$(SDK_ROOT)/config/nrf52840/config \
+		-I$(SDK_ROOT)/integration/nrfx/legacy \
+		-I$(SDK_ROOT)/components/ble/peer_manager \
+		-Iconfig \
+		-I$(SDK_ROOT)/components/softdevice/common \
+		-I$(SDK_ROOT)/components/libraries/bsp \
+                -I$(SDK_ROOT)/components/ble/ble_advertising \
+		-I$(SDK_ROOT)/components/ble/ble_db_discovery \
+		-I$(SDK_ROOT)/components/ble/nrf_ble_gq \
+                -I$(SDK_ROOT)/components/libraries/memobj \
+             	-I$(SDK_ROOT)/components/libraries/balloc \
+  		-I$(SDK_ROOT)/components/libraries/queue \
+  		-I$(SDK_ROOT)/components/ble/ble_services/ble_lbs_c \
+  		-I$(SDK_ROOT)/components/ble/nrf_ble_scan \
+	       	ble_c.c
+
 openocd: 
 	openocd -c 'interface jlink; transport select swd; source [find target/nrf52.cfg]'
