@@ -150,9 +150,14 @@ static void advertising_init(void) {
 
   // Build and set advertising data.
   memset(&advdata, 0, sizeof(advdata));
-  advdata.name_type = BLE_ADVDATA_FULL_NAME;
+  //advdata.name_type = BLE_ADVDATA_FULL_NAME;
+  advdata.name_type = BLE_ADVDATA_SHORT_NAME;
+  /* Set the length of the short name to be used. This will display the device
+   * as 'BLE_P` in nrfConnect */
+  advdata.short_name_len = 5;
 
-  /* This sets the appearance characteristic which is a 16 bit value that is
+  /* 
+   * This sets the appearance characteristic which is a 16 bit value that is
    * associated with the device. This can then be used to allow an icon to be
    * displayed for this type of device.
    */
