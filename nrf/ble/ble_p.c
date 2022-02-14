@@ -151,6 +151,19 @@ static void advertising_init(void) {
   // Build and set advertising data.
   memset(&advdata, 0, sizeof(advdata));
   advdata.name_type = BLE_ADVDATA_FULL_NAME;
+
+  /* This sets the appearance characteristic which is a 16 bit value that is
+   * associated with the device. This can then be used to allow an icon to be
+   * displayed for this type of device.
+   */
+  err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_COMPUTER);
+  APP_ERROR_CHECK(err_code);
+
+  uint16_t appearance;
+  err_code = sd_ble_gap_appearance_get(&appearance);
+  APP_ERROR_CHECK(err_code);
+  NRF_LOG_INFO("appearance: %d\n", appearance);
+
   advdata.include_appearance = true;
   advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
 
