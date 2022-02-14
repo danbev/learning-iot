@@ -239,7 +239,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/nfc/ndef/conn_hand_parser/ac_rec_parser \
   $(SDK_ROOT)/components/libraries/stack_guard \
   $(SDK_ROOT)/components/libraries/log/src \
-  $(SDK_ROOT)/components/ble/peer_manager \
 
 # Libraries common to all targets
 LIB_FILES += \
@@ -368,7 +367,7 @@ flash_merged: mergehex
 erase:
 	nrfjprog -f nrf52 --eraseall
 
-pre:
+pre_ble_p:
 	arm-none-eabi-gcc -E -I$(SDK_ROOT)/components/libraries/util \
 		-I$(SDK_ROOT)/modules/nrfx/mdk \
 		-I$(SDK_ROOT)/components/softdevice/s132/headers \
@@ -390,6 +389,7 @@ pre:
 		-I$(SDK_ROOT)/modules/nrfx/drivers/include \
 		-I$(SDK_ROOT)/config/nrf52840/config \
 		-I$(SDK_ROOT)/integration/nrfx/legacy \
+		-I$(SDK_ROOT)/components/ble/peer_manager \
 		-Iconfig \
 		-I$(SDK_ROOT)/components/softdevice/common ble_p.c
 
