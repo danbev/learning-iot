@@ -94,10 +94,6 @@ static ble_gap_adv_data_t m_adv_data = {
   .scan_rsp_data = { m_enc_scan_response_data,BLE_GAP_ADV_SET_DATA_SIZE_MAX }
 };
 
-void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name) {
-  app_error_handler(DEAD_BEEF, line_num, p_file_name);
-}
-
 static void leds_init(void) {
   bsp_board_init(BSP_INIT_LEDS);
   nrf_gpio_cfg_output(LEDBUTTON_LED2);
