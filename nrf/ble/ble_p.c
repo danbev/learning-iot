@@ -194,6 +194,8 @@ static void advertising_init(void) {
   adv_params.duration = APP_ADV_DURATION;
   adv_params.properties.type = BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED;
   adv_params.p_peer_addr = NULL;
+  /* Allow scan and connect requests from any device. The other options in the
+   * enum are to filter scan and/or connect requests using the whitelist */
   adv_params.filter_policy = BLE_GAP_ADV_FP_ANY;
   adv_params.interval = APP_ADV_INTERVAL;
   /* Example of restricting advertising to only channel 38 */
