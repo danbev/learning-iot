@@ -1,9 +1,17 @@
 SDK_ROOT := /home/danielbevenius/work/iot/nrf-sdk/nRF5_SDK_17.1.0_ddde560
-TARGETS          := ble_p
+TARGETS          := ble_p ble_c
 OUTPUT_DIRECTORY := build
 
+ifeq ($(MAKECMDGOALS),ble_p)
+  TARGET_SOURCE=ble_p.c
+else
+  TARGET_SOURCE=ble_c.c
+endif
 
 $(OUTPUT_DIRECTORY)/ble_p.out: \
+  LINKER_SCRIPT  := linker_script.ld
+
+$(OUTPUT_DIRECTORY)/ble_c.out: \
   LINKER_SCRIPT  := linker_script.ld
 
 # Source files common to all targets
@@ -50,7 +58,9 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uart.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
-  ble_p.c \
+  $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
+  $(SDK_ROOT)/components/ble/nrf_ble_scan/nrf_ble_scan.c \
+  $(TARGET_SOURCE) \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -89,6 +99,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
+  $(SDK_ROOT)/components/ble/nrf_ble_gq/nrf_ble_gq.c \
+  $(SDK_ROOT)/components/ble/ble_services/ble_lbs_c/ble_lbs_c.c \
+  $(SDK_ROOT)/components/ble/ble_db_discovery/ble_db_discovery.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -138,6 +151,10 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/softdevice/s132/headers \
   $(SDK_ROOT)/components/ble/ble_services/ble_ans_c \
   $(SDK_ROOT)/components/libraries/slip \
+  $(SDK_ROOT)/components/libraries/bsp \
+  $(SDK_ROOT)/components/ble/ble_db_discovery \
+  $(SDK_ROOT)/components/ble/nrf_ble_gq \
+  $(SDK_ROOT)/components/ble/nrf_ble_scan \
   $(SDK_ROOT)/components/libraries/delay \
   $(SDK_ROOT)/components/libraries/csense_drv \
   $(SDK_ROOT)/components/libraries/memobj \
@@ -155,6 +172,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/libraries/scheduler \
   $(SDK_ROOT)/components/libraries/cli \
   $(SDK_ROOT)/components/ble/ble_services/ble_lbs \
+  $(SDK_ROOT)/components/ble/ble_services/ble_lbs_c \
   $(SDK_ROOT)/components/ble/ble_services/ble_hts \
   $(SDK_ROOT)/components/libraries/crc16 \
   $(SDK_ROOT)/components/nfc/t4t_parser/apdu \
@@ -287,6 +305,11 @@ ble_p: CFLAGS += -D__STACK_SIZE=8192
 ble_p: ASMFLAGS += -D__HEAP_SIZE=8192
 ble_p: ASMFLAGS += -D__STACK_SIZE=8192
 
+ble_c: CFLAGS += -D__HEAP_SIZE=8192
+ble_c: CFLAGS += -D__STACK_SIZE=8192
+ble_c: ASMFLAGS += -D__HEAP_SIZE=8192
+ble_c: ASMFLAGS += -D__STACK_SIZE=8192
+
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
 LIB_FILES += -lc -lnosys -lm
@@ -298,24 +321,37 @@ LIB_FILES += -lc -lnosys -lm
 default: ble_p
 
 # Print all targets that can be built
+define HELP_MSG
+
+The following target are available:
+ble_p              Build BLE Peripheral example
+ble_c              Build BLE Central example
+flash_ble_p        Flash ble_p example
+flash_ble_c        Flash ble_c example
+flash_softdevice   Flash the softdevice
+
+endef
 help:
-	@echo following targets are available:
-	@echo		ble_p
-	@echo		flash_softdevice
-	@echo		flash      - flashing binary
+	$(info $(HELP_MSG))
 
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
-
 include $(TEMPLATE_PATH)/Makefile.common
+
+$(foreach target, $(TARGETS), $(echo "bajja"))
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 .PHONY: flash flash_softdevice erase mergehex
 
-flash: default
+flash_ble_p: default
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_p.hex
 	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/ble_p.hex --sectorerase
+	nrfjprog -f nrf52 --reset
+
+flash_ble_c: default
+	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_c.hex
+	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/ble_c.hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 flash_softdevice:
