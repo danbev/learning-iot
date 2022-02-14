@@ -196,6 +196,8 @@ static void advertising_init(void) {
   adv_params.p_peer_addr = NULL;
   adv_params.filter_policy = BLE_GAP_ADV_FP_ANY;
   adv_params.interval = APP_ADV_INTERVAL;
+  /* Example of restricting advertising to only channel 38 */
+  adv_params.channel_mask[4] = 0xA0;
 
   err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, &adv_params);
   APP_ERROR_CHECK(err_code);
