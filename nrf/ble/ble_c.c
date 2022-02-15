@@ -95,17 +95,10 @@ static void lbs_error_handler(uint32_t nrf_error) {
   APP_ERROR_HANDLER(nrf_error);
 }
 
-/**@brief Function for the LEDs initialization.
- *
- * @details Initializes all LEDs used by the application.
- */
 static void leds_init(void) {
   bsp_board_init(BSP_INIT_LEDS);
 }
 
-
-/**@brief Function to start scanning.
- */
 static void scan_start(void) {
   ret_code_t err_code;
 
@@ -119,8 +112,8 @@ static void scan_start(void) {
 
 /**@brief Handles events coming from the LED Button central module.
  */
-static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c,
-                              ble_lbs_c_evt_t * p_lbs_c_evt) {
+static void lbs_c_evt_handler(ble_lbs_c_t* p_lbs_c,
+                              ble_lbs_c_evt_t* p_lbs_c_evt) {
   ret_code_t err_code;
   switch (p_lbs_c_evt->evt_type) {
     case BLE_LBS_C_EVT_DISCOVERY_COMPLETE:
@@ -157,12 +150,12 @@ static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c,
  * @param[in]   p_ble_evt   Bluetooth stack event.
  * @param[in]   p_context   Unused.
  */
-static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
+static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
 {
   ret_code_t err_code;
 
   // For readability.
-  ble_gap_evt_t const * p_gap_evt = &p_ble_evt->evt.gap_evt;
+  ble_gap_evt_t const* p_gap_evt = &p_ble_evt->evt.gap_evt;
 
   switch (p_ble_evt->header.evt_id) {
     // Upon connection, check which peripheral has connected (HR or RSC), initiate DB
@@ -305,7 +298,7 @@ static void button_event_handler(uint8_t pin_no, uint8_t button_action) {
  *
  * @param[in]   p_scan_evt   Scanning event.
  */
-static void scan_evt_handler(scan_evt_t const * p_scan_evt) {
+static void scan_evt_handler(scan_evt_t const* p_scan_evt) {
   ret_code_t err_code;
 
   switch(p_scan_evt->scan_evt_id)
@@ -342,7 +335,7 @@ static void buttons_init(void) {
  *
  * @param[in] p_event  Pointer to the database discovery event.
  */
-static void db_disc_handler(ble_db_discovery_evt_t * p_evt) {
+static void db_disc_handler(ble_db_discovery_evt_t* p_evt) {
   ble_lbs_on_db_disc_evt(&m_ble_lbs_c, p_evt);
 }
 
@@ -391,8 +384,8 @@ static void scan_init(void) {
   memset(&init_scan, 0, sizeof(init_scan));
 
   init_scan.connect_if_match = true;
-  init_scan.conn_cfg_tag     = APP_BLE_CONN_CFG_TAG;
-  ble_gap_scan_params_t *scan_params;
+  init_scan.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
+  ble_gap_scan_params_t* scan_params;
   memset(&scan_params, 0, sizeof(scan_params));
   // Limit the Primary Advertising channel to channel 48
   scan_params->channel_mask[4] = 0xA0;
@@ -409,8 +402,6 @@ static void scan_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
-/**@brief Function for initializing the GATT module.
- */
 static void gatt_init(void) {
   ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
   APP_ERROR_CHECK(err_code);
@@ -426,7 +417,6 @@ static void idle_state_handle(void) {
 }
 
 int main(void) {
-  // Initialize.
   log_init();
   leds_init();
   timer_init();
@@ -439,7 +429,6 @@ int main(void) {
   db_discovery_init();
   lbs_c_init();
 
-  // Start execution.
   NRF_LOG_INFO("BLE Central example started.");
   scan_start();
 
