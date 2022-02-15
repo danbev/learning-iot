@@ -652,9 +652,57 @@ multiple times an hope to get lucky or invest in three ubertooth devices and
 listen to all 3 primary channels.
 
 
+Next the Security Manager, notice that the protocol is now `SMP` (Security
+Manager Protocol` in Wireshark. is the Pairing Request. I was actually looking
+for something named PAIRING_REQ or similar after reading different articles but
+it looks like the protocol will be SMP like mentioned with a packet looking
+like this format:
+```
+ +-----------+------------------+------------+---------+
+ | Code=0x01 | I/O Capabilities |  OOB Flag  | AuthReq |
+ +-----------+------------------+------------+---------+
+   8 bits       8 bites             8 bits     8 bits
 
+OOB =Out Of Bounds flag
 
-Security Request (AuthReq?):
+I/O Capabilities:
+ 0x00   DisplayOnly
+ 0x01   DisplayYesNo
+ 0x02   KeyboardOnly
+ 0x03   NoInputNoOutput
+ 0x04   KeyboardDisplay
+ 0x05   RFU (Reserved for Future Use)
+ ...
+ 0xFF   RFU
+
+OOB Flag:
+ 0x00   OOB Auth data not present
+ 0x01   OOB Auth data from remote device is present
+ 0x02   RFU (Reserved for Future Use)
+ ...
+ 0xFF   RFU
+
+AuthReq (bit field): 
+ +--------------+--------+-----+----------+-----+-----+
+ | Bonding Flag | MITM   | SC  | Keypress | CT2 | RFU |
+ +--------------+--------+-----+----------+-----+-----+
+    2 bits        1 bit   1 bit   1 bit    1 bit  2 bits
+
+Bonding flag:
+  00  No Bonding
+  01  Bonding
+  10  RFU
+  11  RFU
+ 
+MITM:
+
+SC (Secure Connections):
+
+CT2:
+ 1 Support for h7 function
+```
+
+Security Manager Pairing Request packet:
 ```
 Frame 178: 39 bytes on wire (312 bits), 39 bytes captured (312 bits)
 PPI version 0, 24 bytes
@@ -683,8 +731,9 @@ Bluetooth Security Manager Protocol
         .... 1... = Secure Connection Flag: True
         .... .1.. = MITM Flag: True
         .... ..01 = Bonding Flags: Bonding (0x1)
-
 ```
+
+
 #### BLE Blinky Example
 Up until this point I've just been reading and I'm finding this a little
 abstract so I wanted to take a look at an example to help my understanding and
@@ -710,9 +759,95 @@ can send a new value. For example write a Bool value of true will turn on
 LED3.
 
 ### BLE Mesh
-Is a network allowing BLE Many-to-many communication.
-TODO: 
+Is a network allowing BLE Many-to-many communication. So it is based on BLE and
+uses something called managed flooding where messages/packets will get relayed
+by nodes in the network. This is managed in that there are ways to control how
+long the message can live, remeber packets to avoid bouncing. 
 
+Devices in the mesh have difference roles. A Node is just a normal BLE device
+which broadcasts messages. The mesh also needs Releay Nodes which is what is
+sounds like, a node that can receive a packet and then relay it in the network.
+The relay node needs to scan for packets continously and therefor requires a
+high amount of power so these nodes are mostly connected to a power source and
+not powered by batteries. There is also cache of messages that are stored so
+that the same message is not relayed over and over again. 
+
+Low Power Node (LPN) is a battery driven node that can switch off and only
+check for packets once in a while. But not risk missing messages these nodes
+are associated with a Friend Node which will is a node that can store messages
+for a LPN.
+
+For a mobile phone to communicate with the BLE Mesh it needs to create a
+point-to-point connection with a node called a Proxy Node (implements the
+Proxy Node Role).
+
+The Link Layer and Physical Layer are the same for BLE Mesh as they are for
+BLE but the host layer is completely different.
+```
+  +--------------------------------------+
+  |           Application                |
+  +--------------------------------------+
+  +--------------------------------------+
+  |           Mesh Models                |
+  +--------------------------------------+
+  +--------------------------------------+
+  | Access       |                       |
+  |--------------|     Provisioning      |
+  | Transport    |                       | 
+  |--------------|                       |
+  | Network      |                       |
+  |--------------+-----------------------|
+  |            Bearer                    |
+  +--------------------------------------+
+  +--------------------------------------+
+  |           Link Layer                 |
+  +--------------------------------------+
+  +--------------------------------------+
+  |           Physical Layer              |
+  +--------------------------------------+
+```
+
+
+When a device/node wants to be included in the mesh it needs to first be
+provisioned. This device wanting to join is called the provisionee and it will
+contact a devices that has the Provisioning Role.
+The provisionee needs to obtain/receive the following items:
+* Unicast Address
+* network key
+* IV index
+* IV update flag
+* Key Refresh flag
+
+#### Unicast Address
+Is assigned during provisioning and uniquely identify a node.
+
+#### Group Address
+Is used to identify a group of nodes. There are groups that are defined by the
+Bluetooth SIG for things like All-proxies, All-friends, and All-nodes.
+But other groups can be defined during by configuring application.
+
+#### Virtual Address
+Is an address that is assigned to one or more elements, and it can span multiple
+nodes.
+
+#### Provisioning
+This process starts with the unprovisioned device sending out a new type of
+advertisement PDU called `mesh beacon`
+
+When a provisioner discovers the mesh beacon it will send an `invitation` to the
+unprovisioned device which is also a new PDU called provisioning invite PDU.
+
+When the unprovisioned device receives the `provisioning invite` it will in turn
+send a provision capabilities PDU which include:
+* The number of elements that it has
+* The security algorightms it supports
+* Input/Ouput capabilites
+
+Next, the unprovisioned device will sends its public key to the provisioner and
+it will also send it's public key.
+
+The next step is authentication 
+__wip__
 
 ### Connectionless Packet Switching
 Each packet contains the complete routing infomation in its header section, like
