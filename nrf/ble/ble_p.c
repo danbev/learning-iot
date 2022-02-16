@@ -40,9 +40,9 @@ static void log_error(ret_code_t err);
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0
 #define CONNECTED_LED                   BSP_BOARD_LED_1
-#define LEDBUTTON_LED                   BSP_BOARD_LED_2
 #define LEDBUTTON_LED2                  22
-#define LEDBUTTON_BUTTON                BSP_BUTTON_0
+#define PERIPHERAL_ADVERTISING_LED      BSP_BOARD_LED_2
+#define PERIPHERAL_CONNECTED_LED        BSP_BOARD_LED_3
 
 #define DEVICE_NAME                     "BLE_Peripheral_Example"
 
@@ -93,7 +93,7 @@ static void log_error(ret_code_t err);
 #define SEC_PARAM_MITM                  0
 
 /* LE Secure Connections not enabled. */
-#define SEC_PARAM_LESC                  0
+#define SEC_PARAM_LESC                  1
 
 /* Keypress notifications not enabled. */
 #define SEC_PARAM_KEYPRESS              0
@@ -110,6 +110,7 @@ static void log_error(ret_code_t err);
 /* Maximum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16
 
+#define LESC_DEBUG_MODE                 1
 
 /* LED Button Service (LBS) instance. */
 BLE_LBS_DEF(m_lbs);
@@ -131,7 +132,8 @@ static ble_uuid_t m_adv_uuids[] = {
 };
 
 static void leds_init(void) {
-  bsp_board_init(BSP_INIT_LEDS);
+  bsp_board_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS);
+
   nrf_gpio_cfg_output(LEDBUTTON_LED2);
 }
 
@@ -250,6 +252,26 @@ static void sleep_mode_enter(void) {
 }
 
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+  switch (ble_adv_evt) {
+    case BLE_ADV_EVT_FAST:
+      bsp_board_led_on(ADVERTISING_LED);
+      bsp_board_led_off(CONNECTED_LED);
+      break;
+
+    case BLE_ADV_EVT_IDLE:
+      {
+        ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+        APP_ERROR_CHECK(err_code);
+        break;
+      }
+
+    default:
+      break;
+  }
+}
+
+/*
+static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
   ret_code_t err_code;
 
   switch (ble_adv_evt) {
@@ -267,6 +289,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
       break;
   }
 }
+*/
 
 static void advertising_init(void) {
   ret_code_t             err_code;
@@ -367,11 +390,10 @@ static void delete_bonds(void) {
 }
 
 static void advertising_start(bool erase_bonds) {
-  NRF_LOG_INFO("advertising_start %s", (erase_bonds ? "true":"false"));
+  NRF_LOG_INFO("advertising_start erase_bonds: %s", (erase_bonds ? "true":"false"));
 
   if (erase_bonds) {
     delete_bonds();
-    // Advertising is started by PM_EVT_PEERS_DELETED_SUCEEDED event
   } else {
     ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
     log_error(err_code);
@@ -381,69 +403,52 @@ static void advertising_start(bool erase_bonds) {
   }
 }
 
-static void ble_evt_handler(ble_evt_t const* p_ble_evt, void * p_context) {
-  ret_code_t err_code;
+static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
+  ret_code_t err_code = NRF_SUCCESS;
   NRF_LOG_INFO("ble_evt_handler header.evt_id: %d", p_ble_evt->header.evt_id);
 
   switch (p_ble_evt->header.evt_id) {
+    case BLE_GAP_EVT_DISCONNECTED:
+      NRF_LOG_INFO("Disconnected.");
+      break;
+
     case BLE_GAP_EVT_CONNECTED:
-      NRF_LOG_INFO("Connected");
-      bsp_board_led_on(CONNECTED_LED);
-      bsp_board_led_off(ADVERTISING_LED);
+      NRF_LOG_INFO("Connected.");
+      err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
+      APP_ERROR_CHECK(err_code);
 
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
       APP_ERROR_CHECK(err_code);
-      err_code = app_button_enable();
-      APP_ERROR_CHECK(err_code);
       break;
-    case BLE_GAP_EVT_DISCONNECTED:
-      NRF_LOG_INFO("Disconnected");
-      bsp_board_led_off(CONNECTED_LED);
-      m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
-      err_code = app_button_disable();
-      APP_ERROR_CHECK(err_code);
-      advertising_start(false);
-      break;
-    case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
-      // Pairing not supported
-      err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
-                                             BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP,
-                                             NULL,
-                                             NULL);
-      APP_ERROR_CHECK(err_code);
-      break;
     case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
-      {
-        NRF_LOG_DEBUG("PHY update request.");
-        ble_gap_phys_t const phys = { BLE_GAP_PHY_AUTO, BLE_GAP_PHY_AUTO };
-        err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
+      NRF_LOG_DEBUG("PHY update request.");
+      ble_gap_phys_t const phys = {BLE_GAP_PHY_AUTO, BLE_GAP_PHY_AUTO};
+      err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
+      APP_ERROR_CHECK(err_code);
+      break;
+
+      case BLE_GATTC_EVT_TIMEOUT:
+        // Disconnect on GATT Client timeout event.
+        NRF_LOG_DEBUG("GATT Client Timeout.");
+        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
         APP_ERROR_CHECK(err_code);
-      }
+        break;
+
+      case BLE_GATTS_EVT_TIMEOUT:
+        // Disconnect on GATT Server timeout event.
+        NRF_LOG_DEBUG("GATT Server Timeout.");
+        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+        break;
+
       break;
-    case BLE_GATTS_EVT_SYS_ATTR_MISSING:
-      // No system attributes have been stored.
-      err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
-      APP_ERROR_CHECK(err_code);
-      break;
-    case BLE_GATTC_EVT_TIMEOUT:
-      // Disconnect on GATT Client timeout event.
-      NRF_LOG_DEBUG("GATT Client Timeout.");
-      err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
-                                       BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-      APP_ERROR_CHECK(err_code);
-      break;
-    case BLE_GATTS_EVT_TIMEOUT:
-      // Disconnect on GATT Server timeout event.
-      NRF_LOG_DEBUG("GATT Server Timeout.");
-      err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
-                                       BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-      APP_ERROR_CHECK(err_code);
-      break;
-    default:
-      // No implementation needed.
-      break;
+
+      default:
+        break;
     }
 }
 
