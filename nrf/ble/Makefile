@@ -2,9 +2,11 @@ SDK_ROOT := /home/danielbevenius/work/iot/nrf-sdk/nRF5_SDK_17.1.0_ddde560
 TARGETS          := ble_p ble_c
 OUTPUT_DIRECTORY := build
 
-ifeq ($(MAKECMDGOALS),ble_p)
+ifneq ($(shell echo $(MAKECMDGOALS) | egrep "*ble_p"),)
+  $(info "ble_p")
   TARGET_SOURCE=ble_p.c
 else
+  $(info "ble_c")
   TARGET_SOURCE=ble_c.c
 endif
 
