@@ -1,32 +1,42 @@
 #include <stdint.h>
 #include <string.h>
+
 #include "nordic_common.h"
+
 #include "nrf.h"
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_ble_gatt.h"
+#include "nrf_ble_qwr.h"
+#include "nrf_pwr_mgmt.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+#include "nrf_drv_gpiote.h"
+#include "nrf_gpiote.h"
+#include "nrf_gpio.h"
+
 #include "app_error.h"
+
 #include "ble.h"
 #include "ble_err.h"
 #include "ble_hci.h"
 #include "ble_srv_common.h"
 #include "ble_advdata.h"
 #include "ble_conn_params.h"
-#include "nrf_sdh.h"
-#include "nrf_sdh_ble.h"
+#include "ble_advertising.h"
+#include "ble_lbs.h"
+
 #include "boards.h"
+#include "bsp_btn_ble.h"
+
 #include "app_timer.h"
 #include "app_button.h"
-#include "ble_lbs.h"
-#include "nrf_ble_gatt.h"
-#include "nrf_ble_qwr.h"
-#include "nrf_pwr_mgmt.h"
+
 #include "peer_manager.h"
+#include "peer_manager_handler.h"
 
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-
-#include "nrf_drv_gpiote.h"
-#include "nrf_gpiote.h"
-#include "nrf_gpio.h"
+static void log_error(ret_code_t err);
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0
 #define CONNECTED_LED                   BSP_BOARD_LED_1
@@ -76,6 +86,31 @@
    of timer ticks). */
 #define BUTTON_DETECTION_DELAY          APP_TIMER_TICKS(50)
 
+/* Perform bonding. */
+#define SEC_PARAM_BOND                  1
+
+/* Man In The Middle protection not required. */
+#define SEC_PARAM_MITM                  0
+
+/* LE Secure Connections not enabled. */
+#define SEC_PARAM_LESC                  0
+
+/* Keypress notifications not enabled. */
+#define SEC_PARAM_KEYPRESS              0
+
+/* No I/O capabilities. */
+#define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE
+
+/* Out Of Band data not available. */
+#define SEC_PARAM_OOB                   0
+
+/* Minimum encryption key size. */
+#define SEC_PARAM_MIN_KEY_SIZE          7
+
+/* Maximum encryption key size. */
+#define SEC_PARAM_MAX_KEY_SIZE          16
+
+
 /* LED Button Service (LBS) instance. */
 BLE_LBS_DEF(m_lbs);
 
@@ -85,22 +120,14 @@ NRF_BLE_GATT_DEF(m_gatt);
 /* Context for the Queued Write module. */
 NRF_BLE_QWR_DEF(m_qwr);
 
+/* Advertising module instance. */
+BLE_ADVERTISING_DEF(m_advertising);
+
 /* Handle of the current connection. */
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
 
-/* Advertising handle used to identify an advertising set. */
-static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
-
-/* Buffer for storing an encoded advertising set. */
-static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
-
-/* Buffer for storing an encoded scan data. */
-static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];
-
-/* Struct that contains pointers to the encoded advertising data. */
-static ble_gap_adv_data_t m_adv_data = {
-  .adv_data = { m_enc_advdata, BLE_GAP_ADV_SET_DATA_SIZE_MAX },
-  .scan_rsp_data = { m_enc_scan_response_data,BLE_GAP_ADV_SET_DATA_SIZE_MAX }
+static ble_uuid_t m_adv_uuids[] = {
+    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
 };
 
 static void leds_init(void) {
@@ -143,6 +170,7 @@ static void gatt_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+/*
 static void advertising_init(void) {
   ret_code_t err_code;
   ble_advdata_t advdata;
@@ -154,15 +182,13 @@ static void advertising_init(void) {
   memset(&advdata, 0, sizeof(advdata));
   //advdata.name_type = BLE_ADVDATA_FULL_NAME;
   advdata.name_type = BLE_ADVDATA_SHORT_NAME;
-  /* Set the length of the short name to be used. This will display the device
-   * as 'BLE_P` in nrfConnect */
+  // Set the length of the short name to be used. This will display the device
+  // as 'BLE_P` in nrfConnect.
   advdata.short_name_len = 5;
 
-  /* 
-   * This sets the appearance characteristic which is a 16 bit value that is
-   * associated with the device. This can then be used to allow an icon to be
-   * displayed for this type of device.
-   */
+  // This sets the appearance characteristic which is a 16 bit value that is
+  // associated with the device. This can then be used to allow an icon to be
+  // displayed for this type of device.
   err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_COMPUTER);
   APP_ERROR_CHECK(err_code);
 
@@ -196,15 +222,74 @@ static void advertising_init(void) {
   adv_params.duration = APP_ADV_DURATION;
   adv_params.properties.type = BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED;
   adv_params.p_peer_addr = NULL;
-  /* Allow scan and connect requests from any device. The other options in the
-   * enum are to filter scan and/or connect requests using the whitelist */
+  // Allow scan and connect requests from any device. The other options in the
+  // enum are to filter scan and/or connect requests using the whitelist.
   adv_params.filter_policy = BLE_GAP_ADV_FP_ANY;
   adv_params.interval = APP_ADV_INTERVAL;
-  /* Example of restricting advertising to only channel 38 */
+  // Example of restricting advertising to only channel 38.
   adv_params.channel_mask[4] = 0xA0;
 
   err_code = sd_ble_gap_adv_set_configure(&m_adv_handle, &m_adv_data, &adv_params);
   APP_ERROR_CHECK(err_code);
+}
+*/
+
+static void sleep_mode_enter(void) {
+  ret_code_t err_code;
+
+  err_code = bsp_indication_set(BSP_INDICATE_IDLE);
+  APP_ERROR_CHECK(err_code);
+
+  // Prepare wakeup buttons.
+  err_code = bsp_btn_ble_sleep_mode_prepare();
+  APP_ERROR_CHECK(err_code);
+
+  // Go to system-off mode (this function will not return; wakeup will cause a reset).
+  err_code = sd_power_system_off();
+  APP_ERROR_CHECK(err_code);
+}
+
+static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+  ret_code_t err_code;
+
+  switch (ble_adv_evt) {
+    case BLE_ADV_EVT_FAST:
+      NRF_LOG_INFO("Fast advertising.");
+      err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+      APP_ERROR_CHECK(err_code);
+      break;
+
+    case BLE_ADV_EVT_IDLE:
+      sleep_mode_enter();
+      break;
+
+    default:
+      break;
+  }
+}
+
+static void advertising_init(void) {
+  ret_code_t             err_code;
+  ble_advertising_init_t init;
+
+  memset(&init, 0, sizeof(init));
+
+  init.advdata.name_type = BLE_ADVDATA_FULL_NAME;
+  init.advdata.include_appearance = true;
+  init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+  init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
+  init.advdata.uuids_complete.p_uuids = m_adv_uuids;
+
+  init.config.ble_adv_fast_enabled = true;
+  init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;
+  init.config.ble_adv_fast_timeout = APP_ADV_DURATION;
+
+  init.evt_handler = on_adv_evt;
+
+  err_code = ble_advertising_init(&m_advertising, &init);
+  APP_ERROR_CHECK(err_code);
+
+  ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
 }
 
 static void nrf_qwr_error_handler(uint32_t nrf_error) {
@@ -265,7 +350,7 @@ static void conn_params_init(void) {
   cp_init.next_conn_params_update_delay = NEXT_CONN_PARAMS_UPDATE_DELAY;
   cp_init.max_conn_params_update_count = MAX_CONN_PARAMS_UPDATE_COUNT;
   cp_init.start_on_notify_cccd_handle = BLE_GATT_HANDLE_INVALID;
-  cp_init.disconnect_on_fail = false;
+  cp_init.disconnect_on_fail = true;
   cp_init.evt_handler = on_conn_params_evt;
   cp_init.error_handler = conn_params_error_handler;
 
@@ -273,12 +358,27 @@ static void conn_params_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
-static void advertising_start(void) {
+static void delete_bonds(void) {
   ret_code_t err_code;
-  err_code = sd_ble_gap_adv_start(m_adv_handle, APP_BLE_CONN_CFG_TAG);
-  APP_ERROR_CHECK(err_code);
 
-  bsp_board_led_on(ADVERTISING_LED);
+  NRF_LOG_INFO("Erase bonds!");
+  err_code = pm_peers_delete();
+  APP_ERROR_CHECK(err_code);
+}
+
+static void advertising_start(bool erase_bonds) {
+  NRF_LOG_INFO("advertising_start %s", (erase_bonds ? "true":"false"));
+
+  if (erase_bonds) {
+    delete_bonds();
+    // Advertising is started by PM_EVT_PEERS_DELETED_SUCEEDED event
+  } else {
+    ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+    log_error(err_code);
+    APP_ERROR_CHECK(err_code);
+
+    bsp_board_led_on(ADVERTISING_LED);
+  }
 }
 
 static void ble_evt_handler(ble_evt_t const* p_ble_evt, void * p_context) {
@@ -304,7 +404,7 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void * p_context) {
 
       err_code = app_button_disable();
       APP_ERROR_CHECK(err_code);
-      advertising_start();
+      advertising_start(false);
       break;
     case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
       // Pairing not supported
@@ -367,42 +467,64 @@ static void ble_stack_init(void) {
   NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 }
 
-static void button_event_handler(uint8_t pin_no, uint8_t button_action) {
+/*
+ * Board Support Package (BSP) event handler.
+ */
+static void bsp_event_handler(bsp_event_t event) {
   ret_code_t err_code;
+  NRF_LOG_INFO("bsp_event_handler...event: %d", event);
 
-  static uint8_t counter = 0;
+  switch (event)
+  {
+    case BSP_EVENT_SLEEP:
+      sleep_mode_enter();
+      break; // BSP_EVENT_SLEEP
 
-  switch (pin_no) {
-    case LEDBUTTON_BUTTON:
-      NRF_LOG_INFO("Send button state change. action: %d", button_action);
-      if (button_action == 1) {
-        counter++;
-      }
-      err_code = ble_lbs_on_button_change(m_conn_handle, &m_lbs, counter);
-      if (err_code != NRF_SUCCESS &&
-        err_code != BLE_ERROR_INVALID_CONN_HANDLE &&
-        err_code != NRF_ERROR_INVALID_STATE &&
-        err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING) {
-        APP_ERROR_CHECK(err_code);
-      }
-      break;
-    default:
-      APP_ERROR_HANDLER(pin_no);
-      break;
+      case BSP_EVENT_DISCONNECT:
+        err_code = sd_ble_gap_disconnect(m_conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        if (err_code != NRF_ERROR_INVALID_STATE) {
+          APP_ERROR_CHECK(err_code);
+        }
+        break; // BSP_EVENT_DISCONNECT
+
+      case BSP_EVENT_WHITELIST_OFF:
+        if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+          err_code = ble_advertising_restart_without_whitelist(&m_advertising);
+          if (err_code != NRF_ERROR_INVALID_STATE) {
+            APP_ERROR_CHECK(err_code);
+          }
+        }
+        break; // BSP_EVENT_KEY_0
+
+      default:
+        break;
+    }
+}
+
+static void log_error(ret_code_t err) {
+  char const* desc = nrf_strerror_find(err);
+  if (desc == NULL) {
+    NRF_LOG_ERROR("Function return code: UNKNOWN (%x)", desc);
+  } else {
+    NRF_LOG_ERROR("Function return code: %s", desc);
   }
 }
 
-static void buttons_init(void) {
+static void buttons_init(bool* p_erase_bonds) {
   ret_code_t err_code;
+  bsp_event_t startup_event;
 
-  //The array must be static because a pointer to it will be saved in the button handler module.
-  static app_button_cfg_t buttons[] = {
-      {LEDBUTTON_BUTTON, false, BUTTON_PULL, button_event_handler}
-  };
+  NRF_LOG_INFO("buttons_init");
 
-  err_code = app_button_init(buttons, ARRAY_SIZE(buttons),
-                             BUTTON_DETECTION_DELAY);
+  err_code = bsp_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS, bsp_event_handler);
+  log_error(err_code);
   APP_ERROR_CHECK(err_code);
+
+  err_code = bsp_btn_ble_init(NULL, &startup_event);
+  APP_ERROR_CHECK(err_code);
+
+  *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }
 
 static void log_init(void) {
@@ -424,24 +546,77 @@ static void idle_state_handle(void) {
   }
 }
 
+static void pm_evt_handler(pm_evt_t const * p_evt)
+{
+    pm_handler_on_pm_evt(p_evt);
+    pm_handler_disconnect_on_sec_failure(p_evt);
+    pm_handler_flash_clean(p_evt);
+
+    switch (p_evt->evt_id)
+    {
+        case PM_EVT_PEERS_DELETE_SUCCEEDED:
+            advertising_start(false);
+            break;
+
+        default:
+            break;
+    }
+}
+
+static void peer_manager_init(void) {
+  ble_gap_sec_params_t sec_param;
+  ret_code_t           err_code;
+
+  err_code = pm_init();
+  APP_ERROR_CHECK(err_code);
+
+  memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+  // Security parameters to be used for all security procedures.
+  sec_param.bond           = SEC_PARAM_BOND;
+  sec_param.mitm           = SEC_PARAM_MITM;
+  sec_param.lesc           = SEC_PARAM_LESC;
+  sec_param.keypress       = SEC_PARAM_KEYPRESS;
+  sec_param.io_caps        = SEC_PARAM_IO_CAPABILITIES;
+  sec_param.oob            = SEC_PARAM_OOB;
+  sec_param.min_key_size   = SEC_PARAM_MIN_KEY_SIZE;
+  sec_param.max_key_size   = SEC_PARAM_MAX_KEY_SIZE;
+  sec_param.kdist_own.enc  = 1;
+  sec_param.kdist_own.id   = 1;
+  sec_param.kdist_peer.enc = 1;
+  sec_param.kdist_peer.id  = 1;
+
+  err_code = pm_sec_params_set(&sec_param);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = pm_register(pm_evt_handler);
+  APP_ERROR_CHECK(err_code);
+}
+
 int main(void) {
+  bool erase_bonds;
+  ret_code_t err_code;
+
   NRF_LOG_INFO("BLE_Peripheral example started.");
 
-  ret_code_t err_code;
   uint32_t count = pm_peer_count();
   NRF_LOG_INFO("Number of peers: %d", count);
 
   log_init();
   leds_init();
   timers_init();
-  buttons_init();
+  buttons_init(&erase_bonds);
   power_management_init();
   ble_stack_init();
+
   gap_params_init();
   gatt_init();
+
   services_init();
   advertising_init();
   conn_params_init();
+  peer_manager_init();
+  //db_discovery_init();
 
   ble_gap_addr_t addr;
   err_code = sd_ble_gap_addr_get(&addr);
@@ -449,7 +624,7 @@ int main(void) {
   NRF_LOG_INFO("ADDR: %x:%x:%x:%x:%x:%x\n", addr.addr[5], addr.addr[4],
       addr.addr[3], addr.addr[2], addr.addr[1], addr.addr[0]);
 
-  advertising_start();
+  advertising_start(erase_bonds);
 
   for (;;) {
     idle_state_handle();
