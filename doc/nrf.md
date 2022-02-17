@@ -368,3 +368,24 @@ High power and high frequency
 These are standalone drivers for nrf peripherals which were originally in the
 nRF5 SDK and have been extracted to standalone modules/libraries.
 https://github.com/NordicSemiconductor/nrfx
+
+
+## nrf_crypto
+
+### RNG context cannot be allocated on the stack
+```console
+00> <error> app: RNG context cannot be allocated on the stack.
+00> 
+00> <error> nrf_ble_lesc: nrf_crypto_init() returned error 0x8515.
+00> 
+00> <error> peer_manager: pm_init failed because sm_init() returned Unknown error code.
+00> 
+00> <error> app: Fatal error
+```
+This is most likly due to not having enabled
+`NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED in config/sdk_config.h:
+```c
+#ifndef NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED                            
+#define NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED 1                          
+#endif
+```
