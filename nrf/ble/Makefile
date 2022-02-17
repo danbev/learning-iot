@@ -3,12 +3,11 @@ TARGETS          := ble_p ble_c
 OUTPUT_DIRECTORY := build
 
 ifneq ($(shell echo $(MAKECMDGOALS) | egrep "*ble_p"),)
-  $(info "ble_p")
   TARGET_SOURCE=ble_p.c
 else
-  $(info "ble_c")
   TARGET_SOURCE=ble_c.c
 endif
+$(info "Building for $(TARGET_SOURCE)")
 
 $(OUTPUT_DIRECTORY)/ble_p.out: \
   LINKER_SCRIPT  := linker_script.ld
