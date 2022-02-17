@@ -363,3 +363,8 @@ Low power and low frequency
 * Timer
 High power and high frequency
 
+
+### nrfx
+These are standalone drivers for nrf peripherals which were originally in the
+nRF5 SDK and have been extracted to standalone modules/libraries.
+https://github.com/NordicSemiconductor/nrfx
