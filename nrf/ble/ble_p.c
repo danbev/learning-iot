@@ -15,6 +15,7 @@
 #include "nrf_drv_gpiote.h"
 #include "nrf_gpiote.h"
 #include "nrf_gpio.h"
+#include "nrf_ble_lesc.h"
 
 #include "app_error.h"
 
@@ -88,29 +89,22 @@ static void log_error(ret_code_t err);
 
 /* Perform bonding. */
 #define SEC_PARAM_BOND                  1
-
 /* Man In The Middle protection not required. */
 #define SEC_PARAM_MITM                  0
-
 /* LE Secure Connections not enabled. */
 #define SEC_PARAM_LESC                  1
-
 /* Keypress notifications not enabled. */
 #define SEC_PARAM_KEYPRESS              0
-
 /* No I/O capabilities. */
 #define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE
-
 /* Out Of Band data not available. */
 #define SEC_PARAM_OOB                   0
-
 /* Minimum encryption key size. */
 #define SEC_PARAM_MIN_KEY_SIZE          7
-
 /* Maximum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16
 
-#define LESC_DEBUG_MODE                 1
+//#define LESC_DEBUG_MODE                 1
 
 /* LED Button Service (LBS) instance. */
 BLE_LBS_DEF(m_lbs);
@@ -130,6 +124,11 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
 static ble_uuid_t m_adv_uuids[] = {
     {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
 };
+
+#define DEAD_BEEF                           0xDEADBEEF
+void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name) {
+  app_error_handler(DEAD_BEEF, line_num, p_file_name);
+}
 
 static void leds_init(void) {
   bsp_board_init(BSP_INIT_LEDS | BSP_INIT_BUTTONS);
@@ -155,6 +154,9 @@ static void gap_params_init(void) {
   err_code = sd_ble_gap_device_name_set(&sec_mode,
                                         (const uint8_t *)DEVICE_NAME,
                                         strlen(DEVICE_NAME));
+  APP_ERROR_CHECK(err_code);
+
+  err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_COMPUTER);
   APP_ERROR_CHECK(err_code);
 
   memset(&gap_conn_params, 0, sizeof(gap_conn_params));
@@ -407,6 +409,8 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
   ret_code_t err_code = NRF_SUCCESS;
   NRF_LOG_INFO("ble_evt_handler header.evt_id: %d", p_ble_evt->header.evt_id);
 
+  nrf_ble_lesc_request_handler();
+
   switch (p_ble_evt->header.evt_id) {
     case BLE_GAP_EVT_DISCONNECTED:
       NRF_LOG_INFO("Disconnected.");
@@ -420,6 +424,11 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
       m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
       err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
       APP_ERROR_CHECK(err_code);
+
+      err_code = pm_conn_secure(p_ble_evt->evt.gap_evt.conn_handle, false);
+      if (err_code != NRF_ERROR_BUSY) {
+        APP_ERROR_CHECK(err_code);
+      }
       break;
 
     case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
@@ -546,26 +555,29 @@ static void power_management_init(void) {
 }
 
 static void idle_state_handle(void) {
+  ret_code_t err_code;
+  err_code = nrf_ble_lesc_request_handler();
+  APP_ERROR_CHECK(err_code);
+
   if (NRF_LOG_PROCESS() == false) {
     nrf_pwr_mgmt_run();
   }
 }
 
-static void pm_evt_handler(pm_evt_t const * p_evt)
-{
-    pm_handler_on_pm_evt(p_evt);
-    pm_handler_disconnect_on_sec_failure(p_evt);
-    pm_handler_flash_clean(p_evt);
+static void pm_evt_handler(pm_evt_t const* p_evt) {
+  NRF_LOG_INFO("pm_event_handler...<------------------");
+  pm_handler_on_pm_evt(p_evt);
+  pm_handler_disconnect_on_sec_failure(p_evt);
+  pm_handler_flash_clean(p_evt);
 
-    switch (p_evt->evt_id)
-    {
-        case PM_EVT_PEERS_DELETE_SUCCEEDED:
-            advertising_start(false);
-            break;
+  switch (p_evt->evt_id) {
+    case PM_EVT_PEERS_DELETE_SUCCEEDED:
+      advertising_start(false);
+      break;
 
-        default:
-            break;
-    }
+    default:
+      break;
+  }
 }
 
 static void peer_manager_init(void) {
@@ -591,7 +603,9 @@ static void peer_manager_init(void) {
   sec_param.kdist_peer.enc = 1;
   sec_param.kdist_peer.id  = 1;
 
+  NRF_LOG_INFO("here....");
   err_code = pm_sec_params_set(&sec_param);
+  log_error(err_code);
   APP_ERROR_CHECK(err_code);
 
   err_code = pm_register(pm_evt_handler);
@@ -620,6 +634,7 @@ int main(void) {
   services_init();
   advertising_init();
   conn_params_init();
+
   peer_manager_init();
   //db_discovery_init();
 

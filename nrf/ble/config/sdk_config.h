@@ -204,7 +204,15 @@
 // <i> If set to true, you need to call nrf_ble_lesc_request_handler() in the main loop to respond to LESC-related BLE events. If LESC support is not required, set this to false to save code space.
 
 #ifndef PM_LESC_ENABLED
-#define PM_LESC_ENABLED 0
+#define PM_LESC_ENABLED 1
+#endif
+
+#ifndef NRF_BLE_LESC_ENABLED
+#define NRF_BLE_LESC_ENABLED 1
+#endif
+
+#ifndef NRF_CRYPTO_RNG_AUTO_INIT_ENABLED
+#define NRF_CRYPTO_RNG_AUTO_INIT_ENABLED 1
 #endif
 
 // <e> PM_RA_PROTECTION_ENABLED - Enable/disable protection against repeated pairing attempts in Peer Manager.
@@ -1159,7 +1167,7 @@
 // <i> The nRF HW backend provide access to RNG peripheral in nRF5x devices.
 //==========================================================
 #ifndef NRF_CRYPTO_BACKEND_NRF_HW_RNG_ENABLED
-#define NRF_CRYPTO_BACKEND_NRF_HW_RNG_ENABLED 0
+#define NRF_CRYPTO_BACKEND_NRF_HW_RNG_ENABLED 1
 #endif
 // <q> NRF_CRYPTO_BACKEND_NRF_HW_RNG_MBEDTLS_CTR_DRBG_ENABLED  - Enable mbed TLS CTR-DRBG algorithm.
  
@@ -1189,13 +1197,21 @@
 #endif
 
 // </e>
+//
+#ifndef NRFX_RNG_ENABLED                                                        
+#define NRFX_RNG_ENABLED 1                                                      
+#endif
+
+#ifndef RNG_ENABLED
+#define RNG_ENABLED 1
+#endif
 
 // <e> NRF_CRYPTO_BACKEND_OBERON_ENABLED - Enable the Oberon backend
 
 // <i> The Oberon backend
 //==========================================================
 #ifndef NRF_CRYPTO_BACKEND_OBERON_ENABLED
-#define NRF_CRYPTO_BACKEND_OBERON_ENABLED 0
+#define NRF_CRYPTO_BACKEND_OBERON_ENABLED 1
 #endif
 // <q> NRF_CRYPTO_BACKEND_OBERON_CHACHA_POLY_ENABLED  - Enable the CHACHA-POLY mode using Oberon.
  
@@ -1209,15 +1225,19 @@
 
 // <i> Enable this setting if you need secp256r1 curve support using Oberon library
 
-#ifndef NRF_CRYPTO_BACKEND_OBERON_ECC_SECP256R1_ENABLED
-#define NRF_CRYPTO_BACKEND_OBERON_ECC_SECP256R1_ENABLED 1
+#ifndef NRF_CRYPTO_BACKEND_OBERON_ECC_SECP256R1_ENABLED                         
+#define NRF_CRYPTO_BACKEND_OBERON_ECC_SECP256R1_ENABLED 1                       
+#endif 
+
+#ifndef NRF_CRYPTO_BACKEND_OBERON_ECC_ED25519_ENABLED
+#define NRF_CRYPTO_BACKEND_OBERON_ECC_ED25519_ENABLED 1
 #endif
 
 // <q> NRF_CRYPTO_BACKEND_OBERON_ECC_CURVE25519_ENABLED  - Enable Curve25519 ECDH
  
 
 // <i> Enable this setting if you need Curve25519 ECDH support using Oberon library
-
+//
 #ifndef NRF_CRYPTO_BACKEND_OBERON_ECC_CURVE25519_ENABLED
 #define NRF_CRYPTO_BACKEND_OBERON_ECC_CURVE25519_ENABLED 1
 #endif
@@ -3087,7 +3107,7 @@
 // <e> NRFX_RNG_ENABLED - nrfx_rng - RNG peripheral driver
 //==========================================================
 #ifndef NRFX_RNG_ENABLED
-#define NRFX_RNG_ENABLED 0
+#define NRFX_RNG_ENABLED 1
 #endif
 // <q> NRFX_RNG_CONFIG_ERROR_CORRECTION  - Error correction
  
@@ -12098,6 +12118,10 @@
 
 #ifndef POWER_CONFIG_SOC_OBSERVER_PRIO
 #define POWER_CONFIG_SOC_OBSERVER_PRIO 0
+#endif
+
+#ifndef NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED                            
+#define NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED 1                          
 #endif
 
 // </h> 
