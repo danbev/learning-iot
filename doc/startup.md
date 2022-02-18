@@ -124,7 +124,6 @@ and if the current variable_address is less than _end_data then we should
 copy/mov the value from the current_flash_mem to the current variable_address
 and then increment both pointers.
 
-//*dst++ = *src++;
 ```console
 (gdb) p/t (int*)one
 $4 = 1
@@ -136,4 +135,15 @@ $6 = 2
 $7 = 3
 ```
 
+If you have have a global variable that is a string, for example:
+```assembly
+plain_text:
+    .ascii        "hello\n"
+```
+The to print the contents we need to use the address of the label, and then
+cast the value to a char pointer:
+```console
+(gdb) p (char*) &plain_text
+$22 = 0x2000000e "hello\n"
+```
 
