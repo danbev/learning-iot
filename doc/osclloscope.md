@@ -7,8 +7,8 @@ output clock frequency I ran into problems when working with I2C.
 
 ### Time grid (horizontal)
 So we have a grid of unit for time which is not showing up on my scope by
-default (actually it was but as dots and the intensity was not very large) and
-thi can be adjusted by pressing the `DISPLAY` button and then going to the
+default (actually it was but as dots, and the intensity was not very large) and
+this can be adjusted by pressing the `DISPLAY` button and then going to the
 second meny (by pressing F5) and then I changed the `Grid` to be `Real line` and
 increased the intensity.
 
