@@ -2,6 +2,11 @@ SDK_ROOT := /home/danielbevenius/work/iot/nrf-sdk/nRF5_SDK_17.1.0_ddde560
 TARGETS          := ble_p ble_c
 OUTPUT_DIRECTORY := build
 
+# The serial number can be retrieved using dmesg or
+# using nrfjprog -i
+# Remove any preceeding zeros first.
+DEVICE2_SERIAL_NR = 682659901
+
 ifneq ($(shell echo $(MAKECMDGOALS) | egrep "*ble_p"),)
   TARGET_SOURCE=ble_p.c
 else
@@ -409,8 +414,8 @@ flash_ble_p: default
 
 flash_ble_c: default
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_c.hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/ble_c.hex --sectorerase
-	nrfjprog -f nrf52 --reset
+	nrfjprog -f nrf52 -s $(DEVICE2_SERIAL_NR) --program $(OUTPUT_DIRECTORY)/ble_c.hex --sectorerase
+	nrfjprog -f nrf52 -s $(DEVICE2_SERIAL_NR) --reset
 
 flash_softdevice:
 	@echo Flashing: s132_nrf52_7.2.0_softdevice.hex
