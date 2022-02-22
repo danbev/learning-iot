@@ -21,6 +21,12 @@
 #define BLE_DB_DISCOVERY_ENABLED 1
 #endif
 
+// <o> NRF_BLE_GQ_QUEUE_SIZE - Queue size for BLE GATT Queue module.
+#ifndef NRF_BLE_GQ_QUEUE_SIZE
+#define NRF_BLE_GQ_QUEUE_SIZE 2
+#endif
+
+
 // <e> BLE_DTM_ENABLED - ble_dtm - Module for testing RF/PHY using DTM commands
 //==========================================================
 #ifndef BLE_DTM_ENABLED
@@ -11326,7 +11332,7 @@
 
 // <o> NRF_SDH_BLE_CENTRAL_LINK_COUNT - Maximum number of central links. 
 #ifndef NRF_SDH_BLE_CENTRAL_LINK_COUNT
-#define NRF_SDH_BLE_CENTRAL_LINK_COUNT 0
+#define NRF_SDH_BLE_CENTRAL_LINK_COUNT 1
 #endif
 
 // <o> NRF_SDH_BLE_TOTAL_LINK_COUNT - Total link count. 
