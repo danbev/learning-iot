@@ -115,6 +115,31 @@ we should be able to connect to using nrf-connect.
 _wip_
 
 
+Next we need to flash the central, [ble_c.c](./ble_c.c):
+```console
+$ make flash_ble_c
+```
+One thing to note is that at this point we have two devices connected to the
+computer using USB. In the Makefile, see `DEVICE2_SERIAL_NR ` we specify the
+serial number of the second device. The serial number can be copied taken from
+the output of  `dmesg`. The serial number of the device I'm using as the central
+is '682659901'.
+
+Using the same serial number we can also see the logs using JLinkRTTViewer
+which will ask which device to connect to. The output should be something
+similar to the below for ble_c:
+```console
+00> <info> app_timer: RTC: initialized.
+00>
+00> <debug> ble_scan: Adding filter on BLE_Peripheral_Example name
+00>
+00> <info> app: BLE Central example started.
+00>
+00> <debug> ble_scan: Scanning
+```
+
+
+
 ### Ubertooth One issue
 I've had huge problems trying to capture packets with ubertooth one and it
 seems that it can only listen to one of the three advertisment channels at one
