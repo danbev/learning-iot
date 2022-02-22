@@ -84,7 +84,7 @@ NRF_BLE_GQ_DEF(m_ble_gatt_queue,
                NRF_SDH_BLE_CENTRAL_LINK_COUNT,
                NRF_BLE_GQ_QUEUE_SIZE);
 
-static char const target_name[] = "BLE_Peripheral_Example";
+static char const target_name[] = "BLE_Ex";
 
 /**@brief Function for handling the LED Button Service client errors.
  *
@@ -153,7 +153,6 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
 {
   ret_code_t err_code;
 
-  // For readability.
   ble_gap_evt_t const* p_gap_evt = &p_ble_evt->evt.gap_evt;
 
   switch (p_ble_evt->header.evt_id) {
@@ -191,6 +190,7 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
       break;
 
     case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
+      NRF_LOG_INFO("ble_evt_handler BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST");
       // Accept parameters requested by peer.
       err_code = sd_ble_gap_conn_param_update(p_gap_evt->conn_handle,
                                     &p_gap_evt->params.conn_param_update_request.conn_params);
@@ -222,6 +222,10 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
       err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
                                        BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
       APP_ERROR_CHECK(err_code);
+      break;
+
+    case BLE_GAP_EVT_SCAN_REQ_REPORT:
+      NRF_LOG_DEBUG("GAP_EVENT_SCAN_REQ_REPORT....");
       break;
 
     default:
@@ -296,24 +300,27 @@ static void button_event_handler(uint8_t pin_no, uint8_t button_action) {
   }
 }
 
-/**@brief Function for handling Scaning events.
- *
- * @param[in]   p_scan_evt   Scanning event.
- */
-static void scan_evt_handler(scan_evt_t const* p_scan_evt) {
+static void scan_evt_handler(scan_evt_t const* scan_evt) {
   ret_code_t err_code;
 
-  switch(p_scan_evt->scan_evt_id)
+  switch(scan_evt->scan_evt_id)
   {
     case NRF_BLE_SCAN_EVT_NOT_FOUND:
       NRF_LOG_INFO("No Filter match! Doh");
       break;
     case NRF_BLE_SCAN_EVT_FILTER_MATCH:
-      NRF_LOG_INFO("Filter match! Yay");
+      NRF_LOG_INFO("Filter matched! Yay");
+      break;
+    case NRF_BLE_SCAN_EVT_CONNECTED:
+      NRF_LOG_INFO("SCAN_EVT_CONNECTED");
       break;
     case NRF_BLE_SCAN_EVT_CONNECTING_ERROR:
-      err_code = p_scan_evt->params.connecting_err.err_code;
+      NRF_LOG_INFO("SCAN_EVT_CONNECTING_ERROR");
+      err_code = scan_evt->params.connecting_err.err_code;
       APP_ERROR_CHECK(err_code);
+      break;
+    case NRF_BLE_SCAN_EVT_SCAN_TIMEOUT:
+      NRF_LOG_INFO("SCAN_EVT_TIMEOUT");
       break;
     default:
       break;
@@ -393,7 +400,6 @@ static void scan_init(void) {
 
   init_scan.connect_if_match = true;
   init_scan.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
-  init_scan.connect_if_match = false;
 
   //ble_gap_scan_params_t* scan_params;
   //memset(&scan_params, 0, sizeof(scan_params));

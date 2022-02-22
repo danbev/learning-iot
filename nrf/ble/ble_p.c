@@ -45,7 +45,7 @@ static void log_error(ret_code_t err);
 #define PERIPHERAL_ADVERTISING_LED      BSP_BOARD_LED_2
 #define PERIPHERAL_CONNECTED_LED        BSP_BOARD_LED_3
 
-#define DEVICE_NAME                     "BLE_Peripheral_Example"
+#define DEVICE_NAME                     "BLE_Ex"
 
 #define APP_BLE_OBSERVER_PRIO           3
 
@@ -565,7 +565,6 @@ static void idle_state_handle(void) {
 }
 
 static void pm_evt_handler(pm_evt_t const* p_evt) {
-  NRF_LOG_INFO("pm_event_handler...<------------------");
   pm_handler_on_pm_evt(p_evt);
   pm_handler_disconnect_on_sec_failure(p_evt);
   pm_handler_flash_clean(p_evt);
@@ -603,7 +602,6 @@ static void peer_manager_init(void) {
   sec_param.kdist_peer.enc = 1;
   sec_param.kdist_peer.id  = 1;
 
-  NRF_LOG_INFO("here....");
   err_code = pm_sec_params_set(&sec_param);
   log_error(err_code);
   APP_ERROR_CHECK(err_code);
