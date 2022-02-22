@@ -3034,5 +3034,6 @@ little slow.
 Is a type of EEPROM which is programmed and erased in large blocks in stead of
 bytes/words.
 
-
-
+### Headers
+Headers on a PCB (Printed Circuit Board) board are internal ports. So this is
+nothing to do with software headers.
