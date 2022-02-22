@@ -1,5 +1,4 @@
 SDK_ROOT := /home/danielbevenius/work/iot/nrf-sdk/nRF5_SDK_17.1.0_ddde560
-TARGETS          := ble_p ble_c
 OUTPUT_DIRECTORY := build
 
 # The serial number can be retrieved using dmesg or
@@ -9,8 +8,10 @@ DEVICE2_SERIAL_NR = 682659901
 
 ifneq ($(shell echo $(MAKECMDGOALS) | egrep "*ble_p"),)
   TARGET_SOURCE=ble_p.c
+  TARGETS := ble_p
 else
   TARGET_SOURCE=ble_c.c
+  TARGETS := ble_c
 endif
 $(info "Building for $(TARGET_SOURCE)")
 
@@ -374,10 +375,7 @@ ble_c: ASMFLAGS += -D__STACK_SIZE=8192
 LIB_FILES += -lc -lnosys -lm
 
 
-.PHONY: default help pre
-
-# Default target - first one defined
-default: ble_p
+.PHONY: help pre
 
 # Print all targets that can be built
 define HELP_MSG
@@ -407,12 +405,12 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 .PHONY: flash flash_softdevice erase mergehex
 
-flash_ble_p: default
+flash_ble_p: ble_p
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_p.hex
 	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/ble_p.hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
-flash_ble_c: default
+flash_ble_c: ble_c
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_c.hex
 	nrfjprog -f nrf52 -s $(DEVICE2_SERIAL_NR) --program $(OUTPUT_DIRECTORY)/ble_c.hex --sectorerase
 	nrfjprog -f nrf52 -s $(DEVICE2_SERIAL_NR) --reset
