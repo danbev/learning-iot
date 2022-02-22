@@ -135,7 +135,8 @@ similar to the below for ble_c:
 00>
 00> <info> app: BLE Central example started.
 00>
-00> <debug> ble_scan: Scanning
+00> <info> app: ADDR: E1:9E:91:ED:7:E2
+00>
 ```
 
 

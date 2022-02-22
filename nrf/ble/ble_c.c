@@ -158,7 +158,7 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
   ble_gap_evt_t const* p_gap_evt = &p_ble_evt->evt.gap_evt;
 
   switch (p_ble_evt->header.evt_id) {
-    // Upon connection, check which peripheral has connected (HR or RSC), initiate DB
+    // Upon connection, check which peripheral has connected, initiate DB
     // discovery, update LEDs status and resume scanning if necessary.
     case BLE_GAP_EVT_CONNECTED:
       NRF_LOG_INFO("Connected.");
@@ -388,8 +388,8 @@ static void scan_init(void) {
   ble_gap_scan_params_t* scan_params;
   memset(&scan_params, 0, sizeof(scan_params));
   // Limit the Primary Advertising channel to channel 48
-  scan_params->channel_mask[4] = 0xA0;
-  init_scan.p_scan_param = scan_params;
+  //scan_params->channel_mask[4] = 0xA0;
+  //init_scan.p_scan_param = scan_params;
 
   err_code = nrf_ble_scan_init(&m_scan, &init_scan, scan_evt_handler);
   APP_ERROR_CHECK(err_code);
@@ -417,6 +417,7 @@ static void idle_state_handle(void) {
 }
 
 int main(void) {
+  ret_code_t err_code;
   log_init();
   leds_init();
   timer_init();
@@ -430,6 +431,12 @@ int main(void) {
   lbs_c_init();
 
   NRF_LOG_INFO("BLE Central example started.");
+  ble_gap_addr_t addr;
+  err_code = sd_ble_gap_addr_get(&addr);
+  APP_ERROR_CHECK(err_code);
+  NRF_LOG_INFO("ADDR: %x:%x:%x:%x:%x:%x\n", addr.addr[5], addr.addr[4],
+      addr.addr[3], addr.addr[2], addr.addr[1], addr.addr[0]);
+
   scan_start();
 
   // Turn on the LED to signal scanning.
