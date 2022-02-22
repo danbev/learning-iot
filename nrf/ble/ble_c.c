@@ -86,7 +86,6 @@ NRF_BLE_GQ_DEF(m_ble_gatt_queue,
 
 static char const target_name[] = "BLE_Peripheral_Example";
 
-
 /**@brief Function for handling the LED Button Service client errors.
  *
  * @param[in]   nrf_error   Error code containing information about what went wrong.
@@ -158,6 +157,9 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context)
   ble_gap_evt_t const* p_gap_evt = &p_ble_evt->evt.gap_evt;
 
   switch (p_ble_evt->header.evt_id) {
+    case BLE_GAP_EVT_SEC_REQUEST:
+      NRF_LOG_INFO("ble_evt_handler BLE_GAP_EVT_SEC_REQUEST...");
+      break;
     // Upon connection, check which peripheral has connected, initiate DB
     // discovery, update LEDs status and resume scanning if necessary.
     case BLE_GAP_EVT_CONNECTED:
@@ -303,6 +305,12 @@ static void scan_evt_handler(scan_evt_t const* p_scan_evt) {
 
   switch(p_scan_evt->scan_evt_id)
   {
+    case NRF_BLE_SCAN_EVT_NOT_FOUND:
+      NRF_LOG_INFO("No Filter match! Doh");
+      break;
+    case NRF_BLE_SCAN_EVT_FILTER_MATCH:
+      NRF_LOG_INFO("Filter match! Yay");
+      break;
     case NRF_BLE_SCAN_EVT_CONNECTING_ERROR:
       err_code = p_scan_evt->params.connecting_err.err_code;
       APP_ERROR_CHECK(err_code);
@@ -385,8 +393,10 @@ static void scan_init(void) {
 
   init_scan.connect_if_match = true;
   init_scan.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
-  ble_gap_scan_params_t* scan_params;
-  memset(&scan_params, 0, sizeof(scan_params));
+  init_scan.connect_if_match = false;
+
+  //ble_gap_scan_params_t* scan_params;
+  //memset(&scan_params, 0, sizeof(scan_params));
   // Limit the Primary Advertising channel to channel 48
   //scan_params->channel_mask[4] = 0xA0;
   //init_scan.p_scan_param = scan_params;
