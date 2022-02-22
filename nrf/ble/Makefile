@@ -4,6 +4,7 @@ OUTPUT_DIRECTORY := build
 # The serial number can be retrieved using dmesg or
 # using nrfjprog -i
 # Remove any preceeding zeros first.
+DEVICE1_SERIAL_NR = 682331059
 DEVICE2_SERIAL_NR = 682659901
 
 ifneq ($(shell echo $(MAKECMDGOALS) | egrep "*ble_p"),)
@@ -407,8 +408,8 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 flash_ble_p: ble_p
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_p.hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/ble_p.hex --sectorerase
-	nrfjprog -f nrf52 --reset
+	nrfjprog -f nrf52 -s $(DEVICE1_SERIAL_NR) --program $(OUTPUT_DIRECTORY)/ble_p.hex --sectorerase
+	nrfjprog -f nrf52 -s $(DEVICE1_SERIAL_NR) --reset
 
 flash_ble_c: ble_c
 	@echo Flashing: $(OUTPUT_DIRECTORY)/ble_c.hex
