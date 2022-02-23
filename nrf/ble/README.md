@@ -10,7 +10,6 @@ environment variable `SDK_ROOT ` be set to point to the SDK.
 This example also uses an external LED which can be turned on and off using
 nrf-connect.
 
-```
 #### Building
 First the BLE protocol stack (SoftDevice s132) needs to be flashed to the device:
 ```console
