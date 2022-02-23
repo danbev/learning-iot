@@ -107,27 +107,27 @@ static void log_error(ret_code_t err);
 //#define LESC_DEBUG_MODE                 1
 
 /* LED Button Service (LBS) instance. */
-BLE_LBS_DEF(m_lbs);
+BLE_LBS_DEF(lbs);
 
 /* GATT module instance. */
-NRF_BLE_GATT_DEF(m_gatt);
+NRF_BLE_GATT_DEF(gatt);
 
 /* Context for the Queued Write module. */
-NRF_BLE_QWR_DEF(m_qwr);
+NRF_BLE_QWR_DEF(qwr);
 
 /* Advertising module instance. */
-BLE_ADVERTISING_DEF(m_advertising);
+BLE_ADVERTISING_DEF(advertising);
 
 /* Handle of the current connection. */
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;
+static uint16_t conn_handle = BLE_CONN_HANDLE_INVALID;
 
-static ble_uuid_t m_adv_uuids[] = {
+static ble_uuid_t adv_uuids[] = {
     {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
 };
 
 #define DEAD_BEEF                           0xDEADBEEF
-void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name) {
-  app_error_handler(DEAD_BEEF, line_num, p_file_name);
+void assert_nrf_callback(uint16_t line_num, const uint8_t* file_name) {
+  app_error_handler(DEAD_BEEF, line_num, file_name);
 }
 
 static void leds_init(void) {
@@ -170,7 +170,7 @@ static void gap_params_init(void) {
 }
 
 static void gatt_init(void) {
-  ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
+  ret_code_t err_code = nrf_ble_gatt_init(&gatt, NULL);
   APP_ERROR_CHECK(err_code);
 }
 
@@ -180,7 +180,7 @@ static void advertising_init(void) {
   ble_advdata_t advdata;
   ble_advdata_t srdata;
 
-  ble_uuid_t adv_uuids[] = {{LBS_UUID_SERVICE, m_lbs.uuid_type}};
+  ble_uuid_t adv_uuids[] = {{LBS_UUID_SERVICE, lbs.uuid_type}};
 
   // Build and set advertising data.
   memset(&advdata, 0, sizeof(advdata));
@@ -262,7 +262,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
 
     case BLE_ADV_EVT_IDLE:
       {
-        ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+        ret_code_t err_code = ble_advertising_start(&advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(err_code);
         break;
       }
@@ -294,7 +294,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
 */
 
 static void advertising_init(void) {
-  ret_code_t             err_code;
+  ret_code_t err_code;
   ble_advertising_init_t init;
 
   memset(&init, 0, sizeof(init));
@@ -302,8 +302,8 @@ static void advertising_init(void) {
   init.advdata.name_type = BLE_ADVDATA_FULL_NAME;
   init.advdata.include_appearance = true;
   init.advdata.flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-  init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-  init.advdata.uuids_complete.p_uuids = m_adv_uuids;
+  init.advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+  init.advdata.uuids_complete.p_uuids = adv_uuids;
 
   init.config.ble_adv_fast_enabled = true;
   init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;
@@ -311,10 +311,10 @@ static void advertising_init(void) {
 
   init.evt_handler = on_adv_evt;
 
-  err_code = ble_advertising_init(&m_advertising, &init);
+  err_code = ble_advertising_init(&advertising, &init);
   APP_ERROR_CHECK(err_code);
 
-  ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+  ble_advertising_conn_cfg_tag_set(&advertising, APP_BLE_CONN_CFG_TAG);
 }
 
 static void nrf_qwr_error_handler(uint32_t nrf_error) {
@@ -322,7 +322,7 @@ static void nrf_qwr_error_handler(uint32_t nrf_error) {
 }
 
 static void led_write_handler(uint16_t conn_handle,
-                              ble_lbs_t* p_lbs, uint8_t led_state) {
+                              ble_lbs_t* lbs, uint8_t led_state) {
   if (led_state) {
     nrf_gpio_pin_set(LEDBUTTON_LED2);
     NRF_LOG_INFO("Received LED ON!");
@@ -341,21 +341,21 @@ static void services_init(void) {
   // Initialize Queued Write Module.
   qwr_init.error_handler = nrf_qwr_error_handler;
 
-  err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init);
+  err_code = nrf_ble_qwr_init(&qwr, &qwr_init);
   APP_ERROR_CHECK(err_code);
 
   // Initialize Led Button Service.
   init.led_write_handler = led_write_handler;
 
-  err_code = ble_lbs_init(&m_lbs, &init);
+  err_code = ble_lbs_init(&lbs, &init);
   APP_ERROR_CHECK(err_code);
 }
 
-static void on_conn_params_evt(ble_conn_params_evt_t* p_evt) {
+static void on_conn_params_evt(ble_conn_params_evt_t* evt) {
   ret_code_t err_code;
 
-  if (p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED) {
-    err_code = sd_ble_gap_disconnect(m_conn_handle,
+  if (evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED) {
+    err_code = sd_ble_gap_disconnect(conn_handle,
                                      BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
     APP_ERROR_CHECK(err_code);
   }
@@ -397,7 +397,7 @@ static void advertising_start(bool erase_bonds) {
   if (erase_bonds) {
     delete_bonds();
   } else {
-    ret_code_t err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+    ret_code_t err_code = ble_advertising_start(&advertising, BLE_ADV_MODE_FAST);
     log_error(err_code);
     APP_ERROR_CHECK(err_code);
 
@@ -405,13 +405,13 @@ static void advertising_start(bool erase_bonds) {
   }
 }
 
-static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
+static void ble_evt_handler(ble_evt_t const* ble_evt, void* context) {
   ret_code_t err_code = NRF_SUCCESS;
-  NRF_LOG_INFO("ble_evt_handler header.evt_id: %d", p_ble_evt->header.evt_id);
+  NRF_LOG_INFO("ble_evt_handler header.evt_id: %d", ble_evt->header.evt_id);
 
   nrf_ble_lesc_request_handler();
 
-  switch (p_ble_evt->header.evt_id) {
+  switch (ble_evt->header.evt_id) {
     case BLE_GAP_EVT_DISCONNECTED:
       NRF_LOG_INFO("Disconnected.");
       break;
@@ -421,11 +421,11 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
       err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
       APP_ERROR_CHECK(err_code);
 
-      m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-      err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
+      conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      err_code = nrf_ble_qwr_conn_handle_assign(&qwr, conn_handle);
       APP_ERROR_CHECK(err_code);
 
-      err_code = pm_conn_secure(p_ble_evt->evt.gap_evt.conn_handle, false);
+      err_code = pm_conn_secure(ble_evt->evt.gap_evt.conn_handle, false);
       if (err_code != NRF_ERROR_BUSY) {
         APP_ERROR_CHECK(err_code);
       }
@@ -434,14 +434,14 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
     case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
       NRF_LOG_DEBUG("PHY update request.");
       ble_gap_phys_t const phys = {BLE_GAP_PHY_AUTO, BLE_GAP_PHY_AUTO};
-      err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
+      err_code = sd_ble_gap_phy_update(ble_evt->evt.gap_evt.conn_handle, &phys);
       APP_ERROR_CHECK(err_code);
       break;
 
       case BLE_GATTC_EVT_TIMEOUT:
         // Disconnect on GATT Client timeout event.
         NRF_LOG_DEBUG("GATT Client Timeout.");
-        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+        err_code = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
                                          BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
         APP_ERROR_CHECK(err_code);
         break;
@@ -449,7 +449,7 @@ static void ble_evt_handler(ble_evt_t const* p_ble_evt, void* p_context) {
       case BLE_GATTS_EVT_TIMEOUT:
         // Disconnect on GATT Server timeout event.
         NRF_LOG_DEBUG("GATT Server Timeout.");
-        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+        err_code = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle,
                                          BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
         APP_ERROR_CHECK(err_code);
         break;
@@ -495,7 +495,7 @@ static void bsp_event_handler(bsp_event_t event) {
       break; // BSP_EVENT_SLEEP
 
       case BSP_EVENT_DISCONNECT:
-        err_code = sd_ble_gap_disconnect(m_conn_handle,
+        err_code = sd_ble_gap_disconnect(conn_handle,
                                          BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
         if (err_code != NRF_ERROR_INVALID_STATE) {
           APP_ERROR_CHECK(err_code);
@@ -503,8 +503,8 @@ static void bsp_event_handler(bsp_event_t event) {
         break; // BSP_EVENT_DISCONNECT
 
       case BSP_EVENT_WHITELIST_OFF:
-        if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
-          err_code = ble_advertising_restart_without_whitelist(&m_advertising);
+        if (conn_handle == BLE_CONN_HANDLE_INVALID) {
+          err_code = ble_advertising_restart_without_whitelist(&advertising);
           if (err_code != NRF_ERROR_INVALID_STATE) {
             APP_ERROR_CHECK(err_code);
           }
@@ -525,7 +525,7 @@ static void log_error(ret_code_t err) {
   }
 }
 
-static void buttons_init(bool* p_erase_bonds) {
+static void buttons_init(bool* erase_bonds) {
   ret_code_t err_code;
   bsp_event_t startup_event;
 
@@ -538,7 +538,7 @@ static void buttons_init(bool* p_erase_bonds) {
   err_code = bsp_btn_ble_init(NULL, &startup_event);
   APP_ERROR_CHECK(err_code);
 
-  *p_erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
+  *erase_bonds = (startup_event == BSP_EVENT_CLEAR_BONDING_DATA);
 }
 
 static void log_init(void) {
@@ -564,12 +564,12 @@ static void idle_state_handle(void) {
   }
 }
 
-static void pm_evt_handler(pm_evt_t const* p_evt) {
-  pm_handler_on_pm_evt(p_evt);
-  pm_handler_disconnect_on_sec_failure(p_evt);
-  pm_handler_flash_clean(p_evt);
+static void pm_evt_handler(pm_evt_t const* evt) {
+  pm_handler_on_pm_evt(evt);
+  pm_handler_disconnect_on_sec_failure(evt);
+  pm_handler_flash_clean(evt);
 
-  switch (p_evt->evt_id) {
+  switch (evt->evt_id) {
     case PM_EVT_PEERS_DELETE_SUCCEEDED:
       advertising_start(false);
       break;
@@ -581,7 +581,7 @@ static void pm_evt_handler(pm_evt_t const* p_evt) {
 
 static void peer_manager_init(void) {
   ble_gap_sec_params_t sec_param;
-  ret_code_t           err_code;
+  ret_code_t err_code;
 
   err_code = pm_init();
   APP_ERROR_CHECK(err_code);
