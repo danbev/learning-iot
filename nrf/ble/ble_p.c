@@ -310,6 +310,8 @@ static void advertising_init(void) {
   init.config.ble_adv_fast_timeout = APP_ADV_DURATION;
 
   init.evt_handler = on_adv_evt;
+  // Limit the Primary Advertising channel to channel 38.
+  advertising.adv_params.channel_mask[4] = 0xA0;
 
   err_code = ble_advertising_init(&advertising, &init);
   APP_ERROR_CHECK(err_code);

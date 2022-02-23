@@ -401,11 +401,11 @@ static void scan_init(void) {
   init_scan.connect_if_match = true;
   init_scan.conn_cfg_tag = APP_BLE_CONN_CFG_TAG;
 
-  //ble_gap_scan_params_t* scan_params;
-  //memset(&scan_params, 0, sizeof(scan_params));
-  // Limit the Primary Advertising channel to channel 48
-  //scan_params->channel_mask[4] = 0xA0;
-  //init_scan.p_scan_param = scan_params;
+  // Limit the Primary Advertising channel to channel 38.
+  ble_gap_scan_params_t* scan_params;
+  memset(&scan_params, 0, sizeof(scan_params));
+  scan_params->channel_mask[4] = 0xA0;
+  init_scan.p_scan_param = scan_params;
 
   err_code = nrf_ble_scan_init(&m_scan, &init_scan, scan_evt_handler);
   APP_ERROR_CHECK(err_code);
