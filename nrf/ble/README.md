@@ -139,7 +139,22 @@ similar to the below for ble_c:
 00>
 ```
 
+![BLE example setup](./img/ble-p-c-setup.jpg "Setup image of this example")
 
+And if we press `Button 1` once the devices have paired with each other
+(LED 2 on the central will be on) we should see the LED light up:
+
+![BLE example in action](./img/ble-p-c-led.jpg "Image of pressing button 1")
+
+_wip_ 
+
+Now, both the peripheral and the central in this example have been configured
+to only use one single advertising channel, which is channel 38. The idea is
+to hopefully not miss advertisment packets sent by these two devices and be able
+to capture them using Ubertooth one:
+```console
+$ ubertooth-btle -f -A 38 -tef:47:d2:57:6a:f6 -c /tmp/pipe
+```
 
 ### Ubertooth One issue
 I've had huge problems trying to capture packets with ubertooth one and it
