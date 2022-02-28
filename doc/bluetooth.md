@@ -1043,3 +1043,17 @@ This should now start capturing packets in wireshark and also there will be
 output in the console.
 
 
+### btmon
+Instead of trying to sniff packets on the air between two devices we can instead
+listen/sniff them on a lap top.
+
+```console
+$ sudo btmon -w btmon.log
+Bluetooth monitor ver 5.62
+= Note: Linux version 5.13.14-200.fc34.x86_64 (x86_64)                                                                                                0.153003
+= Note: Bluetooth subsystem version 2.22                                                                                                              0.153005
+= New Index: 84:FD:D1:5C:FE:7B (Primary,USB,hci0)                                                                                              [hci0] 0.153005
+= Open Index: 84:FD:D1:5C:FE:7B                                                                                                                [hci0] 0.153005
+= Index Info: 84:FD:D1:5C:FE:7B (Intel Corp.)                                                                                                  [hci0] 0.153006
+@ MGMT Open: bluetoothd (privileged) version 1.20                                                                                            {0x0001} 0.153006
+```
