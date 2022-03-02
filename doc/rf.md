@@ -805,3 +805,17 @@ all neighbouring values only have a single bit error between them now.
 BER = --------------------
       Total Number of bits
 ```
+
+### RTL-SDR
+Is a computer based radio scanner for receiving live radio signals:
+
+![RTL-SDR image](./doc/img/rtl-sdr.jpg "RTL-SDR image")
+
+### ggrx
+GQRX is an open source software defined radio receiver (SDR) powered by the GNU
+Radio and the Qt graphical toolkit.
+I've read that the name comes from GNU Radio (G), Qt (Q), and RX (receive).
+
+Below is an image of this running tuned into a local radio station:
+
+![GQRX image](./doc/img/gqrx.jpg "GQRX image")
