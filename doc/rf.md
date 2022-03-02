@@ -397,7 +397,7 @@ Lets say we have a signal with a frequency of 200Hz. And recall that frequency
 is the number of waves that pass a fixed place in a given amount of time (in
 Hertz this is per second.
 
-![Frequancy image](./doc/img/frequency.png "Frequency image")
+![Frequancy image](./img/frequency.png "Frequency image")
 
 So the more waves that complete the higher the frequency. These waves are
 shorter and the lower frequency waves are longer.
@@ -809,7 +809,7 @@ BER = --------------------
 ### RTL-SDR
 Is a computer based radio scanner for receiving live radio signals:
 
-![RTL-SDR image](./doc/img/rtl-sdr.jpg "RTL-SDR image")
+![RTL-SDR image](./img/rtl-sdr.jpg "RTL-SDR image")
 
 ### ggrx
 GQRX is an open source software defined radio receiver (SDR) powered by the GNU
@@ -818,4 +818,4 @@ I've read that the name comes from GNU Radio (G), Qt (Q), and RX (receive).
 
 Below is an image of this running tuned into a local radio station:
 
-![GQRX image](./doc/img/gqrx.jpg "GQRX image")
+![GQRX image](./img/gqrx.jpg "GQRX image")
