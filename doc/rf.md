@@ -109,10 +109,10 @@ Amplitude
    |   |   |
    |   +---+
    |       T₁
-
+       1 (high to low represents 1 bit)
 
    ^
-   |
+   |   
    |   ----+
    |   |
    |   |
@@ -122,6 +122,49 @@ Amplitude
    +---+
    |       T₁
 
+       0 (low to high represents 0 bit)
+```
+
+#### Modified Miller 
+In this coding scheme where a 1 bit is always represented by:
+```
+   ^
+   |
+   ----+ +--
+   |   | |
+   |   | |
+   +---+-+----> time
+   |   
+   | 
+   |       T₁
+       1 (high to low represents 1 bit)
+```
+But a 0 bit representation depends on the bit that comes before it. If the
+preceeding bit is 0 then:
+```
+   ^
+   |
+   + +----
+   | |
+   | |
+   +-+-+-+----> time
+   |   
+   | 
+   |       T₁
+       0 
+```
+And if the preceeding bit was 1:
+```
+   ^
+   |
+   +----
+   |
+   |
+   +-+-+-+----> time
+   |   
+   | 
+   |       T₁
+       0 
 ```
 
 ### Pulse shapings techniques
