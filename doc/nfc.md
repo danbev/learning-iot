@@ -94,6 +94,21 @@ Tag to reader: Load modulation (ASK) TODO: explain this
 * Short Range
 * Communication speeds up to 106 kbits/s
 
+Reader to tag:
+```
+                  Type A            Type B
+Bit encoding      Modified Miller   NRZ (No Return to Zero)
+Data modulation   100% ASK          10% ASK
+```
+
+Tag to reader:
+```
+                  Type A            Type B
+Bit encoding      Manchester        NRZ
+Data modulation   Load modulation   Load modulation
+```
+See [rf.md](./rf.md) for explaination of bit encodings mentioned above.
+
 ### ISO 15693
 * 13.56 MHz carrier wave.
 * Magnetic coupling between reader and tag.
