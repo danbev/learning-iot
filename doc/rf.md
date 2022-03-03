@@ -332,6 +332,9 @@ Many materials do not allow visible light to pass at all but do pass
 lower-frequency radio waves. Radio waves can travel through most nonconductive
 materials,
 
+### Signal
+Any series of data points that change over time can be through of as a signal.
+
 
 ### Modulated Signal
 This example is of a computer sending data over a telephone, like when we used
@@ -354,6 +357,46 @@ y(t) = A(t)     *        sin(2π f(t)     + ψ(t))
 So amplitude is the max distance of the trough/crest. And frequency is the
 number of cycles per second. Notice that the phase is added so this would be
 the higth of the y axis.
+
+Modulation is used to reduce the size of the antenna use to send/receive the
+signals. For example:
+```
+c = λf
+
+c = speed of light,  3*10⁸/ms
+λ = wavelength of the signal
+f = frequency of the signal
+
+L = λ/4
+
+L = length of antenna
+```
+So say we have signal that is to be transmitted which has a frequency of 10KHz:
+```
+          3*10⁸
+λ = c/f = ----- = 30000m
+          10⁴
+
+L = 30000/4 = 7500 m
+```
+So having an antennna of 7500m is not very practical. But if we use a higher
+frequency like instead of 10KHz we use 10MHz, we would get:
+```
+          3*10⁸
+λ = c/f = ----- = 300m
+          10⁶
+
+L = 300/4 = 75m
+```
+That is still a faily long antenna but if we keep increasing the frequency
+this will become lower:
+```
+          3*10⁸
+λ = c/f = ----- = 0.4115226m
+          20⁶
+
+L = 0.4115226/4 = 1.171875m
+```
 
 ### Amplitude Modulation (AM)
 We start with an input signal which is what we want to send to the reciever.
@@ -819,3 +862,16 @@ I've read that the name comes from GNU Radio (G), Qt (Q), and RX (receive).
 Below is an image of this running tuned into a local radio station:
 
 ![GQRX image](./img/gqrx.jpg "GQRX image")
+
+
+### Baseband
+Refers to signals before modulation and these have much lower frequencies than
+the carrier frequency signal after modulation.
+So just to recap, we have a signal before modulation, a carrier signal, and a
+signal after modulation.
+
+This could be a stream of bits that is the information that we want to send.
+
+### Passband
+Refers to signals after modulation which have frequencies around the carrier
+signals frequency.
