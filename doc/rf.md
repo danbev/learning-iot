@@ -922,13 +922,13 @@ $ inspectrum
 Also adjust the sample rate to be the same as we specified using the `-s` option
 above.
 
-![Garage clicker inspectrum image](./img/inspectrum.jpg "Garage clicker inspectrum image")
+![Garage clicker inspectrum image](./img/inspectrum.png "Garage clicker inspectrum image")
 
 Now, we can scroll to and zoom in on a portion of the sample and stop at the
 first click of the button. If we right-click in inspectrum we can add an
 amplitude plot and then move it towards the middle of our sample.
 
-![Inspectrum with plot image](./img/inspectrum-with-plot.jpg "Inspectrum image with sample plot")
+![Inspectrum with plot image](./img/inspectrum-with-plot.png "Inspectrum image with sample plot")
 
 _work in progress_
 
