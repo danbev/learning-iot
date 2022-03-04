@@ -640,7 +640,7 @@ The frequency of E is the same as the frequency of B.
 E = cB
 ```
 
-### Amplitude Shift Keying
+### Amplitude Shift Keying (ASK)
 This is where we take a digital message and multiply it with our high frequency
 carrier signal, and vary the amplitude of the carrier signal depending on the
 digital message values 0 or 1.
@@ -649,12 +649,13 @@ amplitude 1 one is whatever the amplitude of the carrier signal. So the bits
 1010 would be transmitted as a pulse with an amplitude of the carriers signal, 
 followed by a pulse of zero amplitude and so on.
 
-### Frequency Shift Keying
+### Frequency Shift Keying (FSK)
 This is where we take a digital message and multiply it with our high frequency
 carrier signal, and vary the frequency of the carrier signal depending on the
-digital message values 0 or 1.
+digital message values 0 or 1, so a high frequency could represent a 1 and a
+low frequency a 0.
 
-### Phase Shift Keying
+### Phase Shift Keying (PSK)
 This is where we take a digital message and multiply it with our high frequency
 carrier signal, and vary the phase of the carrier signal depending on the
 digital message values 0 or 1.
@@ -929,6 +930,15 @@ first click of the button. If we right-click in inspectrum we can add an
 amplitude plot and then move it towards the middle of our sample.
 
 ![Inspectrum with plot image](./img/inspectrum-with-plot.png "Inspectrum image with sample plot")
+
+![Inspectrum zoomed image](./img/inspectrum-zoomed.png "Inspectrum zoomed image")
+Now, I'm trying to understand what I'm seeing in this above image. What I think
+we are seeing here is that first there is the carrier signal (there is more of
+this to the left, from the beginning of the file). What we see above is the
+first press of the button and where we see a change in frequency. Hmm, could
+this actually be Amplitude Shift Keying, ON-OFF Keying?
+
+![Inspectrum ASK/OOK image](./img/inspectrum-ask-ook.png "Inspectrum ASK/OOK image")
 
 _work in progress_
 
