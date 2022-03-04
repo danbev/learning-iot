@@ -849,7 +849,7 @@ BER = --------------------
       Total Number of bits
 ```
 
-### RTL-SDR
+### RTL-SDR (RealTek Software Defined Radio)
 Is a computer based radio scanner for receiving live radio signals:
 
 ![RTL-SDR image](./img/rtl-sdr.jpg "RTL-SDR image")
@@ -875,3 +875,66 @@ This could be a stream of bits that is the information that we want to send.
 ### Passband
 Refers to signals after modulation which have frequencies around the carrier
 signals frequency.
+
+
+### Signal Reverse Engineering
+The thing we want to figure out are:
+* Frequency
+* Bandwidth
+* Modulation
+* Symbol rate
+* Packet structure
+
+1) Find the frequency that the device is using. This can be done by looking at
+the device and seeing if there is any make/model information and look that up
+online. It might be that a datasheet specifies the frequency that the device
+uses.
+
+So I've got this garage opener/clicker at home which is not activated, that is
+I can't open our garage door with it. But I'm interested in the process of
+finding it's frequency so I opened it up and took a look at the circuit board
+and found model number which I searched for. That lead me to an FCC
+identification number which I then [searched](https://fcc.io/) for and found
+that this device has a frequency of `433.92` MHz. Using `gprx` I was able to see
+this signal when pressing the button on the device:
+
+First without pressing the button:
+
+![Garage clicker no signal image](./img/garage-no-signal.jpg "Garage clicker image")
+
+And when pressing the button:
+
+![Garage clicker signal image](./img/garage-signal.jpg "Garage clicker signal image")
+
+Looking at this we can see that the frequency is `433.887`MHz.
+
+```console
+$ rtl_sdr -f 433887000 -s 2000000 -n 20000000 outfile.cu8
+```
+While this is running I clicked on the button a number of times to record the
+signal. The file format cu8 means Complex 8-bit unsigned integer samples
+(RTL-SDR).
+
+Now, we can open `outfile.cu8` in `inspectrum`:
+```console
+$ inspectrum
+```
+Also adjust the sample rate to be the same as we specified using the `-s` option
+above.
+
+![Garage clicker inspectrum image](./img/inspectrum.jpg "Garage clicker inspectrum image")
+
+Now, we can scroll to and zoom in on a portion of the sample and stop at the
+first click of the button. If we right-click in inspectrum we can add an
+amplitude plot and then move it towards the middle of our sample.
+
+![Inspectrum with plot image](./img/inspectrum-with-plot.jpg "Inspectrum image with sample plot")
+
+_work in progress_
+
+### Inspectrum
+Installing on Fedora:
+```console
+$ sudo dnf copr enable domrim/inspectrum
+$ sudo dnf install inspectrum
+```
