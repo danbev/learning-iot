@@ -661,6 +661,14 @@ carrier signal, and vary the phase of the carrier signal depending on the
 digital message values 0 or 1.
 
 
+### On-Off Keying (OOK)
+In OOK there is no carrier signal during the transmission of logical 0, but
+there is a carrier signal for logical one.
+So when looking at such a signal it might look like short lines with spaces
+between them. For example:
+
+![Inspectrum ASK/OOK image](./img/inspectrum-ask-ook.png "Inspectrum ASK/OOK image")
+
 ### Decibel (dB)
 This is a unit of measurment but not quite like kg or other units that we are
 used to. Instead this is a unit that has been calculated using a logarithmic
