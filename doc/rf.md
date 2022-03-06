@@ -944,9 +944,25 @@ Now, I'm trying to understand what I'm seeing in this above image. What I think
 we are seeing here is that first there is the carrier signal (there is more of
 this to the left, from the beginning of the file). What we see above is the
 first press of the button and where we see a change in frequency. Hmm, could
-this actually be Amplitude Shift Keying, ON-OFF Keying?
+this actually be Amplitude Shift Keying, ON-OFF Keying?  
+Notice that there seems to be a gap in the carrier signal which as mentioned
+earlier could be an indication of the usage of Amplitude Shift Keying/On-Off
+Keying (ASK/OOK):
 
 ![Inspectrum ASK/OOK image](./img/inspectrum-ask-ook.png "Inspectrum ASK/OOK image")
+
+I'm really not sure if I'm reading this correctly but this is may current take
+on this plot. The first high is a 1 followed by a 0, and this repeats for
+12 1,0 pairs. Could this be part of a preamble or start of frame (SOF) perhaps?
+
+We can use cursors in inspectrum so try to mark this suspected preamble:
+
+![Inspectrum Cursors image](./img/inspectrum-cursors.png "Inspectrum cursors image")
+
+We can then use the feature "Extract symbols" to generate values:
+```console
+16.5099, 10.8704, -0.960911, -0.988292, 13.8764, 16.2672, -0.980572, -0.992653, 16.5705, 9.20613, -0.997783, -0.986037, 1.34407, 8.89046, 3.48645, -0.995785, -0.961667, 8.09094, 11.6317, -0.987316, -0.986054, 15.0077, 16.1414, -0.981723, -0.999597, 13.1727, 8.94459, -0.995286, -0.998871, 7.86121, 8.10315, -0.999448, -0.964347, 0.488958, 8.39341, 0.859234, -0.961367, -0.994157, 11.807, 12.1975, -0.989033, -0.999805, 9.43692, 8.28986, -0.963617, -0.989944, 16.6482, 13.1775, -0.987882, -0.997981,
+```
 
 _work in progress_
 
