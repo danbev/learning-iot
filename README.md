@@ -1770,8 +1770,8 @@ the Test in the name JTAG, it was for testing pins on a chip that has JTAG built
 into it.
 
 There was also an issue with the higher performace of signals which I
-think lead to issues where having test test probes which disturbed the signals
-on the device. So these companies came together to come up with a standard piece
+think lead to issues where having test probes which disturbed the signals on the
+device. So these companies came together to come up with a standard piece
 of hardware embedded on the chips to enable this kind of testing. This is called
 the JTAG Port which is the test access port.
 
