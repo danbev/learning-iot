@@ -1763,7 +1763,7 @@ Recommended Standard 232.
 ### JTAG (Joint Test Action Group)
 Is a protocol for inspecting/testing microcontrollers. This is a standard that
 goes back to the 1980 where manufacturues ran into problems when components were
-becomming smaller and it was not as each to access pins on their devices for
+becomming smaller and it was not as easy to access pins on their devices for
 testing. What was used was a bed of nails test system which I think were pins
 that needed to be in contact with the CI for testing. This is the reason for
 the Test in the name JTAG, it was for testing pins on a chip that has JTAG built
