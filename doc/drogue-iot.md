@@ -791,5 +791,4 @@ the above linked branch as I'm not sure if that is a valid change. I'm going to
 ask the Drogue team for some feedback on this before doing anything further.
 Either way it was a good excersice to go through and write these examples.
 
-[drogue-device issue]()
-TODO: add link to issue when created.
+[drogue-device pull request](https://github.com/drogue-iot/drogue-device/pull/171)
