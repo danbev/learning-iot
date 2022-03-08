@@ -6,6 +6,7 @@ various concepts related to nrf boards.
 1. [LED](./led/README.md)
 1. [Timer](./timer)
 1. [BlueTooth Low Energy (BLE)](./ble/README.md)
+1. [Near Field Communication (NFC)](./nfc/README.md)
 
 ### Resources/Documentation
 [Product documentation](https://infocenter.nordicsemi.com/pdf/nRF52833_PS_v1.5.pdf)  
