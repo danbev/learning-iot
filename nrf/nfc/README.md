@@ -29,7 +29,7 @@ Connect the NFC antenna to the NFC port as shown below:
 
 ![NFC Board image](./img/nfc-image.jpg "NFC Board image")
 
-Now use a NRC reader, I'm using NFC Connect and move the smart phone close to
+Now use a NFC reader, I'm using NFC Connect and move the smart phone close to
 NRC antenna and LED1 will turn on:
 
 ![NFC LED turned on](./img/nfc-led-on.jpg "NFC LED on image")
