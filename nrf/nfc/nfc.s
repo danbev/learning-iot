@@ -22,6 +22,10 @@ len = . - tag
 .equ PACKETPTR_R, NFCT_BASE + 0x510
 .equ MAXLEN_R, NFCT_BASE + 0x514
 .equ EVENTS_READY, NFCT_BASE + 0x100
+.equ EVENTS_FIELDDETECTED, NFCT_BASE + 0x104
+
+.equ READY, 1
+.equ ACTIVATE, 1
 
 .global start
 
@@ -50,5 +54,17 @@ no_copy:
   ldr r1, =MAXLEN_R
   ldr r2, =len
   str r2, [r1]
+
+  /* This register is write only */
+  ldr r1, =TASKS_ACTIVATE_R
+  ldr r2, =ACTIVATE
+  str r2, [r1]
+
+wait_for_ready:
+  ldr r1, =EVENTS_READY
+  ldr r2, =READY
+  ldr r0, [r1]
+  cmp r0, r2
+  bne wait_for_ready
 
   bl .
