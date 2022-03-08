@@ -1,7 +1,7 @@
 ## Near Field Communication
 This type of wireless system is unique in the wireless spectrum as it can
-offer zero power consumption for an application, short distance, and low
-data-rate.
+offer zero power consumption for an application. It also offers short distance,
+and low data-rate similar to BLE and Zigbee.
 
 NRC can be used with BlueTooth and BLE for pairing of devices.
 
@@ -43,10 +43,10 @@ systems (LF and HF).
 -----------------
 ```
 The reader creates a magnetic field which when it comes in range of the tag,
-that is the reader or the tag need to move closer to each other than shown above
-as they are currently out of range. When they are in range the reader will send
-electricity through the conductive antenna. This allows the tag to be powered
-and allow for data stored on in the tag to be read.
+that is the reader or the tag needs to move closer to each other than shown
+above as they are currently out of range. When they are in range the reader will
+send electricity through the conductive antenna. This allows the tag to be
+powered and allow for data stored on in the tag to be read.
 This transfer of power is one things that limits the distance of this
 technology. And it is also the reason that that tag does not require and
 battery.
