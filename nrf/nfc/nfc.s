@@ -21,11 +21,15 @@ len = . - tag
 .equ ERRORSTATUS_R, NFCT_BASE + 0x404
 .equ PACKETPTR_R, NFCT_BASE + 0x510
 .equ MAXLEN_R, NFCT_BASE + 0x514
-.equ EVENTS_READY, NFCT_BASE + 0x100
-.equ EVENTS_FIELDDETECTED, NFCT_BASE + 0x104
+.equ EVENTS_READY_R, NFCT_BASE + 0x100
+.equ EVENTS_FIELDDETECTED_R, NFCT_BASE + 0x104
+.equ EVENTS_FIELDLOST_R, NFCT_BASE + 0x108
+.equ FIELDPRESENT_R, NFCT_BASE + 0x43C
 
 .equ READY, 1
 .equ ACTIVATE, 1
+.equ FIELD_DETECTED, 1
+.equ NOFIELD, 0
 
 .global start
 
@@ -47,6 +51,8 @@ copy_loop:
   b copy_loop
 
 no_copy:
+  bl led_init
+
   ldr r1, =PACKETPTR_R
   ldr r2, =tag
   str r2, [r1]
@@ -61,10 +67,30 @@ no_copy:
   str r2, [r1]
 
 wait_for_ready:
-  ldr r1, =EVENTS_READY
+  ldr r1, =EVENTS_READY_R
   ldr r2, =READY
   ldr r0, [r1]
   cmp r0, r2
   bne wait_for_ready
 
-  bl .
+main_loop:
+wait_for_field_detected:
+  ldr r1, =FIELDPRESENT_R
+  ldr r2, =FIELD_DETECTED
+  ldr r0, [r1]
+  and r0, r0, r2
+  cmp r0, #1
+  bne wait_for_field_detected
+
+  bl led_turn_on
+
+wait_for_field_lost:
+  ldr r1, =FIELDPRESENT_R
+  ldr r2, =NOFIELD
+  ldr r0, [r1]
+  cmp r0, r2
+  bne wait_for_field_lost
+
+  bl led_turn_off
+
+  bl main_loop
