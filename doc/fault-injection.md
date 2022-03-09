@@ -503,18 +503,17 @@ the AND gate in this case will be 0 & 0 this does not affect the output.
 
 With this we can detect when the input changes from low to high.
 ```
-
-                                          +----+               +----+            
-                                  D ------|NAND|---+-----------|NAND|-----+------- Q
-                                     +----|    |   |         +-|    |     |
-                                     |    +----+   |         | +----+     |
-                                     | +-----------+         +---------------+
-                                     | |                     |  |
-                                     | |                     |  +-----------+
-                                     | |                     |    +----+    |         _
-                  +-----+            | |  +----+             +----|NAND|----+-------- Q
-   C   --+--------| AND |            | +--|NAND|------------------|    |
-         | +---+  |     |------------+----|    |                  +----+
+                                          +----+                 +----+            
+                                  D ------|NAND|---+-------------|NAND|-----+------- Q
+                                     +----|    |   |           +-|    |     |
+                                     |    +----+   |           | +----+     |
+                                     | +-----------+         +--------------+
+                                     | |                     | |
+                                     | |                     | +-----------+
+                                     | |                     |   +----+    |         _
+                  +-----+            | |  +----+             +---|NAND|----+-------- Q
+   C   --+--------| AND |            | +--|NAND|-----------------|    |
+         | +---+  |     |------------+----|    |                 +----+
          +-|NOT|--|     |                 +----+
           +---+   +-----+
 ```
@@ -544,3 +543,29 @@ signal:
                0+---+ 1+-----+
 ```
 
+The Clocked D-Latch symbol above also contains two addition input pins/lines
+named PRE, and CLR:
+
+```
+NAND                                                        PRE
+0 0 0 = 1                                                    |
+0 0 1 = 1                                                    |   +----+ 
+0 1 0 = 1                                 +----+             +---|    |
+0 1 1 = 1                         D ------|NAND|---+-------------|NAND|-----+------- Q
+1 0 0 = 1                            +----|    |   |           +-|    |     |
+1 0 1 = 1                            |    +----+   |           | +----+     |
+1 1 0 = 1                            | +-----------+         +--------------+
+1 1 1 = 0                            | |                     | |
+                                     | |                     | +---------+
+                                     | |                     | +----+    |         _
+                  +-----+            | |  +----+             +-|NAND|----+-------- Q
+   C   --+--------| AND |            | +--|NAND|---------------|    |
+         | +---+  |     |------------+----|    |             +-|    |
+         +-|NOT|--|     |                 +----+             | +----+
+          +---+   +-----+                                    |  
+                                                            CLR
+```
+Notice that when PRE is set high regardless of the other inputs Q will be set
+to 1. And for CLR if it is high then Q_bar will be set to 1 and since it is the
+inverse of Q, Q will be set to 0. This is independant of the clock and is
+therefore called an asynchronous inputs (PRE and CLR that is).
