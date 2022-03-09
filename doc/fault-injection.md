@@ -569,3 +569,21 @@ Notice that when PRE is set high regardless of the other inputs Q will be set
 to 1. And for CLR if it is high then Q_bar will be set to 1 and since it is the
 inverse of Q, Q will be set to 0. This is independant of the clock and is
 therefore called an asynchronous inputs (PRE and CLR that is).
+
+Alright, so back to clock clitching. In this case we can imagine we have a
+number of Clock gated D-Latches. Every circuit has what is called propagation
+delay which is the time it takes for the signal to travel from the input to the
+output. This delay depends on many factors like the number and types of gates in
+the circuit, how they are connected, the data values of the input, and
+temparature, supply voltage etc. And each circuit will also have a maximum
+clock frequency that it can handle to allow this propagation to occur and if
+this is exceeded then the output is undeterministic or at least not what one
+would expect.
+
+So if we can cause the clock cycle to be shorter, a higher frequency, then we
+might be able to get the output to be some indeterminate value as it might not
+have time to propagate through the circuit. And note that the clock pulse is
+just a logic high value, if we can influence the C wire above in between a cycle
+then we have performed a clock clitch (at least that is my current take of how
+ this works).
+
