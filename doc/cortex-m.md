@@ -204,8 +204,66 @@ Is an internal 8MHz clock source. RC oscillator.
 Simlar to HSI but no very accurate. RC oscillator with a frequency of 40 kHz.
 
 #### Phase Locked Loop (PLL)
-Is the frequency doubling output of PLL.
-TODO: explain how this works.
+Is a feedback system where the goal is to provide a constant phase angle
+relative to the reference/input signal.
+
+```     
+REF     +----------------+   +-----+   +-----+
+  ------| Phase Detector |---| LPF |---| VCO |--->
+        +----------------+   +-----+   +-----+
+              ^                           |
+              |                           |
+              +---------------------------+
+
+LPF = Low Pass Filter
+VCO = Voltage Controlled Oscilator (unstable)
+REF = Reference Oscilator (stable)
+```
+Now, if we have this stable reference oscillator why are we going to the trouble
+to construct a PLL?  
+Well the reference oscillator is stable but has a low frequency. So we have this
+ref. oscillator which can provide a low stable frequency, and we have the VCO
+which can provide an high unstable frequency.
+For example a crystal oscillator is very stable but only provides a frequency
+of like 2MHz.
+
+
+Two signals with the same frequency but different phases will have the same,
+constant, phase difference. Both will follow the same path around a circle, or
+on the wave on a graph at different points in time but always at the same
+distance/angle between them. But for two signals with different frequencies they
+will move round the circle/graph at different speeds and the distance/angle will
+not be constant. 
+
+A Voltage Controlled Oscilator is a high frequency component that is suseptable
+to noice and temperature which can cause the frequency to change. We would like
+that the output signal from the VCO has as constant frequency and not one that
+can alternate. So we need a device/system that can stabilize the frequency so
+that they have the same phase.
+```
+Ref            +----------------+   +----+   +------+   +----------------+
+Oscillator ----| Phase Detector |---|AMPL|---|Filter|---| VCO            |--->
+2MHz           +----------------+   +----+   +------+   | High Freq. 2GHz|
+(stable)             ^                                  | Unstable       | 
+                     |                                  +----------------+
+                     |                                         |
+                     |2.1MHz+--------------+ 2.1GHz            |
+                     +------| Freq. Divider|-------------------+
+                            +--------------+
+
+```
+Notice that the frequency divider is reducing the frequency to match the
+frequency of the reference oscillator signal. Once we have done that we can
+compare the phases of the reference oscillator and the reduces signal, if they
+have a constant phase then they have the same frequency, but if the don't then
+their frequency differs. In this case the phase will not be constant as the
+reduced signal has a higher frequency and will be faster going around the
+circle/graph (this just helps me visualize how this works which might not make
+sense if anyone else actually reads this at some point). By calculating this
+phase difference we can convert the differenct to a voltage in the amplifier,
+and then filter will provide a voltage to the VCO to correct for this difference
+and produce a stable output from the VCO.
+
 
 ### Clock prescalars
 The prescalar is used to divide the clock source. For example, with the default
