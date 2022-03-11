@@ -93,3 +93,98 @@ $ make -j4
 $ sudo make install
 ```
 
+### Multiplexer
+Can be built using multiple AND and one OR gate and it selects a single output
+depending on the selected value:
+```
+     +----\
+a    |     \
+-----|      \
+b    |       |
+-----|       |
+c    |       |------ g
+-----|       |
+d    |       |
+-----|      /
+     |     /
+     +----/
+        |
+s       |
+--------+
+
+     +---+
+a ---|AND|-------------+
+   +-|   |             |    +------+  
+   | +---+             +----| OR   |
+   | +---+                  |      |
+b -|-|AND|------------------|      |
+   +-|   |                  |      |
+   | +---+                  |      |
+   | +---+                  |      |
+c -|-|AND|------------------|      |
+   +-|   |                  |      |
+   | +---+             +----|      |
+   | +---+             |    +------+
+d -|-|AND|-------------+
+   +-|   |
+   | +---+
+   |
+s -+
+```
+Multiplexers are used for routing signals in FPGAs.
+
+### Lookup tables (LUT)
+These allow for performing arbitary logic. They can implement boolean
+algebra equations for the number of inputs that the LUT. So for example if
+we have a LUT with two inputs it will be able to perform any combination of the
+following operations:
+```
+A * B                     * = AND
+A + B                     + = OR
+A + B_bar                 - = NOT (should be a bar over the B)
+```
+The following LUT takes two inputs, and hence can handle any boolean algebra
+equation with two terms:
+```
+           +----+
+In[0] -----|LUT2|
+           |    |--- out
+In[1] -----|    |
+           +----+
+
++-------------------+
+|in[0] | in[1] | out|
+|-------------------|
+|  0   |   0   | 0  |
+|  1   |   0   | 0  |
+|  0   |   1   | 0  |
+|  1   |   1   | 1  |
++-------------------+
+```
+So for the inputs 00 we map that to 0, 10 to 0, 01 to 0, and 11 to 1.
+
+This is actually implemented using a multiplexer, but instead of exposing the
+inputs to the mutiplexer they are values that are programmable and they contain
+the ouput of expected operation, in this case AND:
+```
+
+             +---+    +---+
+   0      ---|AND|----|AND|----+
+           +-|   |  +-|   |    |    +------+
+           | +---+  | +---+    +----| OR   |
+           | +---+  | +---+         |      |
+   0      -|-|AND|--|-|AND|---------|      |
+           +-|   |  +-|   |         |      |
+           | +---+  | +---+         |      |
+           | +---+  | +---+         |      |
+   0      -|-|AND|--|-|AND|---------|      |
+           +-|   |  +-|   |         |      |
+           | +---+  | +---+    +----|      |
+           | +---+  | +---+    |    +------+
+   1      -|-|AND|--|-|AND|----+
+           +-|   |  +-|   |
+           | +---+  | +---+
+           |        |
+    s[0]  -+        |
+    s[1]  ----------+
+```
