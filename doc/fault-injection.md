@@ -585,5 +585,15 @@ might be able to get the output to be some indeterminate value as it might not
 have time to propagate through the circuit. And note that the clock pulse is
 just a logic high value, if we can influence the C wire above in between a cycle
 then we have performed a clock clitch (at least that is my current take of how
- this works).
+ this works). For this we need to provide an external clock to be used so that
+we can control the clock pulses. Some devices have an internal clock generator
+and this means that we cannot feed an external clock into the device which is
+something we need for clock faulting/glitching.
+Also, even with an external crystal oscilator clock it might get modified 
+internally by a PLL.
+
+The difference between a latch and a flip-flop is that a latch is asynchronous,
+so the outputs change whenever the inputs are updated. A flip-flop on the other
+hand are edge triggered and only change state when a control signal goes from
+low to high.
 
