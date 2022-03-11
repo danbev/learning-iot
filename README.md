@@ -1043,6 +1043,8 @@ to flow:
 So that is how a NPN Bipolar Junction transistor works and how we can hook it
 up physically. We can use two such transistors:
 
+<a id="and-gate"></a>
+
 ![AND GATE both off](./doc/img/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
 
 Now, pressing just the left button no current will flow:
