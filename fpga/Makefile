@@ -1,10 +1,9 @@
 
 first.blif: first.v
-	yosys -p "read_verilog $<; synth_ice40 -blif $@"
+	yosys -ql first.log -p 'synth_ice40 -top first -json first.json' $<
 
-.PHONY pnr-first:
-pnr-first:
-	nextpnr-ice40 --hx8k --pcf first.pcf --read first.blif --asc first.asc --package ct256 -v
+first.asc: first.blif
+	nextpnr-ice40 --hx8k --package ct256 --json first.json --pcf first.pcf --asc first.asc -v --debug
 
 .PHONY clean:
 
