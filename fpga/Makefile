@@ -8,4 +8,4 @@ first.asc: first.blif
 .PHONY clean:
 
 clean:
-	${RM} *.blif
+	${RM} *.blif *.json *.asc, *.log
