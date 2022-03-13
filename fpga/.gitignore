@@ -1,1 +1,4 @@
 *.blif
+*.json
+*.asc
+*.log
