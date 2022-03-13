@@ -1,5 +1,3 @@
-module first(A, B);
-  input wire A;
-  output wire B;
-  assign B = !A;
+module first(input BUT1, LED1);
+  assign LED1 = BUT1;
 endmodule

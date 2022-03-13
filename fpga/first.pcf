@@ -1,0 +1,6 @@
+# For the iCE40HX-8K Breakout Board
+
+set_io -nowarn LED1 M12
+set_io -nowarn BUT1 K11
+
+set_io clk J3
