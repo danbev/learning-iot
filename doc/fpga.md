@@ -100,11 +100,11 @@ depending on the selected value:
      +----\
 a    |     \
 -----|      \
+     |       |
+     |       |
+     |       |------ g
+     |       |
 b    |       |
------|       |
-c    |       |------ g
------|       |
-d    |       |
 -----|      /
      |     /
      +----/
@@ -112,79 +112,98 @@ d    |       |
 s       |
 --------+
 
-     +---+
-a ---|AND|-------------+
-   +-|   |             |    +------+  
-   | +---+             +----| OR   |
-   | +---+                  |      |
-b -|-|AND|------------------|      |
-   +-|   |                  |      |
-   | +---+                  |      |
-   | +---+                  |      |
-c -|-|AND|------------------|      |
-   +-|   |                  |      |
-   | +---+             +----|      |
-   | +---+             |    +------+
-d -|-|AND|-------------+
-   +-|   |
-   | +---+
-   |
+            +---+
+a ----------|AND|-------------+
+     +---+  |   |             |
+   +-|NOT|--|   |             |    +------+  
+   | +---+  +---+             +----| OR   |
+   |        +---+                  |      |---- Q
+b -|--------|AND|------------------|      |
+   +--------|   |                  |      |
+   |        +---+                  +------+
+   |                        
 s -+
 ```
-Multiplexers are used for routing signals in FPGAs.
+So in the above we have 2 inputs, a, b and we can select one of those using
+0, or 1. The truth table for this looks like this:
+```
++---------------+
+| s | a | b | q |
+|---------------|
+| 0 | 0 | 0 | 0 |
+|---------------|
+| 0 | 0 | 1 | 0 |
+|---------------|
+| 0 | 1 | 0 | 1 |
+|---------------|
+| 0 | 1 | 1 | 1 |
+|---------------|
+| 1 | 0 | 0 | 0 |
+|---------------|
+| 1 | 0 | 1 | 1 |
+|---------------|
+| 1 | 1 | 0 | 0 |
+|---------------|
+| 1 | 1 | 1 | 1 |
++---------------+
+```
+Notice that when we set s=0, regardless of what value we specify for b, the
+value of a is set as the output q. So the first two rows can be merged to one
+as it does not matter that b=1 in that case. And the same goes for when we set
+s=1:
+```
++---------------+             X = ignored, or does not matter.
+| s | a | b | q |
+|---------------|
+| 0 | 0 | X | 0 |
+|---------------|
+| 0 | 1 | X | 1 |
+|---------------|
+| 1 | X | 0 | 0 |
+|---------------|
+| 1 | X | 1 | 1 |
+|---------------|
+```
 
 ### Lookup tables (LUT)
 These allow for performing arbitary logic. They can implement boolean
-algebra equations for the number of inputs that the LUT. So for example if
-we have a LUT with two inputs it will be able to perform any combination of the
-following operations:
-```
-A * B                     * = AND
-A + B                     + = OR
-A + B_bar                 - = NOT (should be a bar over the B)
-```
-The following LUT takes two inputs, and hence can handle any boolean algebra
-equation with two terms:
-```
-           +----+
-In[0] -----|LUT2|
-           |    |--- out
-In[1] -----|    |
-           +----+
+algebra equations for the number of inputs that the LUT. 
 
-+-------------------+
-|in[0] | in[1] | out|
-|-------------------|
-|  0   |   0   | 0  |
-|  1   |   0   | 0  |
-|  0   |   1   | 0  |
-|  1   |   1   | 1  |
-+-------------------+
+So a LUT2 could look like this:
 ```
-So for the inputs 00 we map that to 0, 10 to 0, 01 to 0, and 11 to 1.
+                +---------------+
+                | 0 | 0 | 0 | 1 |     (SRAM)
+                +---------------+
+                 |    |   |   |
+(terms)          |    |   |   |
+ a ----------- -------------------
+               \ 00   01  10  11 /    (2-1 Multiplexer)
+ b -----------  -----------------
+                         |
+                         q
+```
+The inputs a and b are used to 2² 1-byte digital memory that stores the truth
+table. Now, the inputs `a` and `b` would be the same for both `a & b` and for
+a ^ b`. If we want to instead implement the OR (`^`), we (well actually the
+designer tool will do this for us) only have to update the 1-bit digital
+memory to reflect the different truth table:
+```
+                +---------------+
+                | 0 | 1 | 1 | 1 |     (SRAM)
+                +---------------+
+                 |    |   |   |
+(terms)          |    |   |   |
+ a ----------- -------------------
+               \ 00   01  10  11 /    (2-1 Multiplexer)
+ b -----------  -----------------
+                         |
+                         q
+```
 
-This is actually implemented using a multiplexer, but instead of exposing the
-inputs to the mutiplexer they are values that are programmable and they contain
-the ouput of expected operation, in this case AND:
-```
+### Flip-Flop
+Besides LUTs flip-flops are also a main part that makes up an FPGA. I went
+through how these work in [Gated D-Latch](./fault-injection.md#gated_d-latch).
 
-             +---+    +---+
-   0      ---|AND|----|AND|----+
-           +-|   |  +-|   |    |    +------+
-           | +---+  | +---+    +----| OR   |
-           | +---+  | +---+         |      |
-   0      -|-|AND|--|-|AND|---------|      |
-           +-|   |  +-|   |         |      |
-           | +---+  | +---+         |      |
-           | +---+  | +---+         |      |
-   0      -|-|AND|--|-|AND|---------|      |
-           +-|   |  +-|   |         |      |
-           | +---+  | +---+    +----|      |
-           | +---+  | +---+    |    +------+
-   1      -|-|AND|--|-|AND|----+
-           +-|   |  +-|   |
-           | +---+  | +---+
-           |        |
-    s[0]  -+        |
-    s[1]  ----------+
-```
+### Clocks
+An FPGA will typically have several clock signals to allow different areas
+accross the FPGA to operate at different speeds.
