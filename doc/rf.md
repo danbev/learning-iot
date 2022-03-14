@@ -959,9 +959,10 @@ We can use cursors in inspectrum so try to mark this suspected preamble:
 
 ![Inspectrum Cursors image](./img/inspectrum-cursors.png "Inspectrum cursors image")
 
-We can then use the feature "Extract symbols" to generate values:
+We can then use the feature "Extract threshold" and then "Extract symbols" to
+generate values:
 ```console
-16.5099, 10.8704, -0.960911, -0.988292, 13.8764, 16.2672, -0.980572, -0.992653, 16.5705, 9.20613, -0.997783, -0.986037, 1.34407, 8.89046, 3.48645, -0.995785, -0.961667, 8.09094, 11.6317, -0.987316, -0.986054, 15.0077, 16.1414, -0.981723, -0.999597, 13.1727, 8.94459, -0.995286, -0.998871, 7.86121, 8.10315, -0.999448, -0.964347, 0.488958, 8.39341, 0.859234, -0.961367, -0.994157, 11.807, 12.1975, -0.989033, -0.999805, 9.43692, 8.28986, -0.963617, -0.989944, 16.6482, 13.1775, -0.987882, -0.997981,
+1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
 ```
 
 _work in progress_
