@@ -7,6 +7,10 @@ first.json: first.v
 first.asc: first.json
 	nextpnr-ice40 --hx8k --package ct256 --json $< --pcf first.pcf --asc $@ -v --debug
 
+# Create bitstream from P&R output
+first.bin: first.asc
+	icepack $< $@
+
 .PHONY clean:
 
 clean:
