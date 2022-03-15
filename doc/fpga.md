@@ -30,12 +30,37 @@ of these CLBs close togther and these can be programmed.
 A single CLB is made up of discrete logic components like flip-flops, and/or
 look up tables (LUTs).
 
+### Hardware Description Language (HDL)
+Provide a way of describing the behaviour without having to specify any
+implementation. Note what we describing hardware in this case and this enable
+us to verify the design before any hardware is constructed.
+After this abstract design has been verified, we can use a tool to process
+this design into a technology-specific gate-level implementation which is called
+synthesis. The output of synthesis is a netlist specific to a semiconductor
+technology.
+
 ### Verilog
 Is a Hardware Description Language (HDL) used to describe a digital system.
+Uses a `.v` file extension.
+
+```
+always @(event)
+  [statement]
+end
+```
+The @ and content the parenthesis means that this block will be triggered at
+the condition specified in the parenthesis.
+
+### SystemVerilog
+Is a superset of Verilog.
+
+Uses a `.sv` file extension.
+
 
 ### Register Transfer Level (RTL)
 Implies that Verilog code describes how data is transformed as it flows from
 register to register.
+
 
 ### Synthesesis
 Is the process of taking an abstract specification of desired curcuit behaviour
