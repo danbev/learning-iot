@@ -44,18 +44,55 @@ Is a Hardware Description Language (HDL) used to describe a digital system.
 Uses a `.v` file extension.
 
 ```
-always @(event)
+always @(event) begin
   [statement]
 end
 ```
 The @ and content the parenthesis means that this block will be triggered at
 the condition specified in the parenthesis.
 
+Blocks can be named:
+```
+always begin: Something
+...
+end : Something
+
+```
+
+Variables of type net:
+* wire : connects instances
+* tri : alias/same as wire
+* wand : wired AND
+* triand : alias/same as wand
+* tri0 : nets that pull up when not driven
+* tri1 : nets that pull down when not driven
+
 ### SystemVerilog
 Is a superset of Verilog.
 
 Uses a `.sv` file extension.
 
+### Combinational logic
+Does not require a clock to operate, for example an AND gate.
+
+### Sequential logic
+Does require a clock to operate, for example a D Flip-flop.
+
+### Sensitivity list
+```
+       Sensitivity list
+            ↓         
+         |<---->|
+always @ (A or B) begin
+  and_gate = A & B;
+end
+```
+Is a list of all the signals which will cause the always block to execute.
+The same can also be accomplished without using combinational logic and instead
+using `assign`:
+```
+assign and_gate = A & B;
+```
 
 ### Register Transfer Level (RTL)
 Implies that Verilog code describes how data is transformed as it flows from
