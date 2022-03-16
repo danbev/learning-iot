@@ -13,6 +13,20 @@ first.asc: first.json
 first.bin: first.asc
 	icepack $< $@
 
+.PHONY first_flash:
+first_flash:
+	iceprog -v -d d:001/010 first.bin
+	#iceprog -v -d d:001/122 -r /tmp/flash-content.bin
+
+.PHONY first_pad:
+first_pad:
+	dd if=/dev/zero bs=2M count=1 | tr '\0' '\377' > first.bin
+	dd if=first.bin conv=notrunc of=first.bin
+
+.PHONY first_flash_rom:
+first_flash_rom: 
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=250k -w first.bin
+
 .PHONY clean:
 
 clean:
