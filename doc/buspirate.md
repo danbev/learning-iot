@@ -46,6 +46,8 @@ Firmware v5.10 (r559)  Bootloader v4.4
 DEVID:0x0447 REVID:0x3046 (24FJ64GA002 B8)
 http://dangerousprototypes.com
 ```
+The default baud rate for 3.0 and higher is 2M, and otherwise should be set
+to 115200.
 
 When I got this device I wanted to use the 3.3V pin to power an iCE40HZ8K-EVB
 but I was not able to get it to work.
@@ -70,8 +72,23 @@ SPI>W
 Power supplies ON
 SPI>
 ```
+HiZ stands for high impedance mode (HiZ) which is a a safe mode with all outputs
+disabled.
+
 After doing that I can see the Mode led is on as is the VREG led is also on, and
 with the oscilloscope we can verify the voltage is indeed now 3.3V:
 
 ![Bus Pirate image](./img/buspirate-power.jpg "Bus Pirate image")
 
+
+### Probe
+```console
+$ flashrom -p buspirate_spi:dev=/dev/ttyUSB0
+flashrom v1.2 on Linux 5.13.14-200.fc34.x86_64 (x86_64)
+flashrom is free software, get the source code at https://flashrom.org
+
+Using clock_gettime for delay loops (clk_id: 1, resolution: 1ns).
+Bus Pirate firmware 6.1 and older does not support SPI speeds above 2 MHz. Limiting speed to 2 MHz.
+It is recommended to upgrade to firmware 6.2 or newer.
+Found Eon flash chip "EN25QH16" (2048 kB, SPI) on buspirate_spi.
+```
