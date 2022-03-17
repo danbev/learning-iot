@@ -456,6 +456,8 @@ E ____↑   |____↑   |____↑   |____↑   |____↑   |____↑   |____↑
 ```
 The goal is to have a D-Latch that only responds to changes in E at the raising
 edge and not for the entire clock cycle.
+Note that sampling the value and storing it in q is referred to registering the
+value and the reason these are sometimes called registers.
 
 We can construct the following cicuit:
 ```
