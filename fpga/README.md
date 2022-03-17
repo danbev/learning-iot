@@ -56,7 +56,7 @@ I've just used the defaults apart from selecting 250KHz. The MODE LED should be
 on on the Bus Pirate now. Now exit minicom using CTRL+A+Q. 
 
 ### Flashing
-Pad the binary file:
+Pad the binary file so that it is 2048 kB which is the size of the Flash:
 ```
 $ make first_pad
 ```
@@ -64,7 +64,7 @@ $ make first_pad
 Flash the device
 ```console
 $ make first_flash_rom
-flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=250k -w first.bin
+flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w first.bin
 flashrom v1.2 on Linux 5.13.14-200.fc34.x86_64 (x86_64)
 flashrom is free software, get the source code at https://flashrom.org
 
@@ -75,4 +75,11 @@ Erasing and writing flash chip... Erase/write done.
 Verifying flash... VERIFIED.
 ```
 
+After flashing we need can remove all the wires, or just remove the wire
+connected to CRST which is the reset pin. I though that would be enough and
+would work but there is something that is wrong. What I'm seeing at the moment
+is that both LEDs are on which is the same state as during a reset state. I'm
+currently looking into this.
+
 _wip_
+

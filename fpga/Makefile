@@ -24,8 +24,9 @@ first_pad:
 	dd if=first.bin conv=notrunc of=first.bin
 
 .PHONY first_flash_rom:
-first_flash_rom: 
-	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=250k -w first.bin
+first_flash_rom:
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w first.bin
+	#flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=250k,serialspeed=115200 -w first.bin
 
 .PHONY clean:
 
