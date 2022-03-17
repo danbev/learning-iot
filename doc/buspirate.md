@@ -92,3 +92,41 @@ Bus Pirate firmware 6.1 and older does not support SPI speeds above 2 MHz. Limit
 It is recommended to upgrade to firmware 6.2 or newer.
 Found Eon flash chip "EN25QH16" (2048 kB, SPI) on buspirate_spi.
 ```
+
+### Troubleshooting
+```console
+flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w blinky.bin
+flashrom v1.2 on Linux 5.13.14-200.fc34.x86_64 (x86_64)
+flashrom is free software, get the source code at https://flashrom.org
+
+Using clock_gettime for delay loops (clk_id: 1, resolution: 1ns).
+Found Eon flash chip "unknown Eon SPI chip" (0 kB, SPI) on buspirate_spi.
+===
+This flash part has status NOT WORKING for operations: PROBE READ ERASE WRITE
+The test status of this chip may have been updated in the latest development
+version of flashrom. If you are running the latest development version,
+please email a report to flashrom@flashrom.org if any of the above operations
+work correctly for you with this flash chip. Please include the flashrom log
+file for all operations you tested (see the man page for details), and mention
+which mainboard or programmer you tested in the subject line.
+Thanks for your help!
+Error: Image size (135100 B) doesn't match the flash chip's size (0 B)!
+make: *** [Makefile:33: blinky_flash_rom] Error 1
+```
+In this case the issue is that Bus Pirate had not been configured and in SPI
+mode. 
+
+```console
+flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w blinky.bin
+flashrom v1.2 on Linux 5.13.14-200.fc34.x86_64 (x86_64)
+flashrom is free software, get the source code at https://flashrom.org
+
+Using clock_gettime for delay loops (clk_id: 1, resolution: 1ns).
+Found Eon flash chip "EN25QH16" (2048 kB, SPI) on buspirate_spi.
+Error: Image size (135100 B) doesn't match the flash chip's size (2097152 B)!
+make: *** [Makefile:33: blinky_flash_rom] Error 1
+```
+This is because the Flash size is 2048K and the image that we are trying to
+flash it will does not have that size. We can pad it to that size though.
+
+
