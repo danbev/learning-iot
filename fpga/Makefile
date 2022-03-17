@@ -16,16 +16,19 @@ first.bin: first.asc
 .PHONY first_flash:
 first_flash:
 	iceprog -v -d d:001/017 -r first.bin
-	#iceprog -v -d d:001/122 -r /tmp/flash-content.bin
 
 .PHONY first_pad:
-first_pad:
-	dd if=/dev/zero bs=2M count=1 | tr '\0' '\377' > first.bin
-	dd if=first.bin conv=notrunc of=first.bin
+first_pad: first.bin
+	# 377 octal is 255 decimal, which is 0xFF in hex, so we are generating
+	# a file of size 2M (all zeros) and then converting these zeros into
+	# 0xFF.
+	dd if=/dev/zero bs=2M count=1 | tr '\0' '\377' > first_padded.bin
+	# We now take our binary file and write it on top of the padded file.
+	dd if=first.bin conv=notrunc of=first_padded.bin
 
 .PHONY first_flash_rom:
-first_flash_rom:
-	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w first.bin
+first_flash_rom: first_pad
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w first_padded.bin
 	#flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=250k,serialspeed=115200 -w first.bin
 
 .PHONY blinky_pad:
@@ -35,9 +38,9 @@ blinky_pad:
 
 .PHONY blinky_flash_rom:
 blinky_flash_rom:
-	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w blinky.bin
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w blinky.bin -V
 
 .PHONY clean:
 
 clean:
-	${RM} *.blif *.json *.asc, *.log
+	${RM} *.blif *.json *.asc *.log first.bin
