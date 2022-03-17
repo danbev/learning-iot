@@ -2,7 +2,9 @@
 # To add more mappings refer to:
 # https://github.com/OLIMEX/iCE40HX8K-EVB/blob/master/HARDWARE/REV-B/iCE40HX8K-EVB_Rev_B.pdf
 
-set_io -nowarn LED1 M12
-set_io -nowarn BUT1 K11
+set_io LED1 M12
+set_io LED2 R16
+set_io BUT1 K11
+#set_io BUT2 P13
 
-set_io clk J3
+set_io CLK J3
