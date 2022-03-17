@@ -80,6 +80,14 @@ connected to CRST which is the reset pin. I though that would be enough and
 would work but there is something that is wrong. What I'm seeing at the moment
 is that both LEDs are on which is the same state as during a reset state. I'm
 currently looking into this.
+For context, this same board with the blinky example shipped worked fine,
+unfortunatly I read flashrom man page after erasing the board so I lost that
+image. I should have read the contents of it to a file as a backup instead :( 
+I've added what I think is the original
+[blinky](https://github.com/OLIMEX/iCE40HX8K-EVB) and managed to flash using it
+but I'm still seeing the same behaviour, that it looks like the board is still
+in reset mode. 
+
 
 _wip_
 
