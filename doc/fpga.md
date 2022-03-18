@@ -94,6 +94,13 @@ using `assign`:
 assign and_gate = A & B;
 ```
 
+```
+always @ (posedge clock) begin
+  and_gate <= A & B;
+end
+```
+This will cause the and_gate to only be updated on a raising edge of the clock.
+
 ### Register Transfer Level (RTL)
 Implies that Verilog code describes how data is transformed as it flows from
 register to register.
@@ -266,6 +273,43 @@ memory to reflect the different truth table:
 Besides LUTs flip-flops are also a main part that makes up an FPGA. I went
 through how these work in [Gated D-Latch](./fault-injection.md#gated_d-latch).
 
+Are also called registers, and are able to keep a state which means that it
+has information about what happened previously. Wherea  LUTs can act on the
+current input but they don't have any information about what happend earlier.
+
 ### Clocks
 An FPGA will typically have several clock signals to allow different areas
 accross the FPGA to operate at different speeds.
+
+### Mechanical bouncing
+This is an issue with the first button program written where we want to have a
+button that controls an LED.
+This is what we want to have happpen:
+```
+            stable (LED turns on or off depending on the previous state)
+       +---------------
+       |
+       |
+-------  <--- switch toggles
+```
+But in the real world this is what actually happens:
+```
+                  stable (LED turns on or off depending on the previous state)
+       ++ ++ ++ +-----------
+       || || || |
+       || || || |
+------- +- +- +-
+       Glitches
+```
+The glitches happen during a period before the signal goes stable and is
+something the FPGA notices. This is only a short period like say a few 100 micro
+seconds or 1 millisecond. This is called bounceing.
+We want to avoid this as otherwise our button not always turn the button on/off
+when we press the button. Actually it is always toggling the state, which is
+done on the falling edge but that now occurs multiple times instead of in the
+expected case only once. And this happens so fast that we can't see it and it
+might end up in the same state that is started in which looks like there was
+nothing happening at all.
+
+We need someway to wait until the signal become stable, or delay for a short
+period of time to avoid this bouncing. For this we need to count clock signals.
