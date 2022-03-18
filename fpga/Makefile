@@ -29,6 +29,27 @@ led_pad: led.bin
 led_flash_rom: led_pad
 	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w led_padded.bin
 
+.PHONY led_no_bounce_pad:
+led_no_bounce_pad: led_no_bounce.bin
+	@# 377 octal is 255 decimal, which is 0xFF in hex, so we are generating
+	@# a file of size 2M (all zeros) and then converting these zeros into
+	@# 0xFF.
+	@dd if=/dev/zero bs=2M count=1 | tr '\0' '\377' > led_no_bounce_padded.bin
+	@# We now take our binary file and write it on top of the padded file.
+	@dd if=led_no_bounce.bin conv=notrunc of=led_no_bounce_padded.bin
+
+.PHONY led_flash_rom:
+led_flash_rom: led_pad
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w led_padded.bin
+
+.PHONY led_no_bounce_flash_rom:
+led_no_bounce_flash_rom: led_no_bounce_pad
+	flashrom -p buspirate_spi:dev=/dev/buspirate,spispeed=1M -w led_no_bounce_padded.bin -V
+
+.PHONY flash_name:
+flash_name: 
+	flashrom -p buspirate_spi:dev=/dev/buspirate,spispeed=1M --flash-name
+
 .PHONY clean:
 
 clean:
