@@ -3,7 +3,7 @@
 led.json: led.v
 	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $<
 
-led_no_bounce.json: led_no_bounce.v
+led_no_bounce.json: led_no_bounce.v debounce.v
 	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $< debounce.v
 
 # Place And Route
