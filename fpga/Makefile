@@ -16,11 +16,6 @@ led_no_bounce.json: led_no_bounce.v debounce.v
 %.bin: %.asc
 	icepack $< $@
 
-.PHONY led_flash:
-led_flash:
-	@# usb-devices command can be used to get the vendor:product used below.
-	iceprog -v -d i:0403:6001 -r led.bin
-
 .PHONY led_pad:
 led_pad: led.bin
 	@# 377 octal is 255 decimal, which is 0xFF in hex, so we are generating
