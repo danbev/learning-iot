@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ns
 `default_nettype none
-module first(input CLK, input BUT1, output LED1);
+module led(input CLK, input BUT1, output LED1);
   reg button1_reg = 1'b0;
   reg led1_reg = 1'b0;
   // Always block with a sensitivity list containing a single item, the CLK
