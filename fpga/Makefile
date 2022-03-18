@@ -3,14 +3,17 @@
 led.json: led.v
 	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $<
 
+led_no_bounce.json: led_no_bounce.v
+	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $< debounce.v
+
 # Place And Route
-led.asc: led.json
+%.asc: %.json
 	@# package refers to the Lattice iCE40HX8K chip package which can be
 	@# found on the Lattice chip on the board.
-	nextpnr-ice40 --hx8k --package ct256 --json $< --pcf led.pcf --asc $@ -v --debug
+	nextpnr-ice40 --hx8k --package ct256 --json $< --pcf $(*F).pcf --asc $@ -v --debug
 
 # Create bitstream from P&R output
-led.bin: led.asc
+%.bin: %.asc
 	icepack $< $@
 
 .PHONY led_flash:
