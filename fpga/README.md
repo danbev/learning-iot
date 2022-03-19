@@ -169,5 +169,7 @@ I finally managed to get this working and the issue was the length of the
 cables I was using. I had to make extensions as I needed male connectors for
 the breadboard and from there female connectors to the devices. I've takes two
 of these cables and cut them and connected them so they are shorter and that
-got things working as expected. 
+got things working as expected. The issue here is that with these lengths, the
+usage of two connections I was getting close to the 20cm which is getting close
+to the SPI max.
 
