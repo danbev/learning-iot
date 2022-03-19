@@ -165,8 +165,9 @@ the FPGA like write-protection or something, but since the errors is different
 everytime this is more likely a hardware issue. Hardware as in the connection or
 the programmer (Bus Pirate). 
 
-I'm running out of ideas here and tried all things I can think of. I'm going
-to park this as I'm waiting for a new FPGA device which has an onboard
-programmer which was what I should have gotten to start with.
-
+I finally managed to get this working and the issue was the length of the
+cables I was using. I had to make extensions as I needed male connectors for
+the breadboard and from there female connectors to the devices. I've takes two
+of these cables and cut them and connected them so they are shorter and that
+got things working as expected. 
 
