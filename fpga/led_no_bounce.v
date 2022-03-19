@@ -1,9 +1,10 @@
 `timescale 1 ns / 1 ns
 `default_nettype none
-module led(input CLK, input BUT1, output LED1);
+module led(input CLK, input BUT1, output LED1, output LED2);
   reg button1_reg = 1'b0;
   reg led1_reg = 1'b0;
   wire w_BUT1;
+  assign LED2 = 0;
 
   Debounce Instance (.CLK(CLK), .i_BUT1(BUT1), .o_BUT1(w_BUT1));
 
