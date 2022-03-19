@@ -10,6 +10,8 @@ bridge on the bottom side of the board:
 
 ![iCE40HX8K-EVD solder bridge](./img/solder-bridge.jpg "iCE40HX8K-EVD solder bridge")
 
+I actually opted to use a 5V power supply instead of this above 3.3V pin.
+
 ### Building
 Synthesis, Place and Route, and build bitstream:
 ```console
@@ -41,6 +43,9 @@ The reason for having the breadboard is that GND on Bus Pirate needs to be
 connected to GND and CRST.
 
 ![Connections image](./img/connections.jpg "Connections image")
+
+Notice the short wires which is required as this is using SPI and there is a
+limit on the maxium length (something like 20 cm).
 
 
 ### Configure Bus Pirate
