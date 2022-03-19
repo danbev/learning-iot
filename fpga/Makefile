@@ -10,7 +10,7 @@ led_no_bounce.json: src/led_no_bounce.v src/debounce.v
 %.asc: %.json
 	@# package refers to the Lattice iCE40HX8K chip package which can be
 	@# found on the Lattice chip on the board.
-	nextpnr-ice40 --hx8k --package ct256 --json $< --pcf $(*F).pcf --asc $@ -v --debug
+	nextpnr-ice40 --hx8k --package ct256 --json $< --pcf src/$(*F).pcf --asc $@ -v --debug
 
 # Create bitstream from P&R output
 %.bin: %.asc
