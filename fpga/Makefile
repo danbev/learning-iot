@@ -40,7 +40,7 @@ led_no_bounce_pad: led_no_bounce.bin
 
 .PHONY led_flash_rom:
 led_flash_rom: led_pad
-	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w led_padded.bin
+	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=2M -w led_padded.bin
 
 .PHONY led_no_bounce_flash_rom:
 led_no_bounce_flash_rom: led_no_bounce_pad
