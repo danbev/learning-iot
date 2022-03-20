@@ -1,0 +1,9 @@
+# For the iCE40HX-8K Breakout Board
+# To add more mappings refer to:
+# https://github.com/OLIMEX/iCE40HX8K-EVB/blob/master/HARDWARE/REV-B/iCE40HX8K-EVB_Rev_B.pdf
+
+set_io -nowarn CLK J3 # GBIN6
+
+# LEDs
+set_io -nowarn LED1 M12
+set_io -nowarn LED2 R16
