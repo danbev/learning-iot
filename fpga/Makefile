@@ -2,13 +2,13 @@ PROGRAMMER = buspirate_spi:dev=/dev/buspirate,spispeed=2M
 
 # Synthesis
 led.json: src/led.v
-	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $<
+	yosys -ql $(basename $@).log -p 'synth_ice40 -top led -json $@' $<
 
 led_no_bounce.json: src/led_no_bounce.v src/debounce.v
-	yosys -ql led.log -p 'synth_ice40 -top led -json $@' $^
+	yosys -ql $(basename $@).log -p 'synth_ice40 -top led -json $@' $^
 
 blink.json: src/blink.v
-	yosys -ql led.log -p 'synth_ice40 -top blink -json $@' $^
+	yosys -ql $(basename $@).log -p 'synth_ice40 -top blink -json $@' $^
 
 # Place And Route
 %.asc: %.json
