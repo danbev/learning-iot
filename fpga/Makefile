@@ -1,3 +1,4 @@
+PROGRAMMER = buspirate_spi:dev=/dev/buspirate,spispeed=2M
 
 # Synthesis
 led.json: src/led.v
@@ -43,19 +44,19 @@ blink_pad: blink.bin
 
 .PHONY led_flash_rom:
 led_flash_rom: led_pad
-	flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=2M -w led_padded.bin
+	flashrom -p $(PROGRAMMER) -w led_padded.bin
 
 .PHONY led_no_bounce_flash_rom:
 led_no_bounce_flash_rom: led_no_bounce_pad
-	flashrom -p buspirate_spi:dev=/dev/buspirate,spispeed=2M -w led_no_bounce_padded.bin -V
+	flashrom -p $(PROGRAMMER) -w led_no_bounce_padded.bin -V
 
 .PHONY blink_flash_rom:
 blink_flash_rom: blink_pad
-	flashrom -p buspirate_spi:dev=/dev/buspirate,spispeed=2M -w blink_padded.bin -V
+	flashrom -p $(PROGRAMMER) -w blink_padded.bin -V
 
 .PHONY flash_name:
 flash_name: 
-	flashrom -p buspirate_spi:dev=/dev/buspirate,spispeed=1M --flash-name
+	flashrom -p $(PROGRAMMER) --flash-name
 
 .PHONY clean:
 
