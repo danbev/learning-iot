@@ -48,27 +48,7 @@ Notice the short wires which is required as this is using SPI and there is a
 limit on the maxium length (something like 20 cm).
 
 
-### Configure Bus Pirate
-```console
-$ minicom -b 115200 -8 -D /dev/buspirate
-```
-First we have to configure Bus Pirate to use SPI mode:
-```console
-HiZ>m
-(1)> 5
-...
-Ready
-(SPI)>
-```
-I've just used the defaults apart from selecting 250KHz. The MODE LED should be
-on on the Bus Pirate now. Now exit minicom using CTRL+A+Q. 
-
 ### Flashing
-Pad the binary file so that it is 2048 kB which is the size of the Flash:
-```
-$ make first_pad
-```
-
 Flash the device
 ```console
 $ make led_flash_rom
@@ -91,8 +71,8 @@ Verifying flash... VERIFIED.
 rm led.asc
 ```
 
-After flashing we can remove all the wires, or just remove the wire
-connected to CRST which is the reset pin. 
+After flashing we can remove all the wires, or just remove the wire connected to
+CRST which is the reset pin.
 
 The first example, [led.v](./led.v) is a LED1 that is controlled but BUT1.
 
