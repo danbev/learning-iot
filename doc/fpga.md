@@ -324,3 +324,16 @@ Is the amount of time amount of time it takes for a signal to pass between two
 flip-flops. And we also have to factor in the sequential between them.
 TODO: explain this further with some diagrams.
 
+### Setup time
+A signal that travels through a wire can change from 0 to 1, or from 1 to 0
+which can be the input to a flip-flop. The flip-flop needs the input to be in a
+stable state to correctly be able to sample the value. It has to be either 0 or
+1 and not transistioning in between 0 or 1. Just because we draw clock diagrams
+with square waves does not mean that the signals change instantaniously from 0
+to 1 and vice verca. Setup time is an amount of time the input signal needs to
+be stable before the clock edge (before it will be sampled).
+
+### Hold time
+Is similar to setup time but this is an amount of time that the intput signal
+needs to be stable after the clock edge.
+
