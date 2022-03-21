@@ -93,6 +93,11 @@ It is recommended to upgrade to firmware 6.2 or newer.
 Found Eon flash chip "EN25QH16" (2048 kB, SPI) on buspirate_spi.
 ```
 
+### Reading from flash
+```console
+$ flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -r original.bin -V
+```
+
 ### Troubleshooting
 ```console
 flashrom -p buspirate_spi:dev=/dev/ttyUSB0,spispeed=1M -w blinky.bin
@@ -126,7 +131,7 @@ Found Eon flash chip "EN25QH16" (2048 kB, SPI) on buspirate_spi.
 Error: Image size (135100 B) doesn't match the flash chip's size (2097152 B)!
 make: *** [Makefile:33: blinky_flash_rom] Error 1
 ```
-This is because the Flash size is 2048K and the image that we are trying to
+This is because the Flash size is 2048 kB and the image that we are trying to
 flash it will does not have that size. We can pad it to that size though.
 
 
