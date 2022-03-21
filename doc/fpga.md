@@ -313,3 +313,14 @@ nothing happening at all.
 
 We need someway to wait until the signal become stable, or delay for a short
 period of time to avoid this bouncing. For this we need to count clock signals.
+
+### Propagation delay
+An electrical signal does not travel instantaniously, it takes a small amount
+of time to travel on the wire. The signal travels about 30 cm in one nano
+second. Now, inside an FPGA there are many small wires and these can all add up
+and become more that 30cm. 
+
+Is the amount of time amount of time it takes for a signal to pass between two
+flip-flops. And we also have to factor in the sequential between them.
+TODO: explain this further with some diagrams.
+
