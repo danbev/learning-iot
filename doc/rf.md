@@ -964,6 +964,15 @@ generate values:
 ```console
 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
 ```
+So this does look like a preable, alternating 1 and 0.
+
+Now, we can to the same with the next signals:
+
+![Inspectrum Data Cursors image](./img/inspectrum-data-cursor.png "Inspectrum data cursors image")
+
+```console
+1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1,
+```
 
 _work in progress_
 
