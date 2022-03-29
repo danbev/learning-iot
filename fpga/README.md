@@ -150,7 +150,7 @@ cables I was using. I had to make extensions as I needed male connectors for
 the breadboard and from there female connectors to the devices. This made the
 cables too long for SPI. 
 What I did to work around this was take two cables and cut them and connected
-them so they are shorter and that got things working as expected. The issue her
-eis that with these lengths, the usage of two connections I was getting close to
+them so they are shorter and that got things working as expected. The issue here
+is that with these lengths, the usage of two connections, I was getting close to
 the 20cm which is getting close to the SPI max.
 
