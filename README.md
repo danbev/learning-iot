@@ -21,7 +21,7 @@ crates, [rust-pac](./rust-pac/src/main.rs), and
 that uses Embassy, [embassy-led](./embassy-led/src/main.rs), and then one that uses
 Drogue [drogue-led](./drogue-led/src/main.rs).
 
-The [doc](./doc) directory contains notes on various topics related
+The [notes](./notes) directory contains notes on various topics related
 to microcontrollers and IoT. Currently this document also contains notes but I'm
 in the process of extracting these notes into separate documents.
 
@@ -32,8 +32,8 @@ as needed.
 ### Examples for various microcontroller/boards
 1. [stm32f0-discovery](./stm32f0-discovery/README.md)
 1. [nrf52833](./nrf/README.md)
-1. [esp8266](./doc/esp8266.md)
-1. [microbit v2.0](./doc/microbit.md)
+1. [esp8266](./notes/esp8266.md)
+1. [microbit v2.0](./notes/microbit.md)
 
 ### Microcontroller Unit (MCU)
 Is a very small computer system self contained on an integrated circuit (IC).
@@ -505,7 +505,7 @@ Both of these programs are flashed onto STM32F072B-Discovery boards and
 connected using PB6 (SCL) and PB7(SDA).
 
 
-![I2C example](./doc/img/i2c-example.jpg "Example of I2C communication")
+![I2C example](./notes/img/i2c-example.jpg "Example of I2C communication")
 
 ```console
 $ minicom --baudrate 115200 --device /dev/ttyUSB0
@@ -1031,13 +1031,13 @@ with such an NPN transistor:
 For this example I used as button switch which is connected to the base of the
 transistor:
 
-![NPN transistor circuit with switch off](./doc/img/npn-off.jpg "NPN Transistor with switch off")
+![NPN transistor circuit with switch off](./notes/img/npn-off.jpg "NPN Transistor with switch off")
 
 So without a current flowing through the base and the emitter there is no
 current flowing though the transistor. Pressing the button will cause a current
 to flow:
 
-![NPN transistor circuit with switch on](./doc/img/npn-on.jpg "NPN Transistor with switch on")
+![NPN transistor circuit with switch on](./notes/img/npn-on.jpg "NPN Transistor with switch on")
 
 
 So that is how a NPN Bipolar Junction transistor works and how we can hook it
@@ -1045,16 +1045,16 @@ up physically. We can use two such transistors:
 
 <a id="and-gate"></a>
 
-![AND GATE both off](./doc/img/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
+![AND GATE both off](./notes/img/npn-and-gate-off.jpg "NPN Transistors as AND gates switched off")
 
 Now, pressing just the left button no current will flow:
-![AND GATE left on](./doc/img/npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
+![AND GATE left on](./notes/img/npn-and-gate-left.jpg "NPN Transistors as AND gate left switched on")
 
 And, pressing just the right button no current will flow:
-![AND GATE left on](./doc/img/npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
+![AND GATE left on](./notes/img/npn-and-gate-right.jpg "NPN Transistors as AND gate right switched on")
 
 But pressing both and current will flow:
-![AND GATE right on](./doc/img/npn-and-gate-on.jpg "NPN Transistors as AND gate on")
+![AND GATE right on](./notes/img/npn-and-gate-on.jpg "NPN Transistors as AND gate on")
 
 Notice that what we have created here is a AND gate:
 ```
@@ -2011,7 +2011,7 @@ Notice that we are randomly reading 01/00.
 
 Now if we connect a pull-up resistor:
 
-![Pull-up resistor example circuit](./doc/img/pull-up.jpg "Example circuit for pull-up resistor")
+![Pull-up resistor example circuit](./notes/img/pull-up.jpg "Example circuit for pull-up resistor")
 
 And run the example we get:
 ```console
@@ -2055,7 +2055,7 @@ Below is an example which can be used with
 [pull-up.s](stm32f0-discovery/misc/pull-up.s) to show what using a pull-down
 resistor might look like:
 
-![Pull-down resistor example circuit](./doc/img/pull-down.jpg "Example circuit for pull-down resistor")
+![Pull-down resistor example circuit](./notes/img/pull-down.jpg "Example circuit for pull-down resistor")
 
 And if we run this example the output will be:
 ```console
