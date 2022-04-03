@@ -8,9 +8,9 @@ module Debounce(input CLK, input i_BUT1, output o_BUT1);
 
   always @ (posedge CLK)
     begin
-      // Checking current state of BUT1 and it is different (there is a toggle)
-      // and our counter has not reached or MAX_COUNT (which is our time used
-      // to try to avoid the glitches).
+      // Checking current state of BUT1 and if it is different
+      // (there is a toggle) and our counter has not reached or MAX_COUNT
+      // (which is our time used to try to avoid the glitches).
       if (i_BUT1 !== state && count < MAX_COUNT)
         count <= count + 1; 
       // MAX_COUNT has been reached and the current value has been different
@@ -20,7 +20,7 @@ module Debounce(input CLK, input i_BUT1, output o_BUT1);
           count <= 0;
           state <= i_BUT1;
         end
-      // The below else when the current state and the previous state are not
+      // The below else is when the current state and the previous state are not
       // different (indicating a glitch) so we restart the counter so that we
       // can wait for the stable signal state.
       else
