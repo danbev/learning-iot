@@ -4,7 +4,7 @@ The device I'm using is an
 
 ![FPGA Device](./img/ice40hx8k.jpg "FPGA Device")
 
-This FPGA can be powers using a 5V barrel connector or it can be powered using
+This FPGA can be powered using a 5V barrel connector or it can be powered using
 3.3V pin, but notice that this is only possible if enabled by soldering the
 bridge on the bottom side of the board:
 
