@@ -318,6 +318,9 @@ One thing to note is that we always want to sample data in the middle of a clock
 cycle and never close to the edges as that means that data i changing and
 sampling then migth cause corruption to data.
 
+### Quad SPI
+This is a serial interface where 4 data lines are used.
+
 ### Universal Asynchonous Receiver/Transmitter (UART)
 UART is not a communications protocol like SPI and I2C but instead a physical
 component/circuit in a microcontroller or a standalone integrated circuit. The
@@ -3039,3 +3042,11 @@ bytes/words.
 ### Headers
 Headers on a PCB (Printed Circuit Board) board are internal ports. So this is
 nothing to do with software headers.
+
+### eXecute In Place (XIP)
+This is a feature that allows a microcontroller to execute code straight from
+external flash memory (without having to copy it first). So if the code size is
+to big for the on-chip storage a memory mapping of the flash drive can be done
+and if it can use QSPI to improve the speed can be close to that of the on-chip
+storage so it can be used to execute code as well (and not just for storage of
+data).
