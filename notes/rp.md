@@ -32,8 +32,8 @@ IO_BANK0_BASE    0x40014000   (GPIO_BASE)
 ```
 
 ### GPIO
-There are to banks of 18 General Purpose Input/Ouput pins named `QSPI bank` and
-`User Bank`. 
+There are to banks of 18 General Purpose Input/Ouput pins named `QSPI bank`
+(Quad SPI) and `User Bank`. 
 
 ```
 QSPI: QSPI_SS, QSPI_SCLK, QSPI_SD0, QSPI_SD1, SQSPI_SD2, SQPI_SD3
@@ -54,10 +54,12 @@ must first be configured to select the SIO GPIO function.
 ```
 
 Since this microcontroller has two cores it is possible for both of them to
-modify a register at the same time. For this reason there are
+modify a register at the same time. For this reason there are registers that
+perform atomic set/clear operations.
 
 ### Single Cycle IO Block
 TODO:
+https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_sio
 
 ### Programmable I/O (PIO)
 Two of these PIO block are included on the PI Pico board.
@@ -96,6 +98,9 @@ Programming is done in a custom assembly language which only has 9 instructions:
 * jmp
 * set
 
+I looks like this can also be programmed using Rust with
+[pio-rs](https://github.com/rp-rs/pio-rs).
+
 ### Openocd
 ```console
 $ git clone https://github.com/raspberrypi/openocd.git --recursive --branch rp2040 --depth=1
@@ -105,3 +110,28 @@ $ ./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio
 $ make -j8
 ```
 The openocd binary is then located in src/openocd.
+
+###  rp-hal
+[rp-hal](https://github.com/rp-rs/rp-hal) contains high level drivers for
+RP2040 and also has board support (Supported Board Packages) for PI Pico, and
+Adafruit Feather RP2040 that use the HAL but have preconfigured values for the
+specific components of the board in question.
+
+[rp2040-hal](https://github.com/rp-rs/rp-hal/tree/main/rp2040-hal) is the
+hardware abstration layer for RP2040.
+
+
+### USB Flashing Format (UF2)
+Is a file format developed by Microsoft and can be used for flashing
+microcontrollers over Mass Storage Devices (flashdrive). RP2040 contains a
+bootloader that appears as a Mass Storage Device over USB which can accept UF2
+format files.
+
+Rust produces ELF format binaries which can be converted into
+[UF2](https://github.com/microsoft/uf2) using
+[elf2uf2](https://github.com/JoNil/elf2uf2-rs).
+```console
+$ cargo install elf2uf2-rs --locked
+```
+
+
