@@ -125,7 +125,8 @@ hardware abstration layer for RP2040.
 Is a file format developed by Microsoft and can be used for flashing
 microcontrollers over Mass Storage Devices (flashdrive). RP2040 contains a
 bootloader that appears as a Mass Storage Device over USB which can accept UF2
-format files.
+format files. A UF2 file copied to the drive is downloaded and written to Flash
+or RAM.
 
 Rust produces ELF format binaries which can be converted into
 [UF2](https://github.com/microsoft/uf2) using
@@ -138,13 +139,13 @@ $ cargo install elf2uf2-rs --locked
 PI Pico has a first stage bootloader in ROM, and cannot be changed, which is the
 first thing that is run upon startup. How this works is described in the
 datasheet. 
-If we press the `BOOTSEL` button on the, it will enter USB Mass Storage Mode for
-code upload and if not pressed the boot sequence will start executing the
-program in flash memory.
+If we press the `BOOTSEL` button on during startup, it will enter USB Mass
+Storage Mode for code upload and if not pressed the boot sequence will start
+executing the program in flash memory.
 
 Now, the Pico SDK will place piece of code in the start of the flash memory
 instead of our program. This is called a second stage bootloader which will then
-to some stuff, and later call our program. So if we look in linkerscripts of
+do some stuff, and later call our program. So if we look in linkerscripts of
 examples in the SDK we will find this program which is called (in a section)
 `boot2`. The size of boot2 is 256 kb which configures the flash chip using
 commands specific to the external flash chip on the board in question. See the
