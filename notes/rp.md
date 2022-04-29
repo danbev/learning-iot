@@ -86,15 +86,15 @@ Each of these contains 4 state machines:
   +--------------------+
 ```
 Programming is done in a custom assembly language which only has 9 instructions:
-# in
-# out
-# push
-# pull
-# mov
-# irq
-# wait
-# jmp
-# set
+1 in
+2 out
+3 push
+4 pull
+5 mov
+6 irq
+7 wait
+8 jmp
+9 set
 
 ### Openocd
 ```console
