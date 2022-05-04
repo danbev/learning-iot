@@ -76,6 +76,7 @@ start:
   bl systick_init
 
 main_loop:
+  wfi          // Wait For Event (or interrupt
   b main_loop
 
 systick_init:
