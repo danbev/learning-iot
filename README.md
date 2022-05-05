@@ -318,7 +318,7 @@ One thing to note is that we always want to sample data in the middle of a clock
 cycle and never close to the edges as that means that data i changing and
 sampling then migth cause corruption to data.
 
-### Quad SPI
+### Quad SPI (QSPI)
 This is a serial interface where 4 data lines are used.
 
 ### Universal Asynchonous Receiver/Transmitter (UART)
@@ -1493,6 +1493,24 @@ SYMBOL TABLE:
 0000068e g     F .text	00000000 HardFault
 ```
 
+### Interrupts
+Remember that when an interupt occurs the thread state (registers etc) will be
+saved and execution will be paused. The interrupt handler is then executed and
+when it yields the state previously saved thread state is restored and execution
+continues. 
+
+So we can have one thread of execution, which can get interrupted, and then
+restored again. In embedded devices we can use this to have an interrupt wake
+up the processor from low power mode. There are processor instructions like ARMs
+Wait For Event (WFE) and Wait For Interrupt (WFI) which could be used to put
+a processor in low power mode. And when a interrupt happens the Set EVent (SEV)
+instruction can be issued to signal all other processors and wakes them up
+from low-power stand-by mode. A usage of this can be in an async executor were
+if there is not progress to be made by a future, the executor set up a waker
+function, which in this case would call SEV, and then use WFE to place itself
+into low-power mode to save on resources.
+
+
 ### LoRaWAN 
 Is a Low Power Wide Area Network (LPWAN)
 
@@ -1768,7 +1786,7 @@ Recommended Standard 232.
 ### JTAG (Joint Test Action Group)
 Is a protocol for inspecting/testing microcontrollers. This is a standard that
 goes back to the 1980 where manufacturues ran into problems when components were
-becomming smaller and it was not as easy to access pins on their devices for
+becoming smaller and it was not as easy to access pins on their devices for
 testing. What was used was a bed of nails test system which I think were pins
 that needed to be in contact with the CI for testing. This is the reason for
 the Test in the name JTAG, it was for testing pins on a chip that has JTAG built
@@ -1803,6 +1821,7 @@ the JTAG Port which is the test access port.
 ```
 Notice that the JTAG can talk to the flash controller which enables writing
 to flash storage memory.
+
 The connection to the Debug Controller was not part of the original standard
 but something that was added afterwards. This enables us to monitor and debug
 the internals of the processor.
@@ -1811,6 +1830,7 @@ the internals of the processor.
 This is additional circuitry that is in between the I/O pins and connects all
 the pins. By default these cells do nothing and just pass the signal on the pin
 through. 
+
 This allows the the pins to be read/written. So we can read all the values from
 the pins and send it out, or we can write a value to the pins. This can be used
 for checking the that the pins are connected(soldered?) properly.
@@ -3050,3 +3070,7 @@ to big for the on-chip storage a memory mapping of the flash drive can be done
 and if it can use QSPI to improve the speed can be close to that of the on-chip
 storage so it can be used to execute code as well (and not just for storage of
 data).
+
+### Bootloader
+Is a program used to load and run other programs. These programs run as one of
+the first things upon booting and load the code to be run.
