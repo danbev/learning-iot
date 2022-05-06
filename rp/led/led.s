@@ -25,22 +25,16 @@ start:
   // Set Function Select as SIO
   ldr r1, =GPIO_25_CTRL_R
   ldr r2, =GPIO_FUNC_SIO
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
+  str r2, [r1]
 
   // Enable GPIO Output for PIN
   ldr r1, =GPIO_OE_R
   ldr r2, =GPIO_OE_ENABLE_PIN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
+  str r2, [r1]
 
   // Set output of PIN to high
   ldr r1, =GPIO_OUT_R
   ldr r2, =GPIO_OUT_PIN
-  ldr r0, [r1]
-  orr r0, r0, r2
-  str r0, [r1]
+  str r2, [r1]
 
   b .
