@@ -236,7 +236,28 @@ uses an external flash chip to store program code and different flash chips
 chips. This is what the purpose of boot2 is. So I think that to write an
 assemble program we will need to include this boot2 program in our binary file.
 
-https://github.com/raspberrypi/pico-sdk/tree/master/src/rp2_common/boot_stage2
+So to know which second stage boot loader program we need to use depends on
+what kind of flash we have on our board. Lets take a look at the data sheet for
+Pico https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf.
+```
+External Quad-SPI Flash with eXecute In Place (XIP) and 16kByte on-chip cache.
+...
+Pico provides minimal (yet flexible) external circuitry to support the RP2040
+chip: flash (Winbond W25Q16JV)
+```
+[Datasheet](https://octopart.com/datasheet/w25q16jvsniq-winbond-75609620) for
+Winbond W25Q16J.
+If we take a look in https://github.com/raspberrypi/pico-sdk/tree/master/src/rp2_common/boot_stage2
+we can see that there are few assembly files which have `w25q` in them, for
+example [boot2_w25q080.S](https://github.com/raspberrypi/pico-sdk/blob/master/src/rp2_common/boot_stage2/boot2_w25q080.S)
+and if we look in side we can see that this does in fact support W25Q16JV:
+```assembly
+// Device:      Winbond W25Q080
+//              Also supports W25Q16JV (which has some different SR instructions)
+```
+Looking futher down in the comments we find that this program/functions will
+configure the W25Q16JV device to run in QSPI execute in place (XIP) mode.
+
 
 
 ### Hook up
