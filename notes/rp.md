@@ -175,6 +175,13 @@ For bug reports, read
 	http://openocd.org/doc/doxygen/bugs.html
 ```
 
+Update udev rules:
+```console
+$ sudo cp ./contrib/60-openocd.rules /etc/udev/rules.d
+```
+Remember that for this to take effect you'll need to disconnect the probe if
+it is currently hooked in.
+
 Using minicom:
 ```console
 $ sudo minicom -D /dev/ttyACM0 -b 115200
