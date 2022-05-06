@@ -160,42 +160,24 @@ I looks like this can also be programmed using Rust with
 
 ### Openocd
 ```console
-$ git clone https://github.com/raspberrypi/openocd.git --recursive --branch rp2040 --depth=1
+$ git clone https://github.com/raspberrypi/openocd.git --branch rp2040 --depth=1 --no-single-branch
 $ cd openocd
 $ ./bootstrap
-$ ./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio
+$ ./configure --enable-picoprobe --enable-sysfsgpio --enable-bcm2835gpio
 $ make -j8
 ```
 The openocd binary is then located in src/openocd.
-Even after doing this I get the following error:
 ```console
-$ openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg
-Open On-Chip Debugger 0.11.0-g610f137 (2022-04-28-17:17)
+$ ./src/openocd --version
+Open On-Chip Debugger 0.11.0-g610f137 (2022-05-06-14:51)
 Licensed under GNU GPL v2
 For bug reports, read
 	http://openocd.org/doc/doxygen/bugs.html
-Error: The specified debug interface was not found (bcm2835gpio)
-The following debug adapters are available:
-1: ftdi
-2: usb_blaster
-3: ft232r
-4: presto
-5: usbprog
-6: openjtag
-7: jlink
-8: vsllink
-9: rlink
-10: ulink
-11: arm-jtag-ew
-12: hla
-13: osbdm
-14: opendous
-15: sysfsgpio
-16: aice
-17: picoprobe
-18: cmsis-dap
-19: xds110
-20: st-link
+```
+
+Using minicom:
+```console
+$ sudo minicom -D /dev/ttyACM0 -b 115200
 ```
 
 ###  rp-hal
