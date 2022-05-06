@@ -39,8 +39,44 @@ There are to banks of 18 General Purpose Input/Ouput pins named `QSPI bank`
 QSPI: QSPI_SS, QSPI_SCLK, QSPI_SD0, QSPI_SD1, SQSPI_SD2, SQPI_SD3
 User Bank: GPIO0-GPIO29
 ```
-The GPIO pins can have different functions like SPI, UART, SPI, I2C, PIO etc.
-The function of a pin is configured to getting the Function Select value.
+The GPIO pins can have different functions like SPI, UART, SPI, I2C, PIO, SIO
+etc.  The function of a pin is configured to getting the Function Select value
+`FSEL`.
+```
+ +-----+   +---+
+ |SPI  |---| m |
+ +-----+   | u |     +-------+   output data      +----------------+
+ +-----+   | x |-----|???    |------------------->|   IO PAD       |
+ |PIO  |---| e |     +-------+                    |                |
+ +-----+   | r |                                  |                |
+ +-----+   |   |     +-------+   output enable    |                |
+ |UART |---|   |-----|???    |------------------->|                |
+ +-----+   |   |     +-------+                    |                |
+ +-----+   |   |                                  |                |
+ |I2C  |---|   |     +-------+           input    |                |
+ +-----+   |   |-----|???    |<-------------------|                |
+ +-----+   |   |     +-------+                    +----------------+
+ |PWM  |---|   |
+ +-----+   +---+
+```
+
+The IO Pad are the interface to the external circuitry. 
+```
+                            +----------------------------+
+      Slew rate        -----|                            |
+      Output Enable    -----|                            |
+      Output Data      -----|                            |
+      Drive Strength   -----|                            |
+                            |                            |
+      Input Enable     -----|                            |
+      Input Data       -----|                            |
+      Schmitt Trigger  -----|                            |
+                            |                            |
+      Pull up/ Down    -----|                            |
+                            +----------------------------+
+```
+Notice that `Output Enable`, `Output Data`, and `Data Input` are connected to
+the function controlling the pad (using FSEL).
 
 To output to a pin we will need to set the function, enable the pin as output
 and write to the pins output register. Now the function select to use for to
@@ -58,8 +94,18 @@ modify a register at the same time. For this reason there are registers that
 perform atomic set/clear operations.
 
 ### Single Cycle IO Block
-TODO:
+Here the processor can drive the GPIO pins.
+
 https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_sio
+
+Registers in 2.3.1.7. List of Registers:
+```
+SIO_BASE: 0xd0000000
+GPIO_IN: 0x004
+GPIO_OUT: 0x010
+GPIO_OE: 0x020             GPIO Output Enable
+```
+
 
 ### Programmable I/O (PIO)
 Two of these PIO block are included on the PI Pico board.
@@ -153,4 +199,8 @@ RP2040 uses an external flash chip to store program code and different flash
 chips (from different manufactures) have different protocols for configuring
 their chips. This is what the purpose of boot2 is.
 
+```console
+$ lsblk
 
+$ cp blink.uf2 /run/media/danielbevenius/RPI-RP2 
+```
