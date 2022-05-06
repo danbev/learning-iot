@@ -78,6 +78,17 @@ The IO Pad are the interface to the external circuitry.
 Notice that `Output Enable`, `Output Data`, and `Data Input` are connected to
 the function controlling the pad (using FSEL).
 
+Since there are two cores on the PI Pico there are register that perform atomic
+operations. For example there is GPIO_OUT (SIO):
+```
+GPIO_OUT     0x010  RW  Sets the pin 0..29 to high (1) or low (0)
+GPIO_OE      0x020  RW  Set output enable for pins 0..29, (1=output, 0=input)
+
+Atomic registers:
+GPIO_OUT_SET 0x014  RW  Set atomically the pin 0..29 to high (1) or low (0)
+GPIO_OE_SET  0x024  RW  Set atmomically output enable for pins 0..29, (1=output, 0=input)
+```
+
 To output to a pin we will need to set the function, enable the pin as output
 and write to the pins output register. Now the function select to use for to
 the output pin, for example to turn on an LED which has become my first program
@@ -156,6 +167,36 @@ $ ./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio
 $ make -j8
 ```
 The openocd binary is then located in src/openocd.
+Even after doing this I get the following error:
+```console
+$ openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg
+Open On-Chip Debugger 0.11.0-g610f137 (2022-04-28-17:17)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Error: The specified debug interface was not found (bcm2835gpio)
+The following debug adapters are available:
+1: ftdi
+2: usb_blaster
+3: ft232r
+4: presto
+5: usbprog
+6: openjtag
+7: jlink
+8: vsllink
+9: rlink
+10: ulink
+11: arm-jtag-ew
+12: hla
+13: osbdm
+14: opendous
+15: sysfsgpio
+16: aice
+17: picoprobe
+18: cmsis-dap
+19: xds110
+20: st-link
+```
 
 ###  rp-hal
 [rp-hal](https://github.com/rp-rs/rp-hal) contains high level drivers for
@@ -185,19 +226,56 @@ $ cargo install elf2uf2-rs --locked
 PI Pico has a first stage bootloader in ROM, and cannot be changed, which is the
 first thing that is run upon startup. How this works is described in the
 datasheet. 
+
 If we press the `BOOTSEL` button on during startup, it will enter USB Mass
 Storage Mode for code upload and if not pressed the boot sequence will start
 executing the program in flash memory.
 
-Now, the Pico SDK will place piece of code in the start of the flash memory
+Now, the Pico SDK will place a piece of code in the start of the flash memory
 instead of our program. This is called a second stage bootloader which will then
-do some stuff, and later call our program. So if we look in linkerscripts of
-examples in the SDK we will find this program which is called (in a section)
-`boot2`. The size of boot2 is 256 kb which configures the flash chip using
-commands specific to the external flash chip on the board in question. See the
-RP2040 uses an external flash chip to store program code and different flash
-chips (from different manufactures) have different protocols for configuring
-their chips. This is what the purpose of boot2 is.
+do some stuff, and later call our program.
+
+So if we look in linkerscripts of examples in the SDK we will find this program
+which is called (in a section) `boot2`.
+
+The size of boot2 is 256 kb which configures the flash chip using commands
+specific to the external flash chip on the board in question. See the RP2040
+uses an external flash chip to store program code and different flash chips
+(from different manufactures) have different protocols for configuring their
+chips. This is what the purpose of boot2 is. So I think that to write an
+assemble program we will need to include this boot2 program in our binary file.
+
+https://github.com/raspberrypi/pico-sdk/tree/master/src/rp2_common/boot_stage2
+
+
+### Hook up
+In my case I've got two Pico's and I'm going to use one a programmer and the
+other as the target where application will be run.
+
+```console
+$ git clone https://github.com/raspberrypi/picoprobe.git
+$ cd picoprobe
+$ mkdir build
+$ Cmake -G "Unix Makefiles" ..
+$ make
+```
+Now press the BOOTSEL button and while pressing it connect the debugger probe
+into the host using the USB cable.
+Now we are going to copy the generate picoprobe.uf2 to the mounted mass storage
+device named `RPI-RP2`. We can find its path by using:
+```console
+$ lsblk
+NAME                            MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda                               8:0    1     0B  0 disk 
+sdb                               8:16   1     0B  0 disk 
+sdc                               8:32   1     0B  0 disk 
+sdd                               8:48   1   128M  0 disk 
+└─sdd1                            8:49   1   128M  0 part /run/media/danielbevenius/RPI-RP2
+```
+```console
+$ cp picoprobe.uf2 /run/media/danielbevenius/RPI-RP2/
+```
+The onboard LED should now be turned on.
 
 ```console
 $ lsblk
