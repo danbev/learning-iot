@@ -8,9 +8,10 @@ OPENOCD="${OPENOCD_DIR}/src/openocd"
 	$(AS) $(ASFLAGS) $< -asghl=$*.lst -o $@
 
 clean:
-	${RM} *.elf *.o *.elf.map *.lst *.hex *.map
+	${RM} *.elf *.o *.elf.map *.lst *.hex *.map *.uf2
 
 
 .PHONY openocd:
 openocd:
-	${OPENOCD} -s ${OPENOCD_DIR}/tcl -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg
+	${OPENOCD} -s ${OPENOCD_DIR}/tcl -f interface/picoprobe.cfg -f target/rp2040.cfg
+
