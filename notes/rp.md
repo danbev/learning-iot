@@ -182,6 +182,8 @@ $ sudo cp ./contrib/60-openocd.rules /etc/udev/rules.d
 Remember that for this to take effect you'll need to disconnect the probe if
 it is currently hooked in.
 
+![Piceprobe example](./img/picoprobe.jpg "Picoprobe image")
+
 Using minicom:
 ```console
 $ sudo minicom -D /dev/ttyACM0 -b 115200
