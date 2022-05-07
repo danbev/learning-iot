@@ -213,28 +213,99 @@ Rust produces ELF format binaries which can be converted into
 $ cargo install elf2uf2-rs --locked
 ```
 
-### Bootloader
-PI Pico has a first stage bootloader in ROM, and cannot be changed, which is the
-first thing that is run upon startup. How this works is described in the
-datasheet. 
+### Memory
+RP2040 has 16kB ROM `on-chip` at address 0x00000000 and this memory contents
+(Read Only Memory remember) is fixed at manufacturing time and contains the
+initial startup routine, flash boot sequence, flash programming routines, USB
+mass storage support (UF2 format).
+
+There is also 264kB `on-chip` SRAM which is divided into:
+* 4 16k x 32-bit banks (64kB each, 256kB total)
+* 2 1k  x 32-bits banks (4kB each, 8kB total)
+
+SRAM is mapped to system addresses starting at 0x20000000.
+
+There are also another 2 RAM blocks that are used for XIP caching of size
+16kB starting at 0x15000000.
+And 4kB for USB DPRAM at 0x50100000.
+
+Flash is external to the chip (not on-chip) and accessed using Quad SPI (QSPI)
+interface using the Execute in Place (XIP) hardware. This allows an external
+flash memory hardware to be addresses/accessed by the system as though it was
+internal memory. From the RP2040 datasheet:
+```
+Bus reads to a 16MB memory window starting at 0x10000000 are translated into a
+serial flash transfer, and the result is returned to the master that initiated
+the read. This process is transparent to the master, so a processor can execute
+code from the external flash without first copying the code to internal memory,
+ hence "execute in place"
+```
+Like mentioned above there is a internal cache of 16kB fr XIP caching.
+
+### Boot
+The bootrom is 16kB in size and is built into the chip and takes care of a
+number of things like initializing the boot sequence for processor 0 and
+processor 1 will be placed in power wait mode. It will then setup USB Mass
+Storage, and set routines for programming and manipulating external flash.
+
+Source can be found in [pico-bootrom](t https://github.com/raspberrypi/pico-bootrom)
+
+I'm currently most interested in getting a small assembly program running and
+how to do this.
+```
+    ...
+      ↓ 
+   +--------+  no     +------------------------------------------+
+   |BootSel |---------| Conf. init Synopsys SSI for standard mode|
+   +--------+         | QSPI pins                                |
+      |               +------------------------------------------+
+      |                     ↓
+      |               +---------------+
+      |               | Load and copy |
+      |      +------->| 256kB to SDRAM|
+      |      |        | from Flash    |
+      |   no |        +---------------+
+      |      |              ↓          
+      |   +------+    +-----------------+
+      |   | <0.5s|<-- | Verify checksum |
+      |   +------+    +-----------------+
+      |   yes|              ↓
+      |<-----+        +-------------------+
+      |               | Start executing at|
+      |               | at start of the   |
+      |               | copies 256kb in   |
+      |               | SDRAM             |
+      |               +-------------------+
+ +------------------+
+ | Enter USB device |
+ | mode bootcode    |
+ +------------------+
+```
 
 If we press the `BOOTSEL` button on during startup, it will enter USB Mass
 Storage Mode for code upload and if not pressed the boot sequence will start
 executing the program in flash memory.
 
-Now, the Pico SDK will place a piece of code in the start of the flash memory
-instead of our program. This is called a second stage bootloader which will then
-do some stuff, and later call our program.
+If BOOTSEL was not pressed then there will be a step that configures SSI and
+connects to I/O pads and initializes it for Standard SPI mode which I think is
+so that it can communicate with any type of Flash device that is in use. 
+Next in the boot sequence 256 bytes will be read from Flash using the standard
+SPI interface (at least that is how I understand it) and copies those bytes
+into SDRAM. I've read that the reason form copying this is that the intention
+of this code it to configure the external Flash device which need to be
+disabled while doing that. These 256 bytes contain 252 bytes of code and 4 bytes
+of checksum. This checksum will be verified and if it passes execution will
+start by jumping to the first bytes in the 256 bytes copied in SDRAM.
 
-So if we look in linkerscripts of examples in the SDK we will find this program
-which is called (in a section) `boot2`.
+Now, if the checksum check fails, it will be retried 128 times each check
+taking about 4ms which in total takes about 0.5sec. After this it will boot into
+USB device mode.
 
-The size of boot2 is 256 kb which configures the flash chip using commands
-specific to the external flash chip on the board in question. See the RP2040
-uses an external flash chip to store program code and different flash chips
-(from different manufactures) have different protocols for configuring their
-chips. This is what the purpose of boot2 is. So I think that to write an
-assemble program we will need to include this boot2 program in our binary file.
+The second stage bootloader which is normally in a section named `.boot2`
+configures the flash chip using commands specific to the external flash chip on
+the board in question. RP2040 uses an external flash chip to store program code
+and different flash chips (from different manufactures) have different protocols
+for configuring their chips. This is what the purpose of boot2 is. 
 
 So to know which second stage boot loader program we need to use depends on
 what kind of flash we have on our board. Lets take a look at the data sheet for
@@ -257,6 +328,7 @@ and if we look in side we can see that this does in fact support W25Q16JV:
 ```
 Looking futher down in the comments we find that this program/functions will
 configure the W25Q16JV device to run in QSPI execute in place (XIP) mode.
+
 
 Now, with the first program I wrote which is a very basic assembly example that
 turns on the onboard LED. My first attempt to just have a linker-script handle
@@ -299,11 +371,6 @@ $ hexdump -C led.bin
 .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x31, 0x6b, 0xe0
 ```
-So if I've understood this, the boot sequence will read the above 256 bytes,
-check the checksum of it and then start executing at the beginning. Normally
-this would be a small boot loader and it would then call our main entry point
-I think.
-
 
 ### Hook up
 In my case I've got two Pico's and I'm going to use one a programmer and the
@@ -339,3 +406,8 @@ $ lsblk
 
 $ cp blink.uf2 /run/media/danielbevenius/RPI-RP2 
 ```
+
+### Synchronous Serial Interface (SSI)
+This is a controller on the QSPI pins and is used to communicate with external
+Flash devices. SSI is part of the Execute in Place block (XIP block).
+
