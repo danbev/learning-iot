@@ -2,9 +2,9 @@ AS=arm-none-eabi-as
 LD=arm-none-eabi-ld
 OBJCOPY=arm-none-eabi-objcopy
 ASFLAGS=-mcpu=cortex-m0 -mthumb -g
-OPENOCD_DIR="/home/danielbevenius/work/iot/openocd"
+OPENOCD_DIR="/home/danielbevenius/work/iot/rp/openocd"
 OPENOCD="${OPENOCD_DIR}/src/openocd"
-PICO_SDK_DIR=/home/danielbevenius/work/iot/pico-sdk
+PICO_SDK_DIR=/home/danielbevenius/work/iot/rp/pico-sdk
 PAD_CHECKSUM=${PICO_SDK_DIR}/src/rp2_common/boot_stage2/pad_checksum
 
 %.o: %.s
