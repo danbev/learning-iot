@@ -134,3 +134,34 @@ This means that our amplitude will decrease over time and eventually become
 zero. But if we have some way of preventing this from happening we would have
 an oscillator.
 
+### Ring Oscillator
+This is a type of oscillator which can be built using an uneven (odd) number
+of NOT gates.
+```
+  
+    +-----+        +-----+       +-----+      clk
+ +->| NOT |------->| NOT |------>| NOT |---+------->
+ |  +-----+        +-----+       +-----+   |
+ |                                         |
+ +-----------------------------------------+
+```
+There is a signal propagation delay between each of these gates.
+
+Initially the clock will be 0:
+```
+  0 +-----+   1    +-----+  0    +-----+  1 →  clk
+ +->| NOT |------->| NOT |------>| NOT |---+------->
+ |  +-----+        +-----+       +-----+   |  0
+ |                                         |  ↓
+ +-----------------------------------------+
+```
+Next time the clock will be 1:
+```
+  1 +-----+   0    +-----+  1    +-----+  0 →  clk
+ +->| NOT |------->| NOT |------>| NOT |---+------->
+ |  +-----+        +-----+       +-----+   |  1
+ |                                         |  ↓
+ +-----------------------------------------+
+```
+Notice that in this case it takes 3 signal propagation delays between the clock
+changes (from 0-1, and 1-0).
