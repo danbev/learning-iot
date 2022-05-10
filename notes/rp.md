@@ -411,3 +411,31 @@ $ cp blink.uf2 /run/media/danielbevenius/RPI-RP2
 This is a controller on the QSPI pins and is used to communicate with external
 Flash devices. SSI is part of the Execute in Place block (XIP block).
 
+This is covered in section 4.10 of the Peripheral section of the datasheet. It
+contains the following:
+```
+The SSI controller is based on a configuration of the Synopsys DW_apb_ssi IP
+```
+DW stands for Design Ware, and apb stand for advanced peripheral bus. IP stands
+for Intelectual Property (IP as in FPGA IP) which is a block of logic or data
+used in making FPGAs or application specific integrated circuits. There are
+three categories of IPs, hard cores, firm cores, and soft cores.  
+
+The APB port connects the IP instance to the rest of the SoC while the bus is 
+connectd to the register interface and DMA.
+
+On RP2040 DW_abp_ssi is a component of the flash execute-in-place subsystem
+and provides communication with an external SPI, dual SPI or QSPI flash device.
+
+### Clocks
+
+
+### Resus
+Short for resuscitation is a curcuit that enables which will switch the clk_sys
+back to a known good clock source if software for some reason has stopped the
+clock (which would normally cause an unrecoverable lock-up).
+The on-chip resus component restarts the system clock from a known good clock if
+it is accidentally stopped. This allows the software debugger to access
+registers and debug the problem.
+
+
