@@ -439,3 +439,24 @@ it is accidentally stopped. This allows the software debugger to access
 registers and debug the problem.
 
 
+### Turn on LED from GDB
+First set function select SIO (5) for pin 25 (the PI Pico onboard LED):
+```console
+(gdb) set *(0x400140CC as *mut i32) = 5
+(gdb) x/t 0x400140CC
+0x400140cc:	00000000000000000000000000000101
+```
+Next, set enable output:
+```console
+(gdb) set *(0xd0000020 as *mut i32) = 1 << 25
+(gdb) x/t $0xd0000020 
+0xd0000020:	00000010000000000000000000000000
+```
+And finally turn on the LED:
+```console
+(gdb) set *(0xd0000010 as *mut i32) = 1 << 25
+(gdb) x/t 0xd0000010
+0xd0000010:	00000010000000000000000000000000
+```
+Notice that I needed to use a Rust cast in this case for the memory location
+and the dereferencing it.
