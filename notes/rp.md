@@ -248,10 +248,16 @@ number of things like initializing the boot sequence for processor 0 and
 processor 1 will be placed in power wait mode. It will then setup USB Mass
 Storage, and set routines for programming and manipulating external flash.
 
-Source can be found in [pico-bootrom](t https://github.com/raspberrypi/pico-bootrom)
+Source can be found in [pico-bootrom](https://github.com/raspberrypi/pico-bootrom)
 
-I'm currently most interested in getting a small assembly program running and
-how to do this.
+Now, with the first program I wrote which is a very basic assembly example that
+turns on the onboard LED. My first attempt to just have a linker-script handle
+the layout like I've done from `stm32` and `nrf` devices this did not work in
+the case of PI Pico and it instead booted into USB Mass Storage mode when taking
+the device out of reset. The following section will take a closer look at the
+boot sequence to understand why this happening.
+
+Simplified bootsequence:
 ```
     ...
       ↓ 
@@ -287,21 +293,22 @@ Storage Mode for code upload and if not pressed the boot sequence will start
 executing the program in flash memory.
 
 If BOOTSEL was not pressed then there will be a step that configures SSI and
-connects to I/O pads and initializes it for Standard SPI mode which I think is
+connects to I/O pads, and initializes it for Standard SPI mode which I think is
 so that it can communicate with any type of Flash device that is in use. 
+
 Next in the boot sequence 256 bytes will be read from Flash using the standard
 SPI interface (at least that is how I understand it) and copies those bytes
 into SDRAM. I've read that the reason form copying this is that the intention
 of this code it to configure the external Flash device which need to be
 disabled while doing that. These 256 bytes contain 252 bytes of code and 4 bytes
-of checksum. This checksum will be verified and if it passes execution will
+of checksum. This checksum will be verified, and if it passes execution will
 start by jumping to the first bytes in the 256 bytes copied in SDRAM.
 
 Now, if the checksum check fails, it will be retried 128 times each check
 taking about 4ms which in total takes about 0.5sec. After this it will boot into
-USB device mode.
+USB device mode (sounds familiar? This is what I ran into with my first program).
 
-The second stage bootloader which is normally in a section named `.boot2`
+The second stage bootloader which is normally in a section named `.boot2` and
 configures the flash chip using commands specific to the external flash chip on
 the board in question. RP2040 uses an external flash chip to store program code
 and different flash chips (from different manufactures) have different protocols
@@ -330,18 +337,17 @@ Looking futher down in the comments we find that this program/functions will
 configure the W25Q16JV device to run in QSPI execute in place (XIP) mode.
 
 
-Now, with the first program I wrote which is a very basic assembly example that
-turns on the onboard LED. My first attempt to just have a linker-script handle
-the layout like I've done from stm32 and nrf devices this did not work in the
-case of PI Pico. The reason for this is that bootsequence will, after a few
-other things which I've not fully understood yet, will Load 256 bytes from
-flash. This is expected to be .boot2 that was discussed above. After loading
-this it will verify that the checksum is correct for these 256 bytes and if
-that passes it will enter the second stage of the booting, which will start
-after those 256 bytes. But this is a problem for us because we want our program
-to run but it will not pass this boot stage (the checksum check). The solution
-is provided by a python script named `pad_checksum` which can take our binary
-and padded it and adds the checksum:
+So the rhe reason for my first program not working  is that bootsequence will,
+after a few other things which I've not fully understood yet, will read 256
+bytes from flash and store them in SDRAM. This is expected to be the second
+stage bootloader as discussed above.
+
+After loading this it will verify that the checksum is correct for these 256
+bytes and if that passes it will enter the second stage of the booting, which
+will start after those 256 bytes. But this is a problem for us because we want
+our program to run but it will not pass this boot stage (the checksum check).
+The solution is provided by a python script named `pad_checksum` which can take
+our binary and padded it and adds the checksum:
 ```console
 $ hexdump -C led.bin 
 00000000  00 00 00 20 01 00 00 00  04 49 05 4a 0a 60 05 49  |... .....I.J.`.I|
@@ -371,6 +377,8 @@ $ hexdump -C led.bin
 .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x31, 0x6b, 0xe0
 ```
+And this assembly file can then be assembled and linked and will then work. An
+example can be found in [led.s](../rp/led).
 
 ### Hook up
 In my case I've got two Pico's and I'm going to use one a programmer and the
