@@ -497,8 +497,44 @@ FM broadcast band 88 MHz  (frequency of the electrical current)
                     -
 ```
 
+### Periodic analog signals
+Such a signal can be simple or composite. A simple signal cannot be decomposed
+into simpler signals. A composite periodic analog system
+
+
+If a signal does not change at all its frequency is 0. So if we send three
+0 bits then it could be that there is no change to the signal, and that would
+give a frequency of 0.
+
+If a signal changes instantaneously its frequency is infinite.
+
+I've read the following statement in multple places:
+```
+A single frequency sine wave is not useful in data communications, we need to
+send a composite signal.
+```
+Why could a single frequency sine wave not be useful, could we not just alter
+the amplitude?  
+Actually, once we do that, for example use amplitude modulation of the signal
+it is no longer a fundamental wave because it has harmonic components.
+
+Unless the sine wave changes, it can’t carry information, and if it changes, it
+isn’t a pure sine wave any more.
+
+
+
 ### What is bandwidth
-TODO:
+So we know that frequency is:
+```
+     1
+f = ---
+     T
+
+T = time taken to complete one cycle of an oscillation.
+```
+
+Periodic analog signals and non-periodic digital signals
+
 
 ### Electro magnetic waves
 
