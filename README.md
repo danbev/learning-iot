@@ -1799,7 +1799,7 @@ of hardware embedded on the chips to enable this kind of testing. This is called
 the JTAG Port which is the test access port.
 
 ```
-   +---+                        +-----------------------------------------+
+   +----+                       +-----------------------------------------+
    |TMS |----------------------→| [Boundry scan                       ]←+ |
    |TCK |----------------------→|+----+                                [B |
    |TDI |---------------------->||JTAG|         +----------------+      o |
@@ -1857,7 +1857,7 @@ TRST = Test Reset (optional)
 Notice that there can be multiple microprocessors connected and debugged.
 
 ### SWD (Serial Wire Debug)
-Is a protocol for inspecting microcontrollers and is propriatary to ARM.
+Is a protocol for inspecting microcontrollers and is propriatary to `ARM`.
 ```
    +-----+       +-----+
    |SWDIO|<----->|SWDIO|
@@ -1869,10 +1869,49 @@ In this case we can only debug a single microcontroller.
 Notice that SWD only requires two pins where as JTAG required 4 pins.
 Another difference is that while both support programming and debugging only
 JTAG supports Boundry scanning.
+
 SWD like I mentioned above is only for ARM, where as JTAG is supported for
 other devices as well. But also remember that ARM uses a licening model and
 there are a lot of implementations out there so it wil be available on a lot
 of devices.
+
+SWD has a but called Debug Access Port (DAP) and there is a master, the 
+debug port (DP) and then one or more access ports (AP).
+The debug port communicates with a specific access port by specifying the
+access ports address in the packet it sends.
+
+```
+                     +-----+
+ +-------+           | DAP |      +--------+ JTAG
+ |Laptop |---------->|     |----->| JTAG-AP|--------->
+ +-------+ SWJ_DP    |     |      +--------+
+           JTAG-DP   |     |
+           SW-DP     |     |      +--------+  AHB
+                     |     |----->|AHB-AP  |--------->
+                     |     |      +--------+
+                     |     |
+                     |     |      +--------+  APB
+                     |     |----->| APB-AP |--------->
+                     |     |      +--------+
+                     +-----+
+
+SWJ-DP  = Serial Wire/JTAG Debug Port
+This uses the standard JTAG interface to access the DAP.
+
+JTAG-DP = JTAG Debug Port
+This port can use either JTAG or SWD to access the DAP.
+
+SW-DP   = Serial Wire Debug Port
+Uses the SWD protocol to access the DAP.
+```
+
+#### Access Ports 
+Multiple access ports can be added to the debug access port and ARM provides
+spec for two:
+* MEM-AP provides access to core memory and registers.
+* JTAG-AP allows for a JTAG chaing to be added to the DAP.
+
+
 
 ### Debug adapters
 Are small hardware modules which provide the right kind of signaling (JTAG
@@ -3074,3 +3113,17 @@ data).
 ### Bootloader
 Is a program used to load and run other programs. These programs run as one of
 the first things upon booting and load the code to be run.
+
+### Synchronous Serial Interface (SSI)
+Is a standard interface for industrial applications between a master/controller
+and slave/perhipheral. Is a point-to-point connection and all devices use a
+single CPU bus to share data and clock. Since this is synchronous there is a
+clock signal/line:
+```
+   +----------+        +----------+
+   |Controller|        |Peripheral|
+   |      Clk |--------|Clk       |
+   |     Datq |--------|Data      |
+   +----------+        +----------+
+```
+
