@@ -251,11 +251,11 @@ Storage, and set routines for programming and manipulating external flash.
 Source can be found in [pico-bootrom](https://github.com/raspberrypi/pico-bootrom)
 
 Now, with the first program I wrote which is a very basic assembly example that
-turns on the onboard LED. My first attempt to just have a linker-script handle
-the layout like I've done from `stm32` and `nrf` devices this did not work in
-the case of PI Pico and it instead booted into USB Mass Storage mode when taking
-the device out of reset. The following section will take a closer look at the
-boot sequence to understand why this happening.
+turns on the onboard [LED](../rp/led).LED. My first attempt to just have a
+linker-script handle the layout like I've done from `stm32` and `nrf` devices
+this did not work in the case of PI Pico and it instead booted into USB Mass
+Storage mode when taking the device out of reset. The following section will
+take a closer look at the boot sequence to understand why this happening.
 
 Simplified bootsequence:
 ```
@@ -499,10 +499,20 @@ There are two banks:
 These GPIO registers are shared between both cores so both can access them at
 the same time.
 There are registers like GPIO_OUT which is used to set the output level.
+```
+SIO_BASE = 0xd0000000
 
-SIO appears as memory mapped hardware withing the IOPort space. The FIFO allow
-for message passing between the two cores and the spinlocks enable
-synchronization.
+CPUID    = 0xd0000004
+
+GPIO_OUT = 0xd0000010
+  Reading back gives the last value written, NOT the input value from the pins.
+```
+
+SIO appears as memory mapped hardware withing the IOPort space. 
+
+The FIFO allow for message passing between the two cores.
+
+Spinlocks enable synchronization between the two cores.
 
 
 ### Turn on LED from GDB
