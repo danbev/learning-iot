@@ -32,6 +32,7 @@ as needed.
 ### Examples for various microcontroller/boards
 1. [stm32f0-discovery](./stm32f0-discovery/README.md)
 1. [nrf52833](./nrf/README.md)
+1. [rp2040](./rp)
 1. [esp8266](./notes/esp8266.md)
 1. [microbit v2.0](./notes/microbit.md)
 
