@@ -88,6 +88,18 @@ Atomic registers:
 GPIO_OUT_SET 0x014  RW  Set atomically the pin 0..29 to high (1) or low (0)
 GPIO_OE_SET  0x024  RW  Set atmomically output enable for pins 0..29, (1=output, 0=input)
 ```
+Controlling the pads is done by using the following registers:
+```
+User Bank Pad Control registers base address: 0x4001c000
+PADS_BANK0: GPIO0, ...CPIO29
+  OD       Output Enable (this overrides the output enable of the peripheral)
+  IE       Input Enable
+  Drive    0x0 = 2mA, 0x1 = 4mA, 0x2= 8mA, 0x3 = 12mA
+  PUE      Pull up Enable
+  PDE      Pull down Enable
+  Schmitt  Enable schmitt trigger
+  Slewfast Slew control rate. 1 = fast, 0 = slow
+```
 
 To output to a pin we will need to set the function, enable the pin as output
 and write to the pins output register. Now the function select to use for to
@@ -536,3 +548,58 @@ And finally turn on the LED:
 ```
 Notice that I needed to use a Rust cast in this case for the memory location
 and the dereferencing it.
+
+### embassy-rp open drain task
+This section contains notes regarding implementing an Open Drain Output in
+Embassy Raspberry PI.
+
+There is a TODO in embassy-rp/src/gpio.rs:
+```rust
+pub struct Output<'d, T: Pin> {
+      pin: T,
+      phantom: PhantomData<&'d mut T>,
+  }
+
+  impl<'d, T: Pin> Output<'d, T> {
+      // TODO opendrain
+      pub fn new(pin: impl Unborrow<Target = T> + 'd, initial_output: Level) -> Self {
+          unborrow!(pin);
+```
+
+Now, in stm32 have have the ability to configure a GPIO PIN using the
+output type register (GPIOx_OTYPER)
+```
+  0: Output push-pull (reset state)
+  1: Output open-drain
+```
+After reading through and searching the Pico datasheet I've not been able to
+find anything obvious related to open-drain support.
+
+In Pico there is no register like stm32's OTYPER but the the Pico does have the
+pad registers which provide control over the internal circuitry of the pin.
+
+Now, for an open-drain output we want it so that when setting it to high it
+should be pulled to ground and logic zero should be the output. And otherwise
+it should be floating.
+
+In the the control registers for the GPIO pins does have the following:
+```
+GPIO0_CTRL
+
+13:12 OEOVER  0x0 = Drive output enable from perhipheral signal selected by funcsel.
+              0x1 = Drive output enable from inverse of signal select selected by funcsel.
+              0x2 = Disable output
+              0x3 = Enable output
+```
+Now, we have have a pin that is configured for output, and then disable the
+output would this floating pin?  
+I've created an example [opendrain.s](../rp/led/opendrain.s) and hooked up
+an oscilloscope to check the output and it does look like disabling output
+would indeed make the pin floating.
+
+So how would this be used then. Well in the Rust code we methods like
+`set_high` and `set_low`. `set_high` should in this case should pull it to
+ground which is possible using  the GPIO_CTRL register OUTOVER 0x2 drive output
+low.
+And for `set_low` we could disable the output.
+
