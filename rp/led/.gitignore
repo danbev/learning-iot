@@ -2,4 +2,6 @@
 *.lst
 *.o
 *.hex
+*.bin
 *.elf
+*_padded.s
