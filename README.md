@@ -1029,6 +1029,31 @@ This component is called an NPN Bipolar Junction Transistor:
                    | | 
                      |
 ```
+This would be drawn as:
+```
+              Collector
+              /
+        +----/---+
+        |  |/    |
+  Base ----|     |
+        |  |\    |
+        |   _\|  |   (this is supposed to be an arrow pointing to the Emitter)
+        |     \  |
+        +------|-+
+               |
+               |
+              Emitter
+```
+But notice that the electrons are actually flowing from the emitter to the
+base which is always confusing me when looking at schematics. We have the base
+which will have circuit with the emitter, and when there is a voltage applied
+to this, current will flow through the emitter to the base. And there will then
+also be a current flowing through the whole thing/transistor from the emitter
+through the first junction, through the base, through the second junction, and
+through the collector. The box represents the transistor and is usually circle
+but now I think it makes sense that it is there with the above explaination.
+
+
 Alright, so that was the theory now lets see how we can create a circuit
 with such an NPN transistor:
 
@@ -1303,7 +1328,130 @@ normal diode:
 And the addition of the first N box is basically the reversal of a diode
 
 
+
+
 ### Field Effect Transistor
+```
+         Source
+           |
+       | |-+
+Gate --| |  
+       | |-+ 
+           | 
+         Drain
+```
+`closed-circuit` means that electricity is flowing from the Gate to the Source.
+
+`open-circuit` means that electricity is not flowing from the Gate to the
+Source but instead from the Gate to the Drain.
+
+```
+NMOS:
+         Source
+           |
+       | |-+
+Gate --| |  
+       | |-+ 
+           | 
+         Drain
+```
+In NMOS a voltage is applied to the gate this will cause a closed circuit and
+current will flow between the source and the drain.
+When a zero voltage is applied to the gate this will cause an open circuit and
+no current will flow.
+
+```
+PMOS:
+         Source
+           |
+       | |-+
+Gate -o| |  
+       | |-+ 
+           | 
+         Drain
+```
+In PMOS when a volatage is applied to the gate this will cause an open circuit
+and no current will flow. And when zero voltage is applied it will cause a
+closed circuit and current will flow.
+The circle, `o`, on the PMOS gate inverts the value from the voltage. If the
+gate sends a voltage that represents the value 1 the inverter will change this
+to become 0.
+
+We can combine NMOS and PMOS functions into something called complementary
+metal-oxide semiconductors (CMOS):
+```
+            ------ (Source of PMOS)
+               |             PMOS
+          | +--+
+       |-o| |
+       |  | +--+   (Drain of PMOS)
+In ----|       |--- Out
+       |  | +--+   (Source of NMOS)
+       |--| |
+          | +--+             NMOS
+               |
+               ↓   (Drain of NMOS)
+```
+So lets say that we pass a logical zero on the In wire. This will go to both
+the PMOS Gate, and to the NMOS gate
+
+First lets take a look what happens with the PMOS transistor:
+```
+            ------  (Source of PMOS
+               |                        PMOS
+         1| +--+
+      0|-o|\
+       |  | +--+ 1  (Drain of PMOS)
+0 -----|       |--- Out
+       |  | +--+    (Source of NMOS)
+      0|--| |
+          | +--+                        NMOS
+               |
+               ↓
+```
+A voltage on the PMOS Gate will cause an open circuit which means that there
+will no be any electricity flowing from the Gate to the Source, but from
+the Gate to the Drain. So this logical 1 will be the Source of the NMOS
+transistor.
+
+And now lets see what happens with the NMOS transistor:
+```
+            ------  (Source of PMOS
+               |                        PMOS
+         1| +--+
+      0|-o|\
+       |  | +--+ 1  (Drain of PMOS)
+0 -----|       |--- Out
+       |  | +--+    (Source of NMOS)
+      0|--| |
+          | +--+                        NMOS
+               |
+               ↓  (Drain of NMOS)
+```
+The logical 0 will cause the NMOS transistor to become an open circuit
+to ground (drain). So the output of this will be a 1.
+
+Now, lets lets take a look what happens with the In is 1 (both PMOS and NMOS):
+```
+            ------  (Source of PMOS
+               |                        PMOS
+         0| +--+
+      1|-o| |
+       |  | +--+ 0  (Drain of PMOS)
+1 -----|       |--- Out
+       |  | +--+    (Source of NMOS)
+      1|--| |
+          | +--+                        NMOS
+               |
+               ↓
+```
+A zero voltage on the PMOS Gate will cause current to flow from the Source to
+the Drain of the PMOS.
+And for NMOS we are now applying a voltage to its Gate will cause a closed
+circuit and current will flow from the Source to the Drain, and in this case
+the Output will be 0.
+
+
 ```
                Drain +-----------------------+   
                      |                       |
@@ -1326,14 +1474,14 @@ Vgs  --- | |--+     L      +--|   |          |
 
 N = N-Type material
 P = P-Type material
-Vds = Voltage drain/source
-Vgs = Voltagae gate/source
+Vds = Voltage Drain to Source
+Vgs = Voltagae Gate to Source
 ```
-Source is the source of electros and drain the output of electrons.
+Source is the source of electrons and drain is the output of electrons.
 By increasing the voltage of Vgs we can cause a depletion zone between the
 two P-type materials which will cause the channel to become smaller, there
 will be more resistance between the source and the drain. One can think of this
-as havin a gardan hose (the channel) where water if flowing through the source
+as having a garden hose (the channel) where water is flowing through the source
 to the drain and the gate is like a wheel that can be turned to pinch the hose
 which reduces the flow or water. How much pinching is done is determined by
 the voltage beween the gate and the source voltage.
@@ -1553,13 +1701,13 @@ circuits.
 This is movement of electrons. 
 
 ### Voltage
-Voltage is what pushes electrons arounda a circuit. Without Voltage the
+Voltage is what pushes electrons around a circuit. Without Voltage the
 electrons will move randomly in any direction.
 
 (Spänning in Swedish) is the difference in charge between two points. This is 
 measured in volt (V) and the symbol used is `U` from the German word unterschied
 that means difference.
-Electrons flow from the netative terminal of a voltage source around the curcuit
+Electrons flow from the negative terminal of a voltage source around the curcuit
 as they are attracted by the positive terminal.
 In the beginning voltage was known as Electromotive Force (EMF) and is the
 reason for using the Ohm's lay uses `E` as the symbol for voltage.
@@ -1596,7 +1744,7 @@ circuit:
 ```
 Now, my understanding was that electrons flow out of the negative terminal of
 the voltage source through the LED where they cause the LED to shine. So the
-resistor would not be of any use in that case, it would have to be placed before
+resistor would not be of any use in this case, it would have to be placed before
 the LED in my way of thinking. This is not how electricity works. Instead what
 happens is it is the voltage difference that pushes the electrons through the
 LED. To find out the current (I) that flows through this circuit we use
@@ -2136,15 +2284,98 @@ Press CTRL-A Z for help on special keys
 ```
 Now we are reading 00 consistently.
 
-### pull-push
+### Pad
+Each pin, which are physical points on the IC, have circuitry which is called
+a pad. This circuitry can be configured to interface with different types of
+digital and analog circuits.
+
+### Pull-Push
+This is an output configuration of a Pad which has two output levels.
 When the output goes low, the signal is actively `pulled` to ground, and when
 the output goes high it is actively `pushed` to VCC.
+
+Push phase:
+```
+             ------ Vdd 
+                |             PMOS
+           | +--+
+        |-o| |
+        |  | +--+   
+Vin ----|       |--- Vout
+        |  | +--+   
+        |--| |
+           | +--+             NMOS
+                |
+                ↓   
+               gnd
+
+Vin = Voltage In (Gate in put voltage)
+VDD = Voltage applied to Drain
+```
+If Vin is 0, that will get inverted by the PMOS, and from what we've learned
+(TODO: link of move this closer to the MOSFET notes), this will cause the value
+out Vout to be taken from Vdd (what every voltage level a logical 1 has). The
+value of Vout is `pushed`.
+
+If Vin is 1, that will get inverted by the PMOS, and from what we've learned
+the value will be take from ground, or pulled to ground. The value of Vout is
+`pulled` from ground.
+
 
 ### Open Drain
 In this case the pin only has two states, GND or floating, which does not sound
 very useful, but it can be combined with a pull-resistor. So I think this allows
 for multiple components connected to the same line, like in I²C.
-TODO: explain this properly.
+
+Compared to Push-Pull Open Drain does not contain an PMOS transistor. Instead
+if only has an NMOS transistor:
+```
+             ----- Vout
+             |
+        | +--+   
+Vin ----| | 
+        | +--+             NMOS
+             |
+             ↓   
+            gnd
+```
+In NMOS if a voltage is applied to the Vin this will cause a closed circuit and
+current will flow between the source (Vout) and the drain (gnd).
+When a zero voltage is applied to the gate this will cause an open circuit and
+no current will flow.
+
+So if we apply 1 to a pin that is in open drain this will cause current to flow
+between the source and the drain. This this case we say it `drains` the current
+and is where the Drain part in Open Drain comes from.
+
+And if we apply 0 this will cause an `open`-circuit which means that electricity
+is not flowing from the Gate to the Source but instead from the Gate to the
+Drain. This is where `open` comes from in the name Open Drain.
+
+```
+NMOS -> ON  (1) -> Vout -> Logic 0
+NMOS -> OFF (0) -> Vout -> Floating
+```
+Floating here means that we don't know what value might be seen on the pin at
+this stage, reading this pin could be 0 or could be 1 and change over time.
+Why would we use something like this?  
+Well lets take a look at what happens if we connect multiple of this with each
+other:
+```
+                       Vdd
+                       /  
+                       \  (Pull Pull Resistor)
+                       /
+                       |
+             +-----Vout+---------+
+             |                   |
+        | +--+                   +--+ |
+Vin ----| |                         | | ---- Vin
+        | +--+                   +--+ |
+             |                   |
+             ↓                   ↓
+            gnd                 gnd
+```
 
 In the stm32 we have the GPIOx_OTYPER register which allow us to configure pins:
 ```
