@@ -1,4 +1,4 @@
-/* Raspberry PI Pico external LED example */
+/* Raspberry PI Pico onboard LED example */
 .thumb
 .text
 
