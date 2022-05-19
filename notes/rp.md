@@ -603,3 +603,122 @@ ground which is possible using  the GPIO_CTRL register OUTOVER 0x2 drive output
 low.
 And for `set_low` we could disable the output.
 
+
+### GPIO Interrupts
+Every GPIO pin can generate an interrupt in the following situations:
+* Level High: The pin is a logical 1
+* Level Low: The pin is a logical 0
+* Edge High: The pin transistioned from logical 0 to 1
+* Edge Low: The pin transistioned from logical 1 to 0
+
+IO_BANK0: INTR0 Register has entries:
+```
+GPIO0_LEVEL_LOW              RO (Read Only)
+GPIO0_LEVEL_HIGH             RO (Read Only)
+GPIO0_EDGE_LOW               WC (Write Clear)
+GPIO0_EDGE_HIGH              WC (Write Clear)
+...
+GPIO7_LEVEL_LOW
+GPIO7_LEVEL_HIGH
+GPIO7_EDGE_LOW
+GPIO7_EDGE_HIGH
+```
+
+IO_BANK0: INTR1 Register has entries:
+```
+GPIO8_LEVEL_LOW
+GPIO8_LEVEL_HIGH
+GPIO8_EDGE_LOW
+GPIO8_EDGE_HIGH
+...
+GPIO15_LEVEL_LOW
+GPIO15_LEVEL_HIGH
+GPIO15_EDGE_LOW
+GPIO15_EDGE_HIGH
+```
+
+IO_BANK0: INTR2 Register has entries
+```
+GPIO16_LEVEL_LOW
+GPIO16_LEVEL_HIGH
+GPIO16_EDGE_LOW
+GPIO16_EDGE_HIGH
+...
+GPIO23_LEVEL_LOW
+GPIO23_LEVEL_HIGH
+GPIO23_EDGE_LOW
+GPIO23_EDGE_HIGH
+```
+
+IO_BANK0: INTR3 Register has entries
+```
+GPIO23_LEVEL_LOW
+GPIO23_LEVEL_HIGH
+GPIO23_EDGE_LOW
+GPIO23_EDGE_HIGH
+...
+GPIO29_LEVEL_LOW
+GPIO29_LEVEL_HIGH
+GPIO29_EDGE_LOW
+GPIO29_EDGE_HIGH
+```
+
+IO_BANK0: PROC0_INTE0 (Interrupt Enable 0) Register:
+```
+31 GPIO7_EDGE_HIGH              RW  Enable interrupt on transistion from logical 0 to 1
+30 GPIO7_EDGE_LOW               RW  Enable interrupt on transistion from logical 1 to 0
+29 GPIO7_LEVEL_HIGH             RW  Enable interrupt on Level high
+28 GPIO7_LEVEL_LOW              RW  Enable interrupt on Level Low
+...
+3  GPIO0_EDGE_HIGH              RW  Enable interrupt on transistion from logical 0 to 1
+2  GPIO0_EDGE_LOW               RW  Enable interrupt on transistion from logical 1 to 0
+1  GPIO0_LEVEL_HIGH             RW  Enable interrupt on Level high
+0  GPIO0_LEVEL_LOW              RW  Enable interrupt on Level Low
+```
+
+IO_BANK0: PROC0_INTE1 (Interrupt Enable 1) Register:
+```
+31 GPIO15_EDGE_HIGH             RW  Enable interrupt on transistion from logical 0 to 1
+30 GPIO15_EDGE_LOW              RW  Enable interrupt on transistion from logical 1 to 0
+29 GPIO15_LEVEL_HIGH            RW  Enable interrupt on Level high
+28 GPIO15_LEVEL_LOW             RW  Enable interrupt on Level Low
+...
+3  GPIO8_EDGE_HIGH              RW  Enable interrupt on transistion from logical 0 to 1
+2  GPIO8_EDGE_LOW               RW  Enable interrupt on transistion from logical 1 to 0
+1  GPIO8_LEVEL_HIGH             RW  Enable interrupt on Level high
+0  GPIO8_LEVEL_LOW              RW  Enable interrupt on Level Low
+```
+
+IO_BANK0: PROC0_INTE2 (Interrupt Enable 2) Register:
+```
+31 GPIO23_EDGE_HIGH             RW  Enable interrupt on transistion from logical 0 to 1
+30 GPIO23_EDGE_LOW              RW  Enable interrupt on transistion from logical 1 to 0
+29 GPIO23_LEVEL_HIGH            RW  Enable interrupt on Level high
+28 GPIO23_LEVEL_LOW             RW  Enable interrupt on Level Low
+...
+3  GPIO16_EDGE_HIGH             RW  Enable interrupt on transistion from logical 0 to 1
+2  GPIO16_EDGE_LOW              RW  Enable interrupt on transistion from logical 1 to 0
+1  GPIO16_LEVEL_HIGH            RW  Enable interrupt on Level high
+0  GPIO16_LEVEL_LOW             RW  Enable interrupt on Level Low
+```
+
+IO_BANK0: PROC0_INTE3 (Interrupt Enable 3) Register:
+```
+31 GPIO29_EDGE_HIGH             RW  Enable interrupt on transistion from logical 0 to 1
+30 GPIO29_EDGE_LOW              RW  Enable interrupt on transistion from logical 1 to 0
+29 GPIO29_LEVEL_HIGH            RW  Enable interrupt on Level high
+28 GPIO29_LEVEL_LOW             RW  Enable interrupt on Level Low
+...
+3  GPIO24_EDGE_HIGH             RW  Enable interrupt on transistion from logical 0 to 1
+2  GPIO24_EDGE_LOW              RW  Enable interrupt on transistion from logical 1 to 0
+1  GPIO24_LEVEL_HIGH            RW  Enable interrupt on Level high
+0  GPIO24_LEVEL_LOW             RW  Enable interrupt on Level Low
+```
+There are also PROC0_INTFx registers that force which I'm not exactly sure what
+they do yet.
+
+PROC0_INTS0 is the status after masking & forcing.
+
+And the above registers are duplicated for processor 1 (PROC1).
+
+
