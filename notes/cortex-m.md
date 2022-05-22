@@ -96,6 +96,12 @@ PendSV                          14                    0x0000 0038
 SysTick                         15                    0x0000 003C
 Interrups                       16                    0x0000 0040
 ...                             ...                   ...
+The function/routine pointed by the vector address is called the exception
+handler, or interrupt service routine (ISR). This is the function that is run
+when the exception is triggered. It is the ARM hardware which will lookup this
+function pointer in the above table when an exception is triggered and start
+executing the code that is there.
+
 ```
 This would look something like this in assembly:
 ```assembly
@@ -118,6 +124,8 @@ Vector_Table:                        // Vector                     Exception Nr
   .word     systick_handler + 1      // SysTick                          15
 ```
 
+Each exception has a priority associated with it which is ofter configurable.
+External interrupts start at exception number 16.
 
 #### Current Process State Register (CPSR)
 TODO: move this to an arm7tdmi doc.
@@ -815,7 +823,7 @@ Offset: 0x28
 ```
 
 ### Interrupts
-In Cortex-m there is a hardward component in the processor named Nested Vector
+In Cortex-m there is a hardware component in the processor named Nested Vector
 Interrupt Controller (NVIC) that handles interrups, which are called exceptions
 in ARM. So peripherals like UART, Timers can generate interrupts. 
 
