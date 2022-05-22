@@ -717,6 +717,31 @@ IO_BANK0: PROC0_INTE3 (Interrupt Enable 3) Register:
 There are also PROC0_INTFx registers that force which I'm not exactly sure what
 they do yet.
 
+To register an interrupt we have to use interrupt enable PROCxINTE_x which will
+be PROC0 or PROC1, and INTE0, INTE1, INTE2, or INTE3 depending on the PIN in
+question.
+
+We can get the processor use by reading the CPUID register which will be 0
+if we are on CPU0 and 1 if we are on CPU1.
+
+For the INTE register to use we can take the pin number and divide by 8.
+Now, notice that for each pin there are 4 different bits that can be set, one
+for EDGE_LOW, on for EDGE_HIGH, one for LEVEL_HIGH, and one for LEVEL_LOW.
+To get this entry/posistion for a specific pin we can do:
+```
+(pin % 8) * 4 = posistion
+```
+For example, for pin 18:
+```
+(18 % 8) * 4 = 
+       2 * 4 = 8
+```
+And 8 would be the start of the entries in the register, so 8 would be
+GPIO18_LEVEL_LOW, 9 would be GPIO18_LEVEL_HIGH, 10 GPIO10_EDGE_LOW, and 11
+GPIO18_EDGE_HIGH.
+
+
+
 PROC0_INTS0 is the status after masking & forcing.
 
 And the above registers are duplicated for processor 1 (PROC1).
