@@ -1660,11 +1660,6 @@ function, which in this case would call SEV, and then use WFE to place itself
 into low-power mode to save on resources.
 
 
-### LoRaWAN 
-Is a Low Power Wide Area Network (LPWAN)
-
-
-
 ### Electrons
 An atom is composed of a necleus which consists of a core of tightly bound 
 subatomic particles called protons (positive charge) and neutrons (neither 
@@ -1880,53 +1875,6 @@ Yes, think about what happens when you sit in the sun, you get warm and if you
 are like me your skin will become red and burn. We absorb that energy from the
 sun.
 
-### LoRa
-Is short for "long range" and provides low power consumption and long range,
-a low data rate, and secure transmission.
-Is used in small battery driven sensor devices that connect to a gateway which
-may be between 1km to 10km form them. These devices are expected to run on the
-same battery for about 2 years.
-
-Has a greater range than celluar networks which have a range from a few 100m to
-1km.
-
-In Europe the frequencies for LoRa are 433MHz and 868MHz. Be carful when
-configuring this as it could be illegal to use 915MHz which is allowed in other
-places in the world.
-
-LoRa is the physical layer that enables a long-range communication link.
-LoRaWAN is the communication protocol and system architecture for the network.
-
-### LoRaWAN                                                                         
-Is a Low power Wide Area Network (LPWAN)  
-```
-Nodes:         Gateways           Network Server  Application servers
-*------------->+-------+           +-----+         +-----+
-  * *--+------>|       | --------> |     | ------> |     |
-       |       +-------+           |     |         +-----+
-*------+------>+-------+           |     | ------> +-----+
-               |       | --------> |     |         |     |
-               +-------+           +-----+         +-----+
-      (LoRa)             (TCP/IP, TLS)    (TCP/IP, TLS)
-                          
-```
-
-
-Protocol stack:
-```
-
-
-
-+---------------------------------------------------------------+
-| Class A  Baseline | Class B baseline     | Class C baseline   | 
-+---------------------------------------------------------------+
-|           LoRa Modulation
-+---------------------------------------------------------------+
-|         Reginal ISM band                                      |
-+---------------------------------------------------------------+
-| EU 868  | EU 433 | US 915 | AS 430 |                          |
-+---------------------------------------------------------------+
-```
 
 
 ### RS-232
