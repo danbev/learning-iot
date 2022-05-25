@@ -40,16 +40,6 @@ Logging can be enabled using
 $ RUST_LOG=info cargo test --verbose --  --nocapture
 ```
 
-### Embassy
-Embedded Async is an executor of tasks and also a Hardware Access Layer (HAL).
-The HAL provides an API to access peripherals like USART, I2C, SPI, CAN etc.
-
-#### embassy::main
-This macro can be used in an embassy application and expands to something like:
-```console
-$ cargo rustc --profile=check -- -Zunpretty=expanded
-```
-
 ### defmt logging
 Deferred formatter logging can be enabled using the `DEFMT_LOG` environment
 variable:
@@ -792,3 +782,86 @@ ask the Drogue team for some feedback on this before doing anything further.
 Either way it was a good excersice to go through and write these examples.
 
 [drogue-device pull request](https://github.com/drogue-iot/drogue-device/pull/171)
+
+### Drogue Cloud
+This is a connectivity layer for `forwarding` telemetry data (like senors
+reading from a remote device) from devices and sending the along to business
+applications. It can also send also allow business applications to send
+commands back to the devices (I think).
+
+```console
+$ cargo install drg
+```
+Create an app:
+```console
+$ drg create app danbev-app
+App danbev-app created.
+```
+Create a device for that above application:
+```console
+$ drg create device --app danbev-app danbev-device
+Device danbev-device created.
+```
+If we go to https://sandbox.drogue.cloud/apps/ we can now see the application.
+We can also use `drg` to get the same information from the command line:
+
+Show all apps:
+```console
+$ drg get apps
+NAME       AGE
+danbev-app 6m
+```
+Show all devices for an app:
+```console
+$ drg get devices --app danbev-app
+NAME          AGE
+danbev-device 6m
+```
+Get details about a specific device:
+```console
+$ drg get device --app danbev-app danbev-device
+{
+  "metadata": {
+    "application": "danbev-app",
+    "creationTimestamp": "2022-05-24T07:11:39.992973Z",
+    "generation": 1,
+    "name": "danbev-device",
+    "resourceVersion": "bd4502de-2f57-486b-8008-403b63027d8e",
+    "uid": "a666cc1c-f3a1-49fc-92b6-79402b165472"
+  },
+  "spec": {
+    "credentials": {}
+  },
+  "status": {
+    "conditions": [
+      {
+        "lastTransitionTime": "2022-05-24T07:11:40.016849387Z",
+        "status": "True",
+        "type": "Ready"
+      }
+    ]
+  }
+}
+```
+Edit a device:
+```console
+$ drg edit device --app danbev-app danbev-device
+```
+
+Now, notice that in the application there is an integrations tab which
+has a list of integration protocols, like Kafka, MQTT, and WebSocket.
+What Drogue Cloud provides is like a "broker" of sort enabling communication
+between devices and backend cloud services. It enables devices to send/public
+data that can the be routed/brokered (is that a word?) to backend cloud apps
+that are listening or subscribed. It also enables these backends to send data
+to the devices, but I guess data in this case would be commands for the device
+to act upon.
+
+
+Install websocat (websocket cat tool):
+```console
+$ cargo install --features=ssl websocat
+```
+
+
+
