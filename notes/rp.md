@@ -605,13 +605,30 @@ And for `set_low` we could disable the output.
 
 
 ### GPIO Interrupts
+```
+  Core0                     Core1
++--------------+           +----------------+
+| NVIC         |           | NVIC           |
+|              |           |                |
+|              |           |                |
+|              |           |                |
+|              |           |                |
++--------------+           +----------------+
+
+```
+
+
 Every GPIO pin can generate an interrupt in the following situations:
 * Level High: The pin is a logical 1
 * Level Low: The pin is a logical 0
 * Edge High: The pin transistioned from logical 0 to 1
 * Edge Low: The pin transistioned from logical 1 to 0
 
+IOBANK : 0x40014000
+
 IO_BANK0: INTR0 Register has entries:
+Offset: 0x100
+Address : 0x40014100
 ```
 GPIO0_LEVEL_LOW              RO (Read Only)
 GPIO0_LEVEL_HIGH             RO (Read Only)
@@ -625,6 +642,8 @@ GPIO7_EDGE_HIGH
 ```
 
 IO_BANK0: INTR1 Register has entries:
+Offset: 0x104
+Address : 0x40014104
 ```
 GPIO8_LEVEL_LOW
 GPIO8_LEVEL_HIGH
@@ -638,6 +657,8 @@ GPIO15_EDGE_HIGH
 ```
 
 IO_BANK0: INTR2 Register has entries
+Offset: 0x108
+Address : 0x40014108
 ```
 GPIO16_LEVEL_LOW
 GPIO16_LEVEL_HIGH
