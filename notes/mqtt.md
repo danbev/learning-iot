@@ -5,8 +5,8 @@ MQ Series (Message Queue) product. Uses a p publish subscribe model which
 decouples the publisher from the subscriber.
 
 In 2014 MQTT 3.1.1 became an official OASIS Standard.
-* [v3.1.1 specification][v3.1.1]
-* [v5.0 specification][v5.0]
+* [v3.1.1 specification][v3]
+* [v5.0 specification][v5]
 
 MQTT messages are small and can be as small as 2 bytes compared to HTTP requests
 which are larger due to HTTP headers. Also with a a broker it is possible to
@@ -141,5 +141,5 @@ This will show the message in the `mosquitto_sub' console.
 ### Eclipse Amien
 Is a clusterable MQTT broker more suited for Enterprise deployment.
 
-[v3.1.1] http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718008
-[v5.0] https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html
+[v3]: http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718008
+[v5]: https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html
