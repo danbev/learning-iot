@@ -107,6 +107,7 @@ Each connection to the broker can specify an int value between 0-2:
     I needs to be stored on the broker for subscribers that are offline.
 2 = exactly once. Sender and receiver use a two level handshake to ensure
     only one copy of the message is received.
+```
 
 
 ### Eclipse Mosquitto
