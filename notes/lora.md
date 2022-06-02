@@ -13,7 +13,8 @@ configuring this as it could be illegal to use 915MHz which is allowed in other
 places in the world.
 
 LoRa is the `physical layer` that enables a long-range communication link.
-LoRaWAN is the communication protocol and system architecture for the network.
+LoRaWAN is a media access control (MAC) layer built on top of LoRa.
+
 ```
 +---------------------------------------+
 |           Application                 |
@@ -57,6 +58,7 @@ RFID = Radio Frequency Identification
 
 ### Modulation
 Uses chirp spread spectrum modulation
+TODO: explain CSS modulation.
 
 The modulation and demodulation is relatively simple and a device can do both.
 
@@ -65,6 +67,8 @@ Is a Low power Wide Area Network (LPWAN), low power, long range, has geolocation
 so the network can determine the location of devices. Can have both public and
 private deployments. Supports fireware updates over the air (of the LoraWAN
 stack I'm guessing). Supports end-to-end security.
+
+* [v1.1 Specification][loraspec]
 
 ```
 Nodes:         Gateways           Network Server     Application servers
@@ -106,6 +110,42 @@ TCP/IP to the TTN LoRa network backend.
 Register an account: https://account.thethingsnetwork.org/.
 
 My username is `danbev`, and the cluster location I'm using is `eu1`.
+
+### Message types
+These are used to transport Media Access Control (MAC) layer commands as well
+as application data.
+
+An `uplink` message is a message that is sent from a device to the network
+server via one or more gateways.
+
+A `downlink` message is sent by the network server to one and only one end
+device.
+
+* Join-Request
+* Join-Accept
+* Rejoin-Request
+* Proprietary
+* Unconfirmated Data Up (non-acked uplink message)
+* Unconfirmated Data Down (non-acked downlink message)
+* Confirmated Data Up (acked uplink message)
+* Confirmated Data Down (acked downlink message)
+
+
+MAC payload:
+```
+   |--------   FHDR   ---------------| 
+   22                               7
+   +--------------------------------------------------------+
+   | DevAddr | FCtrl | FCnt  | FOpts | FPort | FRMPayload
+   +--------------------------------------------------------+
+
+FPort and FRMPayload are optional
+```
+If `FPort` is 0 it means that this packet contains MAC commands in the
+FRMPayload field. A value greater then 0 indicated that FRMPayload contains
+application data.
+
+The MAC payload is then put into a physical layer packet.
 
 This following is just my notes while following the
 [ttn-lorawan-quarkus workshop](https://book.drogue.io/drogue-workshops/ttn-lorawan-quarkus/drogue-cloud.html).
@@ -154,3 +194,64 @@ For the `frequency_plan_id` one can look at the
 Sweden	EU863-870        Svenska frekvensplanen, CEPT Rec. 70-03
         EU433	
 ```
+
+### Organizationally Unique Identifier (OUI)
+Is a 24 bit number that uniquely identifies a vendor, manufacturer, or an
+organisation and are assigned by IEEE Standards Association Registration
+Authority.
+Example:
+```
+  F4-BD-9E
+```
+
+### OUI-36
+This type of identifier is created by taking a 24-bit OUI and adding 12 bits
+to it, so we have 4,5 octets:
+```
+  70-B3-D5-7E-D
+``
+
+### Extended Unique Identifier (EUI)
+Is used to identify devices and software and it includes the manufacturers
+OUI and an extension identifier (which is set freely by the manufacturer).
+```
+
+     36-bits       28-bits
+  70-B3-D5-7E-D - 00-40-62-0
+     OUI           Extension
+``
+
+### DevEUI
+Is a EUI-64 address that unquely identifies an end device.
+
+### AppEUI
+This is also a EUI-64 address which uniquely identifies the entity that is able
+to process a JoinReq packet/frame. This identifies an application server and is
+similar to a port number.
+
+### AppKey
+Is an AES 128 bit symmetric key used to generate the Media Integrity Code (MIC)
+which is the same as a Message Authenitcation Code but this collides with the
+term media access control (as in layer). This is used to ensure the integrity
+of messages. The same key is use by the device and the network server.
+
+And end device will have a DevEUI, either on the device itself or generated for
+it.
+```
+   +-----------+                 +----------------+
+   | End Device|                 | Network Server |
+   +-----------+                 +----------------+
+   | DevEUI    |  JoinRequest    | AppKey         |
+   +-----------+ --------------> +----------------+
+   | AppEUI    |
+   +-----------+
+   | AppKey    |
+   +-----------+
+```
+
+
+### Frequency Shift Chirp Modulation (FSCM)
+Is the modulation that LoRa uses.
+
+[loraspec]: https://lora-alliance.org/wp-content/uploads/2020/11/lorawantm_specification_-v1.1.pdf
+
