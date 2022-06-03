@@ -163,7 +163,7 @@ I also have a an oscilloscope connected to the breadboard for this pin and I can
 see that the its working as expected. But the interrupt handler that I've
 configured does not trigger.
 
-![Interrupt troubleshooting setup](./notes/img/interrupt.jpg "Interrupt troubleshooting setup")
+![Interrupt troubleshooting setup](./img/interrupt.jpg "Interrupt troubleshooting setup")
 
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
