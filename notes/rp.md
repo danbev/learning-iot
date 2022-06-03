@@ -143,12 +143,26 @@ We can inspect the values using:
 (gdb) x/t 0x400140f8
 0x400140f8:	00010001000100010001000100010101
 ```
+We can see that the last bits are `0101`.
 or:
 ```console
 (gdb) p/t *((int*)0x400140f8)
 $2 = 10001000100010001000100010101
 ```
-We can see that the last bits are `0101`.
+Just note that when running the last command it depends on the "context" you
+are currently in. For example, if you have just loaded the program into
+memory but not started executing the above will work just fine. But if you
+have started it and stopped at a break point the above command might produce
+the following error:
+```console
+(gdb) p/t (*0xd0000004)
+Attempt to take contents of a non-pointer value.
+```
+Instead the we need to write it as:
+```console
+(gdb) p/t (0xd0000004 as *mut &[u8])
+$3 = 11010000000000000000000000000100
+```
 
 What I've found useful is to hook up a power source with 3.3V to an input pin
 and then enable interrupts for the pin. But I'm currently haveing issues with
@@ -187,6 +201,28 @@ $20 = 10000000000000000
 So at least so far I can see that the input pin is getting changed as the scope
 shows the change in voltage, the input pin changes values in the GPIO_IN
 register, and I can see the interrupt registers are also getting updated.
+
+The reason for this was the I discovered that I was not clearning/unpending the
+interrupt. Adding an unpend call allowed the intertupt handler to be invoked.
+So I'm still having issue with this and I need to dig further.
+
+Lets check if the NVIC regiseters are actually set or cleared.
+
+```
+Base:      0xe0000000 
+NVIC_ISER: 0xe0000100 
+```
+```console
+(gdb) x/t 0xe0000100
+0xe0000100:	00000000000000000000000000000000
+```
+Reading from this register should show a 1 if the interrupt is enabled.
+
+
+One thing I noticed is that before starting the program, and checking the value
+of the input pin it will toggle, but if i stop at a break point it will no
+longer toggle anymore. Perhaps I've messed up some setup of the input pin?  
+
 
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
