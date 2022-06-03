@@ -178,6 +178,7 @@ First when the power is off:
 ```console
 (gdb) p/t (*0xd0000004) & (1 << 16)
 $21 = 0
+```
 And the after turning it on:
 ```console
 (gdb) p/t (*0xd0000004) & (1 << 16)
