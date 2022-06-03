@@ -136,7 +136,7 @@ entries for pin 16 which are bit positions 0-3.
 * 0 GPIO16_LEVEL_LOG
 * 1 GPIO16_LEVEL_HIGH
 * 2 GPIO16_EDGE_LOW
-* 3  GPIO16_LEVEL_HIGH):
+* 3 GPIO16_LEVEL_HIGH)
 
 We can inspect the values using:
 ```console
@@ -148,14 +148,18 @@ or:
 (gdb) p/t *((int*)0x400140f8)
 $2 = 10001000100010001000100010101
 ```
-We can see that the last bits are `0101`. What I've found useful is to hook up
-a power source with 3.3V to an input pin and then enable interrupts for the
-pin. But I'm currently haveing issues with the interrupt handler not getting
-triggered. If I toggle the power to this pin I can see the change in this
-register:
+We can see that the last bits are `0101`.
+
+What I've found useful is to hook up a power source with 3.3V to an input pin
+and then enable interrupts for the pin. But I'm currently haveing issues with
+the interrupt handler not getting triggered. If I toggle the power to this pin
+I can see the change in this register:
 ```console
 (gdb) x/t 0x400140f8
 0x400140f8:	00010001000100010001000100010101
+```
+And turning on the power:
+```
 (gdb) x/t 0x400140f8
 0x400140f8:	00010001000100010001000100011110
 ```
@@ -164,6 +168,24 @@ see that the its working as expected. But the interrupt handler that I've
 configured does not trigger.
 
 ![Interrupt troubleshooting setup](./img/interrupt.jpg "Interrupt troubleshooting setup")
+
+We can also check the state of the input pins using GPIO_IN:
+```
+SIO_BASE: 0xd0000000
+GPIO_IN:  0xd0000004
+```
+First when the power is off:
+```console
+(gdb) p/t (*0xd0000004) & (1 << 16)
+$21 = 0
+And the after turning it on:
+```console
+(gdb) p/t (*0xd0000004) & (1 << 16)
+$20 = 10000000000000000
+```
+So at least so far I can see that the input pin is getting changed as the scope
+shows the change in voltage, the input pin changes values in the GPIO_IN
+register, and I can see the interrupt registers are also getting updated.
 
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
