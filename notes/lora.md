@@ -57,8 +57,109 @@ RFID = Radio Frequency Identification
 ```
 
 ### Modulation
-Uses chirp spread spectrum modulation
-TODO: explain CSS modulation.
+Uses `compressed high intensity radar pulse (CHIRP)` spread spectrum (CSS)
+modulation.
+A chirp is also called sweep signal which is a signal that increases, called
+upchirp, or decreases, called downchrip , linearly with time.
+
+```
+Upchirp
+
+  Lower Frequency      Higher Frequency
+
+         \__
+            \__
+               \__
+                  \__
+                     \__
+                        \__
+                           \__
+```
+So this signal starts at a lower frequency and increases to a higher frequency.
+If we imaging a sine wave this would start off with longer wavelenghts to become
+shorter and shorter.
+
+```
+Downchirp
+
+  Lower Frequency      Higher Frequency
+
+                          __/
+                       __/
+                    __/
+                 __/
+              __/
+           __/
+          /
+```
+In this case the starts at a higher frequency and decreases to a lower frequency.
+If we imaging a sine wave this would start off with shorter wavelenghts to
+become longer and longer.
+
+
+Let look at frequency shift keying (FSK) which is something that is somewhat
+more familar to me:
+```
+Waterfall "diagram"
+
+  Lower Frequency                    Higher Frequency
+
+         |
+         | Logical 0
+         |
+                                           |
+                                           |      Logical 1
+                                           |
+         |
+         | Logical 0
+         |
+                                           |
+                                           |      Logical 1
+                                           |
+```
+In FSK the frequency will shift or jump depending on the symbol being
+represented, on the above case the lower frequency could represent a logical 0
+and the higher a logical 1.
+
+In CSS I think this would look like:
+```
+Waterfall "diagram"
+
+  Lower Frequency         Higher Frequency
+
+         \__
+            \__
+               \__                     Logical 0
+                  \__
+                     \__
+                        \__
+                           \_
+                          __/
+                       __/
+                    __/                Logical 1
+                 __/
+              __/
+           __/
+           \__
+              \__                     Logical 0
+                 \__
+                    \__
+                       \__
+                          \_
+                         __/
+                      __/
+                   __/                Logical 1
+                __/
+             __/
+          __/
+
+```
+
+
+So if we compare this to frequency modulation where the carrier signal will be
+modulates in its frequency depending on the symbol that is being represented. In
+this case chirp signals are the carrier.
+
 
 The modulation and demodulation is relatively simple and a device can do both.
 
