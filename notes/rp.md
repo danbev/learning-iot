@@ -116,6 +116,55 @@ Since this microcontroller has two cores it is possible for both of them to
 modify a register at the same time. For this reason there are registers that
 perform atomic set/clear operations.
 
+### Reading a GPIO pin from gdb
+First find the offset for the register that contains the pin.
+
+For example, if we want to read pin 16 it is in register PROC0_INTE2:
+```
+IO_BANK0_BASE    0x40014000
+GPIO16_STATUS    0x40014080
+```
+```console
+(gdb) x/t 0x40014080
+0x40014080:	00000111000011100000000000000000
+```
+
+### Troubleshooting interrupts
+We can see if any interrupts have been triggered for a pin, in this case pin 16
+which has entried in register `INTR2: 0x400140f8`. This register has four
+entries for pin 16 which are bit positions 0-3.
+* 0 GPIO16_LEVEL_LOG
+* 1 GPIO16_LEVEL_HIGH
+* 2 GPIO16_EDGE_LOW
+* 3  GPIO16_LEVEL_HIGH):
+
+We can inspect the values using:
+```console
+(gdb) x/t 0x400140f8
+0x400140f8:	00010001000100010001000100010101
+```
+or:
+```console
+(gdb) p/t *((int*)0x400140f8)
+$2 = 10001000100010001000100010101
+```
+We can see that the last bits are `0101`. What I've found useful is to hook up
+a power source with 3.3V to an input pin and then enable interrupts for the
+pin. But I'm currently haveing issues with the interrupt handler not getting
+triggered. If I toggle the power to this pin I can see the change in this
+register:
+```console
+(gdb) x/t 0x400140f8
+0x400140f8:	00010001000100010001000100010101
+(gdb) x/t 0x400140f8
+0x400140f8:	00010001000100010001000100011110
+```
+I also have a an oscilloscope connected to the breadboard for this pin and I can
+see that the its working as expected. But the interrupt handler that I've
+configured does not trigger.
+
+![Interrupt troubleshooting setup](./notes/img/interrupt.jpg "Interrupt troubleshooting setup")
+
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
 
@@ -750,16 +799,19 @@ Now, notice that for each pin there are 4 different bits that can be set, one
 for EDGE_LOW, on for EDGE_HIGH, one for LEVEL_HIGH, and one for LEVEL_LOW.
 To get this entry/posistion for a specific pin we can do:
 ```
-(pin % 8) * 4 = posistion
+(pin % 8) * 4 = position
 ```
 For example, for pin 18:
 ```
 (18 % 8) * 4 = 
-       2 * 4 = 8
+      2  * 4 = 8
 ```
 And 8 would be the start of the entries in the register, so 8 would be
 GPIO18_LEVEL_LOW, 9 would be GPIO18_LEVEL_HIGH, 10 GPIO10_EDGE_LOW, and 11
 GPIO18_EDGE_HIGH.
+
+(16 % 8) * 4 = 
+       0 * 4 = 0
 
 
 
@@ -768,3 +820,16 @@ PROC0_INTS0 is the status after masking & forcing.
 And the above registers are duplicated for processor 1 (PROC1).
 
 
+
+### Semihosting with Pico PI
+```rust
+let s = heprintln!("Hello, world!").unwrap();
+```
+
+```console
+Error: Failed to read memory at 0x10002af5
+Info : SWD DPIDR 0x0bc12477
+Info : SWD DLPIDR 0x00000001
+Error: Failed to read memory at 0x1000049c
+```
+The first 
