@@ -160,8 +160,13 @@ Attempt to take contents of a non-pointer value.
 ```
 Instead the we need to write it as:
 ```console
-(gdb) p/t (0xd0000004 as *mut &[u8])
-$3 = 11010000000000000000000000000100
+(gdb) p/t *(0xd0000004 as *mut &[u8])
+$12 = &[*gdb*] {data_ptr: 10000000000000010, length: 110010}
+
+(gdb) p/t (0xd0000004 as *mut &[u8]).data_ptr
+$23 = 10000000000000010
+
+(gdb) p/t (0x400140f8 as *mut &[u8]).data_ptr
 ```
 
 What I've found useful is to hook up a power source with 3.3V to an input pin
@@ -192,6 +197,10 @@ First when the power is off:
 ```console
 (gdb) p/t (*0xd0000004) & (1 << 16)
 $21 = 0
+(gdb) p/t (*(0xd0000004 as *mut &[u8])).data_ptr
+$2 = 10000000010000000000000010
+
+(gdb) p/t (*(0xd0000004 as *mut &[u8])).data_ptr
 ```
 And the after turning it on:
 ```console
@@ -208,20 +217,87 @@ So I'm still having issue with this and I need to dig further.
 
 Lets check if the NVIC regiseters are actually set or cleared.
 
+Checking `NVIC_ISER` (interrupt set-enable):
 ```
 Base:      0xe0000000 
 NVIC_ISER: 0xe0000100 
 ```
 ```console
-(gdb) x/t 0xe0000100
+(gdb) x/t 0xe0000100 
 0xe0000100:	00000000000000000000000000000000
 ```
-Reading from this register should show a 1 if the interrupt is enabled.
+Reading from this register should show a 1 if the interrupt is enabled, but it
+is not enabled.
+Lets try enabling the interrupt manually:
+```console
+(gdb) set (*(0xe0000100 as *mut &[u8])).data_ptr = (1 << 13)
+```
 
+Checking `NVIC_ICER` (interrupt clear-enable):
+```console
+(gdb) x/t 0xe0000180
+0xe0000180:	00000000000000000000000000000000
+```
 
-One thing I noticed is that before starting the program, and checking the value
-of the input pin it will toggle, but if i stop at a break point it will no
-longer toggle anymore. Perhaps I've messed up some setup of the input pin?  
+Checking `NVIC_ISPR` (interrupt state pending):
+```console
+(gdb) x/t 0xe0000200
+
+(gdb) set (*(0xe0000200 as *mut &[u8])).data_ptr = (1 << 13)
+```
+
+Checking `NVIC_ICPR` (interrupt clear pending):
+```console
+(gdb) x/t 0xe0000280
+```
+
+Checking PROC0_INTE2 (interrupt enable 2):
+```console
+(gdb) x/t 0x40014108
+0x40014108:	00000000000000000000000000000010
+```
+And this matches the second bit in that register which is GPIO16_LEVEL_HIGH.
+We can also set the using:
+```console
+(gdb) set  (*(0x40014108 as *mut &[u8])).data_ptr = (1 << 1)
+(gdb) x/t 0x40014108
+0x40014108:	00000000000000000000000000000010
+```
+
+Can I inspect if there is a interrupt request handler registered?
+
+The strange things is that I've got this to work a few times today but when
+I try to 
+```console
+gdb) bt
+#0  0x00000030 in ?? ()
+#1  0x10001c56 in rp2040_pac2::common::Reg<rp2040_pac2::io::regs::Int, rp2040_pac2::common::RW>::write<rp2040_pac2::io::regs::Int, rp2040_pac2::common::RW, (), embassy_rp::gpio::{impl#4}::new::{closure_env#2}<embassy_rp::peripherals::PIN_16>> (self=0x20041c2c, f=...)
+    at /home/danielbevenius/.cargo/git/checkouts/rp2040-pac2-1734f07ab2f17c18/9ad7223/src/common.rs:51
+#2  0x10000c90 in embassy_rp::gpio::InterruptInputFuture<embassy_rp::peripherals::PIN_16>::new<embassy_rp::peripherals::PIN_16> (
+    pin=0x20000050 <async_gpio::__embassy_main::POOL+32>, level=embassy_rp::gpio::IntTrigger::LevelHigh)
+    at /home/danielbevenius/work/drougue/embassy/embassy-rp/src/gpio.rs:237
+#3  0x10000936 in embassy_rp::gpio::{impl#3}::wait_for_high::{async_fn#0}<embassy_rp::peripherals::PIN_16> ()
+    at /home/danielbevenius/work/drougue/embassy/embassy-rp/src/gpio.rs:160
+```
+Line 237 is where I'm enableing the 
+```rust
+pin.int_proc().inte(Self::intr_reg(pin.pin())).write(|w| {
+    w.set_level_high((pin.pin() % 8) as usize, true);
+});
+```
+And `0x00000030` I think is the `wfi` (wait for interrupt):
+```console
+(gdb) x/i 0x00000030
+=> 0x30:	wfi
+```
+So an interrupt is required to wake up the processor at this stage. But the
+interrupt is not getting triggered, even though
+
+For some reason if I enable the interrupt using the following command it seems
+to work, at least for a while:
+```console
+(gdb) set (*(0xe0000100 as *mut &[u8])).data_ptr = (1 << 13)
+```
 
 
 ### Single Cycle IO Block
