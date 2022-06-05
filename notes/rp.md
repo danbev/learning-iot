@@ -242,7 +242,10 @@ Checking `NVIC_ICER` (interrupt clear-enable):
 Checking `NVIC_ISPR` (interrupt state pending):
 ```console
 (gdb) x/t 0xe0000200
-
+0xe0000280:	00000000000000000000000000000000
+```
+And we can set this if needed using:
+```console
 (gdb) set (*(0xe0000200 as *mut &[u8])).data_ptr = (1 << 13)
 ```
 
@@ -250,13 +253,28 @@ Checking `NVIC_ICPR` (interrupt clear pending):
 ```console
 (gdb) x/t 0xe0000280
 ```
+Having to check each of these individually become tedious and error prone. So
+instead we can add custom command to gdb by adding the following to a `.gdbinit`
+file:
+```console
+define checkint
+print "NVIC_ISER:"
+x/t 0xe0000100
+print "NVIC_ICER:"
+x/t 0xe0000180
+print "NVIC_ISPR:"
+x/t 0xe0000200
+print "NVIC_ISPR:"
+x/t 0xe0000280
+end
+```
 
 Checking PROC0_INTE2 (interrupt enable 2):
 ```console
 (gdb) x/t 0x40014108
 0x40014108:	00000000000000000000000000000010
 ```
-And this matches the second bit in that register which is GPIO16_LEVEL_HIGH.
+And this matches the second bit in that register which is `GPIO16_LEVEL_HIGH`.
 We can also set the using:
 ```console
 (gdb) set  (*(0x40014108 as *mut &[u8])).data_ptr = (1 << 1)
