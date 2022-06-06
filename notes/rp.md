@@ -258,14 +258,32 @@ instead we can add custom command to gdb by adding the following to a `.gdbinit`
 file:
 ```console
 define checkint
-print "NVIC_ISER:"
-x/t 0xe0000100
-print "NVIC_ICER:"
-x/t 0xe0000180
-print "NVIC_ISPR:"
-x/t 0xe0000200
-print "NVIC_ISPR:"
-x/t 0xe0000280
+echo "NVIC_ISER:\n"
+x/t 0xe000e100
+echo "NVIC_ICER:\n"
+x/t 0xe000e180
+echo "NVIC_ISPR:\n"
+x/t 0xe000e200
+echo "NVIC_ISPR:\n"
+x/t 0xe000e280
+echo "NVIC_IPR0:\n"
+x/t 0xe000e400
+echo "NVIC_IPR1:\n"
+x/t 0xe000e404
+echo "NVIC_IPR2:\n"
+x/t 0xe000e408
+echo "NVIC_IPR3:\n"
+x/t 0xe000e40c
+echo "NVIC_IPR4:\n"
+x/t 0xe000e410
+echo "NVIC_IPR5:\n"
+x/t 0xe000e414
+echo "NVIC_IPR6:\n"
+x/t 0xe000e418
+echo "NVIC_IPR7:\n"
+x/t 0xe000e41c
+echo "VTOR:\n"
+x/t 0xe000e41c
 end
 ```
 
@@ -282,41 +300,167 @@ We can also set the using:
 0x40014108:	00000000000000000000000000000010
 ```
 
-Can I inspect if there is a interrupt request handler registered?
+The strange things is that I've got this to work a few times today and I was
+not sure how or when it worked. After a while I noticed that doing a reset halt,
+and then flashing, and then a load will allow this to work. But just loading
+will not work. It seems to be something that is not being reset by my code. I've
+checked the NVIC registers: NVIC_ISPR, NVIC_ICPR, and NVIC_ICER but they are
+all zero even after load. So how about the registers related to the pin itself?
 
-The strange things is that I've got this to work a few times today but when
-I try to 
+We can check the pins status and control register using:
 ```console
-gdb) bt
-#0  0x00000030 in ?? ()
-#1  0x10001c56 in rp2040_pac2::common::Reg<rp2040_pac2::io::regs::Int, rp2040_pac2::common::RW>::write<rp2040_pac2::io::regs::Int, rp2040_pac2::common::RW, (), embassy_rp::gpio::{impl#4}::new::{closure_env#2}<embassy_rp::peripherals::PIN_16>> (self=0x20041c2c, f=...)
-    at /home/danielbevenius/.cargo/git/checkouts/rp2040-pac2-1734f07ab2f17c18/9ad7223/src/common.rs:51
-#2  0x10000c90 in embassy_rp::gpio::InterruptInputFuture<embassy_rp::peripherals::PIN_16>::new<embassy_rp::peripherals::PIN_16> (
-    pin=0x20000050 <async_gpio::__embassy_main::POOL+32>, level=embassy_rp::gpio::IntTrigger::LevelHigh)
-    at /home/danielbevenius/work/drougue/embassy/embassy-rp/src/gpio.rs:237
-#3  0x10000936 in embassy_rp::gpio::{impl#3}::wait_for_high::{async_fn#0}<embassy_rp::peripherals::PIN_16> ()
-    at /home/danielbevenius/work/drougue/embassy/embassy-rp/src/gpio.rs:160
+(gdb) x/t 0x40014080
+0x40014080:	00000000000000000000000000000000
+(gdb) x/t 0x40014084
+0x40014084:	00000000000000000000000000000101
 ```
-Line 237 is where I'm enableing the 
-```rust
-pin.int_proc().inte(Self::intr_reg(pin.pin())).write(|w| {
-    w.set_level_high((pin.pin() % 8) as usize, true);
-});
-```
-And `0x00000030` I think is the `wfi` (wait for interrupt):
-```console
-(gdb) x/i 0x00000030
-=> 0x30:	wfi
-```
-So an interrupt is required to wake up the processor at this stage. But the
-interrupt is not getting triggered, even though
+The last one, 0x40014084, is the control register and the first 4 bits are the
+function select which is 5 which is expected as we are setting that to SIO.
 
-For some reason if I enable the interrupt using the following command it seems
-to work, at least for a while:
+Check GPIO_OE:
 ```console
-(gdb) set (*(0xe0000100 as *mut &[u8])).data_ptr = (1 << 13)
+(gdb) x/t 0xd0000020
+0xd0000020:	00000010000000000000000000000000
 ```
 
+Check GPIO_IN:
+```console
+(gdb) x/t 0xd0000004
+0xd0000004:	00000010000000000000000000000010
+```
+So this looks alright as turning on the pin would produce:
+```console
+(gdb) x/t 0xd0000004
+0xd0000004:	00000010000000010000000000000010
+```
+
+set (*(0xe000e200 as *mut &[u8])).data_ptr = (1 << 13)
+
+set (*(0xe000e100 as *mut &[u8])).data_ptr = (1 << 13)
+
+
+
+(gdb) set (*(0xe000e280 as *mut &[u8])).data_ptr = (1 << 13)
+(gdb) set *0xe000e280 = (1 << 13)
+
+Working:
+```console
+(gdb) checkint 
+"NVIC_ISER:
+"0xe000e100:	00000000000000000010000000001111
+"NVIC_ICER:
+"0xe000e180:	00000000000000000010000000001111
+"NVIC_ISPR:
+"0xe000e200:	00000000000000011000000001000000
+"NVIC_ICPR:
+"0xe000e280:	00000000000000011000000001000000
+"NVIC_IPR0:
+"0xe000e400:	00000000000000000000000000000000
+"NVIC_IPR1:
+"0xe000e404:	00000000000000000000000000000000
+"NVIC_IPR2:
+"0xe000e408:	00000000000000000000000000000000
+"NVIC_IPR3:
+"0xe000e40c:	00000000000000001100000000000000
+"NVIC_IPR4:
+"0xe000e410:	00000000000000000000000000000000
+"NVIC_IPR5:
+"0xe000e414:	00000000000000000000000000000000
+"NVIC_IPR6:
+"0xe000e418:	00000000000000000000000000000000
+"NVIC_IPR7:
+"0xe000e41c:	00000000000000000000000000000000
+"VTOR:
+"0xe000e41c:	00000000000000000000000000000000
+
+(gdb) checkpin
+"PROC0_INTE2:
+"0x40014108:	00000000000000000000000000000010
+"GPIO_IN:
+"0xd0000004:	00000010000000000000000000000010
+"GPIO_OE:
+"0xd0000020:	00000010000000000000000000000000
+"GPIO16_STATUS:
+"0x40014080:	00000000000000000000000000000000
+"GPIO16_CLR:
+"0x40014084:	00000000000000000000000000000101
+```
+Recall that the interrupt is number 13 and the pin is pin 16.
+Notice that `NVIC_ISPR` is set for pin 16. 
+
+Not working:
+```console
+(gdb) checkint 
+"NVIC_ISER:
+"0xe000e100:	00000000000000000010000000001111
+"NVIC_ICER:
+"0xe000e180:	00000000000000000010000000001111
+"NVIC_ISPR:
+"0xe000e200:	00000000000000011010000001000000
+"NVIC_ISPR:
+"0xe000e280:	00000000000000011010000001000000
+"NVIC_IPR0:
+"0xe000e400:	00000000000000000000000000000000
+"NVIC_IPR1:
+"0xe000e404:	00000000000000000000000000000000
+"NVIC_IPR2:
+"0xe000e408:	00000000000000000000000000000000
+"NVIC_IPR3:
+"0xe000e40c:	00000000000000001100000000000000
+"NVIC_IPR4:
+"0xe000e410:	00000000000000000000000000000000
+"NVIC_IPR5:
+"0xe000e414:	00000000000000000000000000000000
+"NVIC_IPR6:
+"0xe000e418:	00000000000000000000000000000000
+"NVIC_IPR7:
+"0xe000e41c:	00000000000000000000000000000000
+"VTOR:
+"0xe000e41c:	00000000000000000000000000000000
+```
+Recall that the intertup is 13 (not 16 which is the pin number) and we can
+see that the interrupt is enabled but there is clear-pending for this. Also 
+notice that `NVIC_ISER` is set but also `NVIC_ICER` so the interrupt is enabled.
+
+
+Checking the interrupt handler:
+First we can disassemble `IO_IRQ_BANK0`:
+```console
+(gdb) disassemble IO_IRQ_BANK0
+Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
+   0x10003b58 <+0>:	push	{r7, lr}
+```
+
+And the address to the start of the interrupt vector can been seen in the
+output of the `load` command:
+```console
+(gdb) load
+Loading section .boot2, size 0x100 lma 0x10000000
+Loading section .vector_table, size 0xa8 lma 0x10000100
+Loading section .text, size 0xf228 lma 0x100001a8
+Loading section .rodata, size 0x25b0 lma 0x1000f3d0
+Loading section .data, size 0x30 lma 0x10011980
+Start address 0x100001a8, load size 72112
+Transfer rate: 23 KB/sec, 9014 bytes/write.
+The above shows the address of the vector_table:
+```
+And we can then list the function pointers that the interrupt vector contains:
+```console
+(gdb) x/30x 0x10000100 
+0x10000100:	0x20040000	0x100001a9	0x10002911	0x1000f3a5
+0x10000110 <__EXCEPTIONS+8>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x10000120 <__EXCEPTIONS+24>:	0x00000000	0x00000000	0x00000000	0x10002911
+0x10000130 <__EXCEPTIONS+40>:	0x00000000	0x00000000	0x10002911	0x10002911
+0x10000140 <__INTERRUPTS>:	0x10006621	0x10006639	0x10006651	0x10006669
+0x10000150 <__INTERRUPTS+16>:	0x10002911	0x10002911	0x10002911	0x10002911
+0x10000160 <__INTERRUPTS+32>:	0x10002911	0x10002911	0x10002911	0x10002911
+0x10000170 <__INTERRUPTS+48>:	0x10002911	0x10003b59
+                                                     ↑
+                                                 0x1003b58 + 1 (for thumb instruction)
+```
+And from the above we can see that the interrupt request handler is there. I
+just wanted to double check that it was not being removed for some reason which
+was causing the behaviour that I'm seeing.
 
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
