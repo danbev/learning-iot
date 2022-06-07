@@ -462,6 +462,25 @@ And from the above we can see that the interrupt request handler is there. I
 just wanted to double check that it was not being removed for some reason which
 was causing the behaviour that I'm seeing.
 
+
+Now, the states for interrupts are as follows:
+* Pending: This is where the microcontroller has detected the interrupt and
+scheduled it, but not yet invoked the handler. So in my current case it has
+detected the transion from low to high, but not invoked the handler.
+
+* Active: This where the microcontroller has started running the interrupt
+handler but not finished its execution yet (it might have been pre-empted by
+a higher priority interrupt/exception).
+
+* Pending & Active: Can happen when the microcontroller detects an interrupt
+of the same type/number while currently executing a handler for that type. Like
+the same interrupt happening while executing it's handler code.
+
+* Inactive: Neither pending or active.
+
+So, I can see that the interrupt is pending but the handler is not being called.
+What could be the reason for this?
+
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
 
@@ -1130,3 +1149,60 @@ Info : SWD DLPIDR 0x00000001
 Error: Failed to read memory at 0x1000049c
 ```
 The first 
+
+### gdb init
+```console
+target remote localhost:3333
+monitor arm semihosting enable
+monitor reset halt
+#monitor debug_level -2
+
+define checkint
+echo "NVIC_ISER:\n"
+x/t 0xe000e100
+echo "NVIC_ICER:\n"
+x/t 0xe000e180
+echo "NVIC_ISPR:\n"
+x/t 0xe000e200
+echo "NVIC_ICPR:\n"
+x/t 0xe000e280
+echo "NVIC_IPR0:\n"
+x/t 0xe000e400
+echo "NVIC_IPR1:\n"
+x/t 0xe000e404
+echo "NVIC_IPR2:\n"
+x/t 0xe000e408
+echo "NVIC_IPR3:\n"
+x/t 0xe000e40c
+echo "NVIC_IPR4:\n"
+x/t 0xe000e410
+echo "NVIC_IPR5:\n"
+x/t 0xe000e414
+echo "NVIC_IPR6:\n"
+x/t 0xe000e418
+echo "NVIC_IPR7:\n"
+x/t 0xe000e41c
+echo "VTOR:\n"
+x/t 0xe000e41c
+echo "ICSR:\n"
+x/t 0xe000ed04
+end
+
+define checkpin
+echo "PROC0_INTE2:\n"
+x/t 0x40014108
+echo "GPIO_IN:\n"
+x/t 0xd0000004
+echo "GPIO_OE:\n"
+x/t 0xd0000020
+echo "GPIO16_STATUS:\n"
+x/t 0x40014080
+echo "GPIO16_CTLR:\n"
+x/t 0x40014084
+end
+
+define intvec
+echo "Interrupt vector:\n"
+x/30x 0x10000100
+end
+```
