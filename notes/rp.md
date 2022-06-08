@@ -481,6 +481,115 @@ the same interrupt happening while executing it's handler code.
 So, I can see that the interrupt is pending but the handler is not being called.
 What could be the reason for this?
 
+The `VTOR` register contains an offset from the default address 0x00000000 to
+a user-provided address:
+```console
+"VTOR:
+"0xe000e41c:	00000000000000000000000000000000
+```
+Now in PICO we have a boot loader and upon startup we can see that the vector
+table is loaded at:
+```console
+(gdb) load
+Loading section .vector_table, size 0xc0 lma 0x10000100
+```
+
+The VTOR register offsets the vector table from the default 0x0000_0000 to a
+user-provided address, which is required if the user's vector table is not at
+the start of memory (for example, because a bootloader is present).
+But this does not make sense in this case we I know that the handler is works
+sometimes, if it never worked that might have been the issue.
+
+So what I'm seeing this this:
+```console
+(gdb) bt
+#0  0x00000030 in ?? ()
+#1  <signal handler called>
+#2  0x744c2066 in ?? ()
+#3  <signal handler called>
+#4  lib::__wfe () at asm/lib.rs:52
+#5  0x10000af4 in cortex_m::asm::wfe () at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-0.7.4/src/asm.rs:49
+#6  0x10000326 in embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}> (self=0x20041ed0, init=...)
+    at /home/danielbevenius/work/drougue/embassy/embassy/src/executor/arch/cortex_m.rs:54
+#7  0x10000882 in async_gpio::__cortex_m_rt_main () at src/bin/async_gpio.rs:17
+#8  0x10000854 in async_gpio::__cortex_m_rt_main_trampoline () at src/bin/async_gpio.rs:17
+```
+Now, I can't tell what those signal handlers are but we can step up the frames
+in gdb. Lets start by going back to the first signal handler (frame 3)
+```console
+(gdb) frame 3
+#3  <signal handler called>
+```
+And lets take a look at the frame information:
+```console
+(gdb) info frame
+Stack level 3, frame at 0x20041ea4:
+ pc = 0xfffffff9; saved pc = 0x1000c50e
+ called by frame at 0x20041ea4, caller of frame at 0x20041e80
+ Arglist at unknown address.
+ Locals at unknown address, Previous frame's sp is 0x20041ea4
+ Saved registers:
+  r0 at 0x20041e80, r1 at 0x20041e84, r2 at 0x20041e88, r3 at 0x20041e8c, r12 at 0x20041e90, lr at 0x20041e94, pc at 0x20041e98, xPSR at 0x20041e9c
+```
+Notice the saved registers and lets inspecte `xPSR`:
+```console
+(gdb) p/t 0x20041e9c
+$1 = 100000000001000001111010011100
+```
+And we can mask the execption number using:
+```console
+(gdb) p/t 0x20041e9c & 0x1f
+$10 = 11100
+(gdb) p/d 0x20041e9c & 0x1f
+$11 = 28
+```
+What is this number 28, the interrupt we have enabled in 13. Hmm, looking at
+this a little close 
+```console
+(gdb) intvec 
+"Interrupt vector:
+"0x10000100:                 	0x20040000	0x100001a9	0x10001d91	0x1000ea6d
+0x10000110 <__EXCEPTIONS+8>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x10000120 <__EXCEPTIONS+24>:	0x00000000	0x00000000	0x00000000	0x10001d91
+0x10000130 <__EXCEPTIONS+40>:	0x00000000	0x00000000	0x10001d91	0x10001d91
+0x10000140 <__INTERRUPTS>:	0x10005e39	0x10005e51	0x10005e69	0x10005e81
+0x10000150 <__INTERRUPTS+16>:	0x10001d91	0x10001d91	0x10001d91	0x10001d91
+0x10000160 <__INTERRUPTS+32>:	0x10001d91	0x10001d91	0x10001d91	0x10001d91
+0x10000170 <__INTERRUPTS+48>:	0x10001d91	0x100030f9	0x10001d91	0x10001d91
+0x10000180 <__INTERRUPTS+64>:	0x10001d91	0x10001d91	0x10001d91	0x10001d91
+0x10000190 <__INTERRUPTS+80>:	0x10001d91	0x10001d91	0x10001d91	0x10001d91
+```
+First we have the stack pointer value which is `0x20040000` which does not have
+an exception number, followed by the reset handler in `0x100001a9`, followed
+by the NMI handler (2) which is this case is `cortex_m_rt::DefaultHandler`,
+followed by the HardFault handler (3) which is this case is HardFaultTrampoline,
+then we have Memory Management fault (4), bus fault (5).
+If we start counting from the first handler being 0 then the 28th one is in
+fact `0x100030f9` which is our interrupt handler:
+```console
+(gdb) disassemble 0x100030f9
+Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
+   0x100030f8 <+0>:	push	{r7, lr}
+   0x100030fa <+2>:	add	r7, sp, #0
+   0x100030fc <+4>:	sub	sp, #8
+   0x100030fe <+6>:	bl	0x100046c8 <_ZN8cortex_m9interrupt4free17hfbb6b193986e31caE>
+   0x10003102 <+10>:	b.n	0x10003104 <embassy_rp::gpio::IO_IRQ_BANK0+12>
+   0x10003104 <+12>:	add	sp, #8
+   0x10003106 <+14>:	pop	{r7, pc}
+End of assembler dump.
+```
+
+And notice the saved program counter which is 0x1000c50e:
+```console
+(gdb) disassemble 0x1000c50e
+Dump of assembler code for function lib::__wfe:
+   0x1000c50c <+0>:	wfe
+   0x1000c50e <+2>:	bx	lr
+End of assembler dump.
+```
+
+
+
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
 
