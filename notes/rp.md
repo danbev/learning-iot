@@ -492,8 +492,9 @@ Things that could generate a hard fault
 `0x10002d2d` is the address of irq handler when it works and I ran the `checkint`
 command to display the registers that I think might be interesting. One things
 I noticed is that VTOR (the vector table offset) is set when it works which is
-not the case when it does not. I think this is normally set by the bootloader
-but I'm not sure (TODO: take a look at the bootloader code):
+not the case when it does not:
+
+```console
 "VTOR:
 "0xe000ed08:	00010000000000000000000100000000
 
@@ -519,6 +520,9 @@ Lets try this and see if I can force a failing load to actually run:
 "0xe000ed08:	00010000000000000000000100000000
 ```
 That worked! :) 
+
+I think this is normally set by the bootloader but I'm not sure (TODO: take a
+look at the bootloader code).
 
 The `VTOR` register contains an offset from the default address 0x00000000 to
 a user-provided address:
