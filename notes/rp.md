@@ -578,16 +578,169 @@ Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
    0x10003106 <+14>:	pop	{r7, pc}
 End of assembler dump.
 ```
+But this does not look correct, in the actual handler code I am using
+semihosting to print out a debug string which is not showing up in the
+disassembly. This is interesting and if I comment in another line of code I
+see the full source, and in this case the interrupt work!
+TODO: clean up the above section as see if I can reproduce it again.
 
-And notice the saved program counter which is 0x1000c50e:
+
+Sometimes I get the following backtrace:
 ```console
-(gdb) disassemble 0x1000c50e
-Dump of assembler code for function lib::__wfe:
-   0x1000c50c <+0>:	wfe
-   0x1000c50e <+2>:	bx	lr
+Thread 1 received signal SIGINT, Interrupt.
+0x00000030 in ?? ()
+(gdb) bt
+#0  0x00000030 in ?? ()
+#1  0x10000326 in embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}> (self=0x20041ed0, init=...)
+    at /home/danielbevenius/work/drougue/embassy/embassy/src/executor/arch/cortex_m.rs:54
+#2  0x1000076a in async_gpio::__cortex_m_rt_main () at src/bin/async_gpio.rs:17
+#3  0x1000073c in async_gpio::__cortex_m_rt_main_trampoline () at src/bin/async_gpio.rs:17
+```
+
+We can inspect the register `xPSR` and look at the bits 0-5 which contain the
+number of the currently executing exception. This will be 0 for normal thread
+mode, but if there is the interrupt service routine number of the currently
+active exception.
+If we check this value we find:
+```console
+(gdb) p/d $xPSR & 0x1f
+$5 = 3
+```
+And 3 is the number of the `HardFault` exception. So it seems like sometimes
+the interrupt occurs which awakens the the processor which was suspended
+due to the `wfe` call. Or should this be a negative value for an exception?
+
+
+We can also take a look at the current frame:
+```console
+(gdb) info frame
+Stack level 0, frame at 0x20041eac:
+ pc = 0x30; saved pc = 0x10000326
+ called by frame at 0x20041ecc
+ Arglist at 0x20041e60, args: 
+ Locals at 0x20041e60, Previous frame's sp is 0x20041eac
+ Saved registers:
+  r7 at 0x20041ea4, lr at 0x20041ea8
+```
+
+And if we take a look at the saved program counter using:
+```console
+(gdb) set print asm-demangle on
+
+(gdb) disassemble 0x10000326
+Dump of assembler code for function embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>:
+   0x100002fa <+0>:	push	{r7, lr}
+   0x100002fc <+2>:	add	r7, sp, #0
+   0x100002fe <+4>:	sub	sp, #24
+   0x10000300 <+6>:	str	r0, [sp, #4]
+   0x10000302 <+8>:	str	r0, [sp, #16]
+   0x10000304 <+10>:	bl	0x1000a294 <embassy::executor::raw::Executor::spawner>
+   0x10000308 <+14>:	str	r0, [sp, #8]
+   0x1000030a <+16>:	b.n	0x1000030c <embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>+18>
+   0x1000030c <+18>:	ldr	r0, [sp, #8]
+   0x1000030e <+20>:	str	r0, [sp, #12]
+   0x10000310 <+22>:	ldr	r0, [sp, #12]
+   0x10000312 <+24>:	bl	0x10000e5a <async_gpio::__cortex_m_rt_main::{closure#0}>
+   0x10000316 <+28>:	b.n	0x10000318 <embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>+30>
+   0x10000318 <+30>:	b.n	0x1000031a <embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>+32>
+   0x1000031a <+32>:	ldr	r0, [sp, #4]
+   0x1000031c <+34>:	bl	0x1000a232 <embassy::executor::raw::Executor::poll>
+   0x10000320 <+38>:	b.n	0x10000322 <embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>+40>
+   0x10000322 <+40>:	bl	0x100009d4 <cortex_m::asm::wfe>
+   0x10000326 <+44>:	b.n	0x1000031a <embassy::executor::arch::Executor::run<async_gpio::__cortex_m_rt_main::{closure_env#0}>+32>
 End of assembler dump.
 ```
 
+But sometimes it just works, there is no HardFault, and the output is:
+```console
+InterruptInput new
+wait_for_high
+InterruptInputFuture  new
+IO_IRQ_BANK0 global Interrupt handler
+InterruptInputFuture::poll
+check is high
+high so clear the interrutp flag
+```
+Where is this hard fault being generated?
+Things that could generate a hard fault
+
+```
+  Incoming Exception        Priority             Execution Priority
+1   Reset           -------> -3   ---+          +---      Base Level
+2   NMI             -------> -2   ---|          |---      Active Exception
+3   HardFault       -------> -1   ---|          |---      BASEPRI
+4   MemManagement   -------> PPn  ---+--->  <---+---     PRIMASK
+5   BusFault        -------> PPn  ---|          |---     FAULTMASK
+6   UsageFault      -------> PPn  ---|          
+7   Reserved
+8   Reserved
+9   Reserved
+10  Reserved
+11  SVC             -------> PPn  ---|
+12  DebugMonitor    -------> PPn  ---|
+13  Reserved
+14  PendSV
+15  SysTick
+16  TIMER_IRQ_0   (0)
+17  TIMER_IRQ_1   (1)
+18  TIMER_IRQ_2   (2)
+19  TIMER_IRQ_3   (3)
+20  PWM_IRQ_WRAP  (4)
+21  USBCTRL_IRQ   (5)
+22  XIP_IRQ       (6)
+23  PIO0_IRQ_0    (7)
+24  PIO0_IRQ_1    (8)
+25  PIO1_IRQ_0    (9)
+26  PIO1_IRQ_1    (10)
+27  DMA_IRQ_0     (11)
+28  DMA_IRQ_1     (12)
+29  IO_IRQ_BANK0  (13)
+30  IO_IRQ_QSPI   (14)
+31  SIO_IRQ_PROC0 (15)
+32  SIO_IRQ_PROC1 (16)
+33  CLOCKS_IRQ    (17)
+34  SPI0_IRQ      (18)
+35  SPI1_IRQ      (19)
+36  UART0_IRQ     (20)
+37  UART1_IRQ     (21)
+38  ADC_IRQ_FIFO  (22)
+39  I2C0_IRQ      (23)
+40  I2C1_IRQ      (24)
+41  RTC_IRQ       (25)
+
+PPn = Programmable number between 0-255
+```
+
+`0x10002d2d` is the address of irq handler when it works and I ran the `checkint`
+command to display the registers that I think might be interesting. One things
+I noticed is that VTOR (the vector table offset) is set when it works which is
+not the case when it does not. I think this is normally set by the bootloader
+but I'm not sure (TODO: take a look at the bootloader code):
+"VTOR:
+"0xe000ed08:	00010000000000000000000100000000
+
+(gdb) x/t 0xe000ed08
+0xe000ed08:	00010000000000000000000100000000
+
+(gdb) x/x 0xe000ed08
+0xe000ed08:	0x10000100
+```
+Lets try this and see if I can force a failing load to actually run:
+```console
+(gdb) monitor reset halt
+(gdb) flash target/thumbv6m-none-eabi/debug/async_gpio 
+(gdb) load
+(gdb) checkint
+...
+"VTOR:
+"0xe000ed08:	00000000000000000000000000000000
+(gdb) set *0xe000ed08 = 0x10000100
+(gdb) checkint 
+...
+"VTOR:
+"0xe000ed08:	00010000000000000000000100000000
+```
+That worked! :) 
 
 
 ### Single Cycle IO Block
