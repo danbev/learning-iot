@@ -1,0 +1,62 @@
+set print asm-demangle on
+
+target remote localhost:3333
+monitor arm semihosting enable
+monitor reset halt
+#monitor debug_level -2
+
+define checkint
+echo "NVIC_ISER:\n"
+x/t 0xe000e100
+echo "NVIC_ICER:\n"
+x/t 0xe000e180
+echo "NVIC_ISPR:\n"
+x/t 0xe000e200
+echo "NVIC_ICPR:\n"
+x/t 0xe000e280
+echo "NVIC_IPR0:\n"
+x/t 0xe000e400
+echo "NVIC_IPR1:\n"
+x/t 0xe000e404
+echo "NVIC_IPR2:\n"
+x/t 0xe000e408
+echo "NVIC_IPR3:\n"
+x/t 0xe000e40c
+echo "NVIC_IPR4:\n"
+x/t 0xe000e410
+echo "NVIC_IPR5:\n"
+x/t 0xe000e414
+echo "NVIC_IPR6:\n"
+x/t 0xe000e418
+echo "NVIC_IPR7:\n"
+x/t 0xe000e41c
+echo "VTOR:\n"
+x/t 0xe000ed08
+echo "ICSR:\n"
+x/t 0xe000ed04
+echo "PROC0_NMI_MASK:\n"
+x/t 0x40014000
+end
+
+define checkpin
+echo "PROC0_INTE2:\n"
+x/t 0x40014108
+echo "GPIO_IN:\n"
+x/t 0xd0000004
+echo "GPIO_OE:\n"
+x/t 0xd0000020
+echo "GPIO16_STATUS:\n"
+x/t 0x40014080
+echo "GPIO16_CTLR:\n"
+x/t 0x40014084
+end
+
+define vectab
+echo "Interrupt vector:\n"
+x/40x 0x10000100
+end
+
+define setvtor
+echo "Setting VTOR to 0x10000100:\n"
+set *0xe000ed08 = 0x10000100
+end

@@ -254,37 +254,8 @@ Checking `NVIC_ICPR` (interrupt clear pending):
 (gdb) x/t 0xe0000280
 ```
 Having to check each of these individually become tedious and error prone. So
-instead we can add custom command to gdb by adding the following to a `.gdbinit`
-file:
-```console
-define checkint
-echo "NVIC_ISER:\n"
-x/t 0xe000e100
-echo "NVIC_ICER:\n"
-x/t 0xe000e180
-echo "NVIC_ISPR:\n"
-x/t 0xe000e200
-echo "NVIC_ISPR:\n"
-x/t 0xe000e280
-echo "NVIC_IPR0:\n"
-x/t 0xe000e400
-echo "NVIC_IPR1:\n"
-x/t 0xe000e404
-echo "NVIC_IPR2:\n"
-x/t 0xe000e408
-echo "NVIC_IPR3:\n"
-x/t 0xe000e40c
-echo "NVIC_IPR4:\n"
-x/t 0xe000e410
-echo "NVIC_IPR5:\n"
-x/t 0xe000e414
-echo "NVIC_IPR6:\n"
-x/t 0xe000e418
-echo "NVIC_IPR7:\n"
-x/t 0xe000e41c
-echo "VTOR:\n"
-x/t 0xe000e41c
-end
+instead we can add custom command to gdb by adding a custom command to
+[.gdbinit](rp_.gdbinit) file
 ```
 
 Checking PROC0_INTE2 (interrupt enable 2):
@@ -546,7 +517,7 @@ $11 = 28
 What is this number 28, the interrupt we have enabled in 13. Hmm, looking at
 this a little close 
 ```console
-(gdb) intvec 
+(gdb) vectab 
 "Interrupt vector:
 "0x10000100:                 	0x20040000	0x100001a9	0x10001d91	0x1000ea6d
 0x10000110 <__EXCEPTIONS+8>:	0x00000000	0x00000000	0x00000000	0x00000000
@@ -1463,7 +1434,7 @@ echo "GPIO16_CTLR:\n"
 x/t 0x40014084
 end
 
-define intvec
+define vectab
 echo "Interrupt vector:\n"
 x/30x 0x10000100
 end
