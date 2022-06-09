@@ -409,6 +409,7 @@ see the full source, and in this case the interrupt work!
 TODO: clean up the above section as see if I can reproduce it again.
 
 
+<a name="vtor_issue"></a>
 Sometimes I get the following backtrace:
 ```console
 Thread 1 received signal SIGINT, Interrupt.
