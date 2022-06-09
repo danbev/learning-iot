@@ -251,7 +251,7 @@ Checking `NVIC_ICPR` (interrupt clear pending):
 ```
 Having to check each of these individually become tedious and error prone. So
 instead we can add custom command to gdb by adding a custom command to
-[.gdbinit](rp_.gdbinit) file
+[.gdbinit](rp_gdbinit) file
 ```
 
 Checking PROC0_INTE2 (interrupt enable 2):
@@ -287,7 +287,6 @@ what we think it should contain:
 
 
 (gdb) disassemble 0x1003b58 
-Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
 Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
    0x10002d2c <+0>:	push	{r7, lr}
    0x10002d2e <+2>:	add	r7, sp, #0
