@@ -170,9 +170,9 @@ $23 = 10000000000000010
 ```
 
 What I've found useful is to hook up a power source with 3.3V to an input pin
-and then enable interrupts for the pin. But I'm currently haveing issues with
-the interrupt handler not getting triggered. If I toggle the power to this pin
-I can see the change in this register:
+and then enable interrupts for the pin. But I'm currently having issues with
+the interrupt handler not getting triggered, or rather sometimes it triggers. If
+I toggle the power to this pin I can see the change in this register:
 ```console
 (gdb) x/t 0x400140f8
 0x400140f8:	00010001000100010001000100010101
@@ -211,11 +211,7 @@ So at least so far I can see that the input pin is getting changed as the scope
 shows the change in voltage, the input pin changes values in the GPIO_IN
 register, and I can see the interrupt registers are also getting updated.
 
-The reason for this was the I discovered that I was not clearning/unpending the
-interrupt. Adding an unpend call allowed the intertupt handler to be invoked.
-So I'm still having issue with this and I need to dig further.
-
-Lets check if the NVIC regiseters are actually set or cleared.
+Lets check if the `NVIC` registers are actually set or cleared.
 
 Checking `NVIC_ISER` (interrupt set-enable):
 ```
@@ -272,152 +268,12 @@ We can also set the using:
 ```
 
 The strange things is that I've got this to work a few times today and I was
-not sure how or when it worked. After a while I noticed that doing a reset halt,
-and then flashing, and then a load will allow this to work. But just loading
-will not work. It seems to be something that is not being reset by my code. I've
-checked the NVIC registers: NVIC_ISPR, NVIC_ICPR, and NVIC_ICER but they are
-all zero even after load. So how about the registers related to the pin itself?
+not sure how or when it worked. 
 
-We can check the pins status and control register using:
+Lets check that our irq handler is in the expected location and contains
+what we think it should contain:
 ```console
-(gdb) x/t 0x40014080
-0x40014080:	00000000000000000000000000000000
-(gdb) x/t 0x40014084
-0x40014084:	00000000000000000000000000000101
-```
-The last one, 0x40014084, is the control register and the first 4 bits are the
-function select which is 5 which is expected as we are setting that to SIO.
-
-Check GPIO_OE:
-```console
-(gdb) x/t 0xd0000020
-0xd0000020:	00000010000000000000000000000000
-```
-
-Check GPIO_IN:
-```console
-(gdb) x/t 0xd0000004
-0xd0000004:	00000010000000000000000000000010
-```
-So this looks alright as turning on the pin would produce:
-```console
-(gdb) x/t 0xd0000004
-0xd0000004:	00000010000000010000000000000010
-```
-
-set (*(0xe000e200 as *mut &[u8])).data_ptr = (1 << 13)
-
-set (*(0xe000e100 as *mut &[u8])).data_ptr = (1 << 13)
-
-
-
-(gdb) set (*(0xe000e280 as *mut &[u8])).data_ptr = (1 << 13)
-(gdb) set *0xe000e280 = (1 << 13)
-
-Working:
-```console
-(gdb) checkint 
-"NVIC_ISER:
-"0xe000e100:	00000000000000000010000000001111
-"NVIC_ICER:
-"0xe000e180:	00000000000000000010000000001111
-"NVIC_ISPR:
-"0xe000e200:	00000000000000011000000001000000
-"NVIC_ICPR:
-"0xe000e280:	00000000000000011000000001000000
-"NVIC_IPR0:
-"0xe000e400:	00000000000000000000000000000000
-"NVIC_IPR1:
-"0xe000e404:	00000000000000000000000000000000
-"NVIC_IPR2:
-"0xe000e408:	00000000000000000000000000000000
-"NVIC_IPR3:
-"0xe000e40c:	00000000000000001100000000000000
-"NVIC_IPR4:
-"0xe000e410:	00000000000000000000000000000000
-"NVIC_IPR5:
-"0xe000e414:	00000000000000000000000000000000
-"NVIC_IPR6:
-"0xe000e418:	00000000000000000000000000000000
-"NVIC_IPR7:
-"0xe000e41c:	00000000000000000000000000000000
-"VTOR:
-"0xe000e41c:	00000000000000000000000000000000
-
-(gdb) checkpin
-"PROC0_INTE2:
-"0x40014108:	00000000000000000000000000000010
-"GPIO_IN:
-"0xd0000004:	00000010000000000000000000000010
-"GPIO_OE:
-"0xd0000020:	00000010000000000000000000000000
-"GPIO16_STATUS:
-"0x40014080:	00000000000000000000000000000000
-"GPIO16_CLR:
-"0x40014084:	00000000000000000000000000000101
-```
-Recall that the interrupt is number 13 and the pin is pin 16.
-Notice that `NVIC_ISPR` is set for pin 16. 
-
-Not working:
-```console
-(gdb) checkint 
-"NVIC_ISER:
-"0xe000e100:	00000000000000000010000000001111
-"NVIC_ICER:
-"0xe000e180:	00000000000000000010000000001111
-"NVIC_ISPR:
-"0xe000e200:	00000000000000011010000001000000
-"NVIC_ISPR:
-"0xe000e280:	00000000000000011010000001000000
-"NVIC_IPR0:
-"0xe000e400:	00000000000000000000000000000000
-"NVIC_IPR1:
-"0xe000e404:	00000000000000000000000000000000
-"NVIC_IPR2:
-"0xe000e408:	00000000000000000000000000000000
-"NVIC_IPR3:
-"0xe000e40c:	00000000000000001100000000000000
-"NVIC_IPR4:
-"0xe000e410:	00000000000000000000000000000000
-"NVIC_IPR5:
-"0xe000e414:	00000000000000000000000000000000
-"NVIC_IPR6:
-"0xe000e418:	00000000000000000000000000000000
-"NVIC_IPR7:
-"0xe000e41c:	00000000000000000000000000000000
-"VTOR:
-"0xe000e41c:	00000000000000000000000000000000
-```
-Recall that the intertup is 13 (not 16 which is the pin number) and we can
-see that the interrupt is enabled but there is clear-pending for this. Also 
-notice that `NVIC_ISER` is set but also `NVIC_ICER` so the interrupt is enabled.
-
-
-Checking the interrupt handler:
-First we can disassemble `IO_IRQ_BANK0`:
-```console
-(gdb) disassemble IO_IRQ_BANK0
-Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
-   0x10003b58 <+0>:	push	{r7, lr}
-```
-
-And the address to the start of the interrupt vector can been seen in the
-output of the `load` command:
-```console
-(gdb) load
-Loading section .boot2, size 0x100 lma 0x10000000
-Loading section .vector_table, size 0xa8 lma 0x10000100
-Loading section .text, size 0xf228 lma 0x100001a8
-Loading section .rodata, size 0x25b0 lma 0x1000f3d0
-Loading section .data, size 0x30 lma 0x10011980
-Start address 0x100001a8, load size 72112
-Transfer rate: 23 KB/sec, 9014 bytes/write.
-The above shows the address of the vector_table:
-```
-And we can then list the function pointers that the interrupt vector contains:
-```console
-(gdb) x/30x 0x10000100 
+(gdb) vectab
 0x10000100:	0x20040000	0x100001a9	0x10002911	0x1000f3a5
 0x10000110 <__EXCEPTIONS+8>:	0x00000000	0x00000000	0x00000000	0x00000000
 0x10000120 <__EXCEPTIONS+24>:	0x00000000	0x00000000	0x00000000	0x10002911
@@ -428,11 +284,28 @@ And we can then list the function pointers that the interrupt vector contains:
 0x10000170 <__INTERRUPTS+48>:	0x10002911	0x10003b59
                                                      ↑
                                                  0x1003b58 + 1 (for thumb instruction)
+
+
+(gdb) disassemble 0x1003b58 
+Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
+Dump of assembler code for function embassy_rp::gpio::IO_IRQ_BANK0:
+   0x10002d2c <+0>:	push	{r7, lr}
+   0x10002d2e <+2>:	add	r7, sp, #0
+   0x10002d30 <+4>:	sub	sp, #24
+   0x10002d32 <+6>:	bl	0x10008190 <cortex_m_semihosting::hio::hstdout>
+   0x10002d36 <+10>:	str	r0, [sp, #8]
+   0x10002d38 <+12>:	str	r1, [sp, #12]
+   0x10002d3a <+14>:	b.n	0x10002d3c <embassy_rp::gpio::IO_IRQ_BANK0+16>
+   0x10002d3c <+16>:	ldr	r1, [sp, #12]
+   0x10002d3e <+18>:	ldr	r0, [sp, #8]
+   0x10002d40 <+20>:	ldr	r2, [pc, #44]	; (0x10002d70 <embassy_rp::gpio::IO_IRQ_BANK0+68>)
+   0x10002d42 <+22>:	bl	0x10007cb0 <core::result::Result<cortex_m_semihosting::hio::HostStream, ()>::unwrap<cortex_m_semihosting::hio::HostStream, ()>>
+   0x10002d46 <+26>:	str	r0, [sp, #16]
+...
 ```
 And from the above we can see that the interrupt request handler is there. I
 just wanted to double check that it was not being removed for some reason which
 was causing the behaviour that I'm seeing.
-
 
 Now, the states for interrupts are as follows:
 * Pending: This is where the microcontroller has detected the interrupt and
@@ -452,24 +325,6 @@ the same interrupt happening while executing it's handler code.
 So, I can see that the interrupt is pending but the handler is not being called.
 What could be the reason for this?
 
-The `VTOR` register contains an offset from the default address 0x00000000 to
-a user-provided address:
-```console
-"VTOR:
-"0xe000e41c:	00000000000000000000000000000000
-```
-Now in PICO we have a boot loader and upon startup we can see that the vector
-table is loaded at:
-```console
-(gdb) load
-Loading section .vector_table, size 0xc0 lma 0x10000100
-```
-
-The VTOR register offsets the vector table from the default 0x0000_0000 to a
-user-provided address, which is required if the user's vector table is not at
-the start of memory (for example, because a bootloader is present).
-But this does not make sense in this case we I know that the handler is works
-sometimes, if it never worked that might have been the issue.
 
 So what I'm seeing this this:
 ```console
@@ -635,52 +490,6 @@ high so clear the interrutp flag
 Where is this hard fault being generated?
 Things that could generate a hard fault
 
-```
-  Incoming Exception        Priority             Execution Priority
-1   Reset           -------> -3   ---+          +---      Base Level
-2   NMI             -------> -2   ---|          |---      Active Exception
-3   HardFault       -------> -1   ---|          |---      BASEPRI
-4   MemManagement   -------> PPn  ---+--->  <---+---     PRIMASK
-5   BusFault        -------> PPn  ---|          |---     FAULTMASK
-6   UsageFault      -------> PPn  ---|          
-7   Reserved
-8   Reserved
-9   Reserved
-10  Reserved
-11  SVC             -------> PPn  ---|
-12  DebugMonitor    -------> PPn  ---|
-13  Reserved
-14  PendSV
-15  SysTick
-16  TIMER_IRQ_0   (0)
-17  TIMER_IRQ_1   (1)
-18  TIMER_IRQ_2   (2)
-19  TIMER_IRQ_3   (3)
-20  PWM_IRQ_WRAP  (4)
-21  USBCTRL_IRQ   (5)
-22  XIP_IRQ       (6)
-23  PIO0_IRQ_0    (7)
-24  PIO0_IRQ_1    (8)
-25  PIO1_IRQ_0    (9)
-26  PIO1_IRQ_1    (10)
-27  DMA_IRQ_0     (11)
-28  DMA_IRQ_1     (12)
-29  IO_IRQ_BANK0  (13)
-30  IO_IRQ_QSPI   (14)
-31  SIO_IRQ_PROC0 (15)
-32  SIO_IRQ_PROC1 (16)
-33  CLOCKS_IRQ    (17)
-34  SPI0_IRQ      (18)
-35  SPI1_IRQ      (19)
-36  UART0_IRQ     (20)
-37  UART1_IRQ     (21)
-38  ADC_IRQ_FIFO  (22)
-39  I2C0_IRQ      (23)
-40  I2C1_IRQ      (24)
-41  RTC_IRQ       (25)
-
-PPn = Programmable number between 0-255
-```
 
 `0x10002d2d` is the address of irq handler when it works and I ran the `checkint`
 command to display the registers that I think might be interesting. One things
@@ -712,6 +521,28 @@ Lets try this and see if I can force a failing load to actually run:
 "0xe000ed08:	00010000000000000000000100000000
 ```
 That worked! :) 
+
+The `VTOR` register contains an offset from the default address 0x00000000 to
+a user-provided address:
+```console
+"VTOR:
+"0xe000e41c:	00000000000000000000000000000000
+```
+Now in PICO we have a boot loader and upon startup we can see that the vector
+table is loaded at:
+```console
+(gdb) load
+Loading section .vector_table, size 0xc0 lma 0x10000100
+```
+
+The VTOR register offsets the vector table from the default 0x0000_0000 to a
+user-provided address, which is required if the user's vector table is not at
+the start of memory (for example, because a bootloader is present).
+
+My theory at the moment is that for some reason the VTOR is not getting set, or
+is being reset which is causing an incorrect address to be found when the
+interrupt occurs, which could lead to a HardFault I guess and cause the behavour
+that I'm seeing.
 
 
 ### Single Cycle IO Block
@@ -1362,80 +1193,53 @@ GPIO18_EDGE_HIGH.
 (16 % 8) * 4 = 
        0 * 4 = 0
 
-
-
 PROC0_INTS0 is the status after masking & forcing.
-
 And the above registers are duplicated for processor 1 (PROC1).
 
-
-
-### Semihosting with Pico PI
-```rust
-let s = heprintln!("Hello, world!").unwrap();
+### Exceptions
 ```
+  Incoming Exception        Priority             Execution Priority
+1   Reset           -------> -3   ---+          +---      Base Level
+2   NMI             -------> -2   ---|          |---      Active Exception
+3   HardFault       -------> -1   ---|          |---      BASEPRI
+4   MemManagement   -------> PPn  ---+--->  <---+---     PRIMASK
+5   BusFault        -------> PPn  ---|          |---     FAULTMASK
+6   UsageFault      -------> PPn  ---|          
+7   Reserved
+8   Reserved
+9   Reserved
+10  Reserved
+11  SVC             -------> PPn  ---|
+12  DebugMonitor    -------> PPn  ---|
+13  Reserved
+14  PendSV
+15  SysTick
+16  TIMER_IRQ_0   (0)
+17  TIMER_IRQ_1   (1)
+18  TIMER_IRQ_2   (2)
+19  TIMER_IRQ_3   (3)
+20  PWM_IRQ_WRAP  (4)
+21  USBCTRL_IRQ   (5)
+22  XIP_IRQ       (6)
+23  PIO0_IRQ_0    (7)
+24  PIO0_IRQ_1    (8)
+25  PIO1_IRQ_0    (9)
+26  PIO1_IRQ_1    (10)
+27  DMA_IRQ_0     (11)
+28  DMA_IRQ_1     (12)
+29  IO_IRQ_BANK0  (13)
+30  IO_IRQ_QSPI   (14)
+31  SIO_IRQ_PROC0 (15)
+32  SIO_IRQ_PROC1 (16)
+33  CLOCKS_IRQ    (17)
+34  SPI0_IRQ      (18)
+35  SPI1_IRQ      (19)
+36  UART0_IRQ     (20)
+37  UART1_IRQ     (21)
+38  ADC_IRQ_FIFO  (22)
+39  I2C0_IRQ      (23)
+40  I2C1_IRQ      (24)
+41  RTC_IRQ       (25)
 
-```console
-Error: Failed to read memory at 0x10002af5
-Info : SWD DPIDR 0x0bc12477
-Info : SWD DLPIDR 0x00000001
-Error: Failed to read memory at 0x1000049c
-```
-The first 
-
-### gdb init
-```console
-target remote localhost:3333
-monitor arm semihosting enable
-monitor reset halt
-#monitor debug_level -2
-
-define checkint
-echo "NVIC_ISER:\n"
-x/t 0xe000e100
-echo "NVIC_ICER:\n"
-x/t 0xe000e180
-echo "NVIC_ISPR:\n"
-x/t 0xe000e200
-echo "NVIC_ICPR:\n"
-x/t 0xe000e280
-echo "NVIC_IPR0:\n"
-x/t 0xe000e400
-echo "NVIC_IPR1:\n"
-x/t 0xe000e404
-echo "NVIC_IPR2:\n"
-x/t 0xe000e408
-echo "NVIC_IPR3:\n"
-x/t 0xe000e40c
-echo "NVIC_IPR4:\n"
-x/t 0xe000e410
-echo "NVIC_IPR5:\n"
-x/t 0xe000e414
-echo "NVIC_IPR6:\n"
-x/t 0xe000e418
-echo "NVIC_IPR7:\n"
-x/t 0xe000e41c
-echo "VTOR:\n"
-x/t 0xe000e41c
-echo "ICSR:\n"
-x/t 0xe000ed04
-end
-
-define checkpin
-echo "PROC0_INTE2:\n"
-x/t 0x40014108
-echo "GPIO_IN:\n"
-x/t 0xd0000004
-echo "GPIO_OE:\n"
-x/t 0xd0000020
-echo "GPIO16_STATUS:\n"
-x/t 0x40014080
-echo "GPIO16_CTLR:\n"
-x/t 0x40014084
-end
-
-define vectab
-echo "Interrupt vector:\n"
-x/30x 0x10000100
-end
+PPn = Programmable number between 0-255
 ```
