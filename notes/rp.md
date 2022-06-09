@@ -487,14 +487,11 @@ check is high
 high so clear the interrutp flag
 ```
 Where is this hard fault being generated?
-Things that could generate a hard fault
 
-
-`0x10002d2d` is the address of irq handler when it works and I ran the `checkint`
-command to display the registers that I think might be interesting. One things
+`0x10002d2d` is the address of irq handler when and I ran the `checkint`
+command to display the registers that I think might be interesting. One thing
 I noticed is that VTOR (the vector table offset) is set when it works which is
 not the case when it does not:
-
 ```console
 "VTOR:
 "0xe000ed08:	00010000000000000000000100000000
@@ -505,7 +502,8 @@ not the case when it does not:
 (gdb) x/x 0xe000ed08
 0xe000ed08:	0x10000100
 ```
-Lets try this and see if I can force a failing load to actually run:
+Lets try this and see if I can force a failing load to actually succeed by
+setting the VTOR manually in gdb:
 ```console
 (gdb) monitor reset halt
 (gdb) flash target/thumbv6m-none-eabi/debug/async_gpio 
@@ -514,13 +512,33 @@ Lets try this and see if I can force a failing load to actually run:
 ...
 "VTOR:
 "0xe000ed08:	00000000000000000000000000000000
+```
+And now set the VTOR register (can also use the `setvtor` command if the above
+rp_gdbinit file is used):
+```console
 (gdb) set *0xe000ed08 = 0x10000100
 (gdb) checkint 
 ...
 "VTOR:
 "0xe000ed08:	00010000000000000000000100000000
+
+(gdb) c
+
+openocd.log:
+InterruptInput new
+wait_for_high
+InterruptInputFuture  new
+InterruptInputFuture::poll
+check is high
+return Poll::Pending
+
+(The following is printed from the interrupt handler)
+IO_IRQ_BANK0 global Interrupt handler
+InterruptInputFuture::poll
+check is high
+high so clear the interrutp flag
 ```
-That worked! :) 
+This seems to work consistently! :) 
 
 I think this is normally set by the bootloader but I'm not sure (TODO: take a
 look at the bootloader code).
