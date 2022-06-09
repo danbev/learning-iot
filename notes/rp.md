@@ -252,7 +252,6 @@ Checking `NVIC_ICPR` (interrupt clear pending):
 Having to check each of these individually become tedious and error prone. So
 instead we can add custom command to gdb by adding a custom command to
 [.gdbinit](rp_gdbinit) file
-```
 
 Checking PROC0_INTE2 (interrupt enable 2):
 ```console
