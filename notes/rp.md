@@ -855,6 +855,145 @@ $ hexdump -C led.bin
 And this assembly file can then be assembled and linked and will then work. An
 example can be found in [led.s](../rp/led).
 
+### boot2
+In embassy-rs there is a checked in binary of the boot loader which is available
+in src/boot2.bin. If we take a look at the commit that added it:
+```console
+$ git show d938b954
+commit d938b95430d543d8a97e611642ef09d803b7bdc1
+Author: Dario Nieuwenhuis <dirbaio@dirbaio.net>
+Date:   Mon Mar 29 22:28:36 2021 +0200
+
+    rp: add precompiled boot2 to avoid depending on gcc
+```
+we can see that the following dependency was removed:
+```console
+-rp2040-boot2 = { git = "https://github.com/rp-rs/rp2040-boot2-rs", branch="main" }
+
+
+```
+so I think we can assume that the bootloader is taken from that repo. But there
+are several bootloaders in that repo
+```console
+-#[link_section = ".boot2"]
+-#[used]
+-pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER;
+```
+Now, `rp2040_boot2::BOOT_LOADER` was the only version previousloy but now there
+are more versions available. To me it looks like [boot2_w25q080.S](https://github.com/rp-rs/rp2040-boot2/commit/c07cb25f720f743a350a719266ade8b046af80c1#diff-eb462092669d88d40de86102e876409eb7ed8e5c3b62452332f12f97e2dfa47a) was
+used. So if we needed to update this we would use the same binary of a newer
+build: 
+```console
+$ cargo -vv  b --features="assemble"
+```
+The binary files produced will be available in the `bin` directory. We can
+```console
+$ cp bin/boot2_w25q080.padded.bin ~/work/drougue/embassy/embassy-rp/src/boot2.bin 
+```
+Using this need bootloader still does not set the VTOR. But I also noticed that
+there is a condition in the code:
+```assembly
+check_return:
+    pop {r0}
+    cmp r0, #0
+    beq vector_into_flash
+    bx r0
+vector_into_flash:
+    ldr r0, =(XIP_BASE + 0x100)
+    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    str r0, [r1]
+    ldmia r0, {r0, r1}
+    msr msp, r0
+    bx r1
+```
+
+We can inspect the sections loaded in gdb using:
+```console
+(gdb) maintenance info sections 
+Exec file:
+    `/home/danielbevenius/work/drougue/embassy/examples/rp/target/thumbv6m-none-eabi/debug/async_gpio', file type elf32-littlearm.
+ [0]      0x10000100->0x100001a8 at 0x00000134: .vector_table ALLOC LOAD READONLY DATA HAS_CONTENTS
+ [1]      0x100001a8->0x1000ec10 at 0x000001dc: .text ALLOC LOAD READONLY CODE HAS_CONTENTS
+ [2]      0x1000ec10->0x100111f0 at 0x0000ec50: .rodata ALLOC LOAD READONLY DATA HAS_CONTENTS
+ [3]      0x20000000->0x20000030 at 0x00011230: .data ALLOC LOAD DATA HAS_CONTENTS
+ [4]      0x10011220->0x10011220 at 0x00011260: .gnu.sgstubs ALLOC LOAD DATA HAS_CONTENTS
+ [5]      0x20000030->0x2000013c at 0x00011260: .bss ALLOC
+ [6]      0x2000013c->0x2000053c at 0x00011260: .uninit ALLOC
+ [7]      0x10000000->0x10000100 at 0x00011260: .boot2 ALLOC LOAD READONLY DATA HAS_CONTENTS
+ [8]      0x0000->0x0020 at 0x00011360: .defmt READONLY HAS_CONTENTS
+ [9]      0x0000->0xb828 at 0x00011380: .debug_abbrev READONLY HAS_CONTENTS
+ [10]     0x0000->0xab18c at 0x0001cba8: .debug_info READONLY HAS_CONTENTS
+ [11]     0x0000->0xb4b8 at 0x000c7d38: .debug_aranges READONLY HAS_CONTENTS
+ [12]     0x0000->0x1e500 at 0x000d31f0: .debug_ranges READONLY HAS_CONTENTS
+ [13]     0x0000->0xd38cc at 0x000f16f0: .debug_str READONLY HAS_CONTENTS
+ [14]     0x0000->0x414a8 at 0x001c4fbc: .debug_pubnames READONLY HAS_CONTENTS
+ [15]     0x0000->0x60055 at 0x00206464: .debug_pubtypes READONLY HAS_CONTENTS
+ [16]     0x0000->0x0032 at 0x002664b9: .ARM.attributes READONLY HAS_CONTENTS
+ [17]     0x0000->0x1f0c0 at 0x002664ec: .debug_frame READONLY HAS_CONTENTS
+ [18]     0x0000->0x55b4f at 0x002855ac: .debug_line READONLY HAS_CONTENTS
+ [19]     0x0000->0x6dfe at 0x002db0fb: .debug_loc READONLY HAS_CONTENTS
+ [20]     0x0000->0x0022 at 0x002e1ef9: .debug_line_str READONLY HAS_CONTENTS
+ [21]     0x0000->0x0019 at 0x002e1f1b: .debug_rnglists READONLY HAS_CONTENTS
+ [22]     0x0000->0x006d at 0x002e1f34: .comment READONLY HAS_CONTENTS
+```
+
+```console
+(gdb) info symbol 0x10000000
+embassy_rp::BOOT2 in section .boot2
+```
+And we can disassemble this to see the actual code used and hopefully be able
+to set a break point on an address in there.
+```console
+(gdb) disassemble embassy_rp::BOOT2
+```
+Now, that is the place of the boot loader in the image in gdb, but this will
+get flashed to the device and during reset the 256kB bootloader will be copied
+into SDRAM. So I think we need to set a break point in the location where these
+instructions are copied into (SDRAM).
+In the datasheet and the boot section we can read:
+```
+• Copy 256 bytes from SPI to internal SRAM (SRAM5) and check for valid CRC32 checksum
+```
+And if we search for `SRAM5` we find:
+```
+SRAM5_BASE: 0x20041000
+```
+So lets take a look at the instructions in that location after having loaded
+the program. And instruction in thumb is 16bits long, that is 2 bytes, and
+we know the program copied is 256kB
+```console
+(gdb) x/20i 0x20041000
+   0x20041000:	lsls	r6, r3, #31
+   0x20041002:	lsrs	r6, r3, #7
+   0x20041004:	push	{r3, r5, r7, lr}
+   0x20041006:	orr.w	pc, r2, #132120576	; 0x7e00000
+   0x2004100a:	strh	r5, [r2, r2]
+   0x2004100c:	ldmia	r0!, {r4, r5, r6, r7}
+   0x2004100e:	str	r5, [r6, #88]	; 0x58
+```
+
+I just realised that using the bootloader that updates VTOR that this happens
+during the initalisation of the device phase. So testing this is gdb would
+look like:
+```console
+$ arm-none-eabi-gdb target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) flash target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) monitor reset init
+(gdb) checkint 
+"VTOR:
+"0xe000ed08:	00000000000000000000000000000000
+(gdb) c
+CTRL+C
+(gdb) 
+"VTOR:
+"0xe000ed08:	00010000000000000000000100000000
+``` 
+The problem is that I've been using the `load` command to 'restart' a debugging
+session but this will cause the VTOR register to be cleared and not able the
+interrupts will not be handled correctly. Lesson learned here for me it don't
+use the `load` command. And this was also the reason for this sometimes working
+for me.
+
 ### Hook up
 In my case I've got two Pico's and I'm going to use one a programmer and the
 other as the target where application will be run.
