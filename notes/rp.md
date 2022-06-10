@@ -565,6 +565,17 @@ is being reset which is causing an incorrect address to be found when the
 interrupt occurs, which could lead to a HardFault I guess and cause the behavour
 that I'm seeing.
 
+If we take a look in [rp2040-boot2](https://github.com/rp-rs/rp2040-boot2/blob/4691c7160ad1f5e06a7d281bdf1dcf4934e3055d/src/boot2_w25q080.S#L278-L284)
+we can see that VTOR table is updated.
+
+The boot loader used in embassy-pr is:
+```rust
+#[link_section = ".boot2"]
+#[used]
+static BOOT2: [u8; 256] = *include_bytes!("boot2.bin");
+```
+This was added commit d938b954.
+
 
 ### Single Cycle IO Block
 Here the processor can drive the GPIO pins.
@@ -714,10 +725,10 @@ Source can be found in [pico-bootrom](https://github.com/raspberrypi/pico-bootro
 
 Now, with the first program I wrote which is a very basic assembly example that
 turns on the onboard [LED](../rp/led).LED. My first attempt to just have a
-linker-script handle the layout like I've done from `stm32` and `nrf` devices
-this did not work in the case of PI Pico and it instead booted into USB Mass
+linker-script handle the layout like I've done for `stm32` and `nrf` devices
+did not work in the case of PI Pico and it instead booted into USB Mass
 Storage mode when taking the device out of reset. The following section will
-take a closer look at the boot sequence to understand why this happening.
+take a closer look at the boot sequence to understand why this was happening.
 
 Simplified bootsequence:
 ```
@@ -760,17 +771,18 @@ so that it can communicate with any type of Flash device that is in use.
 
 Next in the boot sequence 256 bytes will be read from Flash using the standard
 SPI interface (at least that is how I understand it) and copies those bytes
-into SDRAM. I've read that the reason form copying this is that the intention
-of this code it to configure the external Flash device which need to be
-disabled while doing that. These 256 bytes contain 252 bytes of code and 4 bytes
-of checksum. This checksum will be verified, and if it passes execution will
-start by jumping to the first bytes in the 256 bytes copied in SDRAM.
+into SDRAM. I've read that the reason for copying this is that the intention
+of this code it to configure the external Flash device which needs to be
+disabled while doing that configuration. These 256 bytes contain 252 bytes of
+code and 4 bytes of checksum. This checksum will be verified, and if it passes
+execution will start by jumping to the first bytes in the 256 bytes copied in
+SDRAM.
 
 Now, if the checksum check fails, it will be retried 128 times each check
 taking about 4ms which in total takes about 0.5sec. After this it will boot into
 USB device mode (sounds familiar? This is what I ran into with my first program).
 
-The second stage bootloader which is normally in a section named `.boot2` and
+The second stage bootloader which is normally in a section named `.boot2` and it
 configures the flash chip using commands specific to the external flash chip on
 the board in question. RP2040 uses an external flash chip to store program code
 and different flash chips (from different manufactures) have different protocols
@@ -800,9 +812,9 @@ Looking futher down in the comments we find that this program/functions will
 configure the W25Q16JV device to run in QSPI execute in place (XIP) mode.
 
 
-So the rhe reason for my first program not working  is that bootsequence will,
-after a few other things which I've not fully understood yet, will read 256
-bytes from flash and store them in SDRAM. This is expected to be the second
+So the the reason for my first program not working is that bootsequence will,
+after a few other things which I've not fully understood yet, read 256 bytes
+from flash and store them in SDRAM. This is expected to be the second
 stage bootloader as discussed above.
 
 After loading this it will verify that the checksum is correct for these 256
@@ -810,7 +822,7 @@ bytes and if that passes it will enter the second stage of the booting, which
 will start after those 256 bytes. But this is a problem for us because we want
 our program to run but it will not pass this boot stage (the checksum check).
 The solution is provided by a python script named `pad_checksum` which can take
-our binary and padded it and adds the checksum:
+our binary and pad it and adds the checksum:
 ```console
 $ hexdump -C led.bin 
 00000000  00 00 00 20 01 00 00 00  04 49 05 4a 0a 60 05 49  |... .....I.J.`.I|
@@ -1226,41 +1238,41 @@ And the above registers are duplicated for processor 1 (PROC1).
 4   MemManagement   -------> PPn  ---+--->  <---+---     PRIMASK
 5   BusFault        -------> PPn  ---|          |---     FAULTMASK
 6   UsageFault      -------> PPn  ---|          
-7   Reserved
-8   Reserved
-9   Reserved
-10  Reserved
+7   Reserved        -----------------|
+8   Reserved        -----------------|
+9   Reserved        -----------------|
+10  Reserved        -----------------|
 11  SVC             -------> PPn  ---|
 12  DebugMonitor    -------> PPn  ---|
-13  Reserved
-14  PendSV
-15  SysTick
-16  TIMER_IRQ_0   (0)
-17  TIMER_IRQ_1   (1)
-18  TIMER_IRQ_2   (2)
-19  TIMER_IRQ_3   (3)
-20  PWM_IRQ_WRAP  (4)
-21  USBCTRL_IRQ   (5)
-22  XIP_IRQ       (6)
-23  PIO0_IRQ_0    (7)
-24  PIO0_IRQ_1    (8)
-25  PIO1_IRQ_0    (9)
-26  PIO1_IRQ_1    (10)
-27  DMA_IRQ_0     (11)
-28  DMA_IRQ_1     (12)
-29  IO_IRQ_BANK0  (13)
-30  IO_IRQ_QSPI   (14)
-31  SIO_IRQ_PROC0 (15)
-32  SIO_IRQ_PROC1 (16)
-33  CLOCKS_IRQ    (17)
-34  SPI0_IRQ      (18)
-35  SPI1_IRQ      (19)
-36  UART0_IRQ     (20)
-37  UART1_IRQ     (21)
-38  ADC_IRQ_FIFO  (22)
-39  I2C0_IRQ      (23)
-40  I2C1_IRQ      (24)
-41  RTC_IRQ       (25)
+13  IO_IRQ_BANK0    -------> PPn  ---|
+14  PendSV          -------> PPn  ---|
+15  SysTick         -------> PPn  ---|
+16  TIMER_IRQ_0   (0) -----> PPn  ---|
+17  TIMER_IRQ_1   (1) -----> PPn  ---|
+18  TIMER_IRQ_2   (2) -----> PPn  ---|
+19  TIMER_IRQ_3   (3) -----> PPn  ---|
+20  PWM_IRQ_WRAP  (4) -----> PPn  ---|
+21  USBCTRL_IRQ   (5) -----> PPn  ---|
+22  XIP_IRQ       (6) -----> PPn  ---|
+23  PIO0_IRQ_0    (7) -----> PPn  ---|
+24  PIO0_IRQ_1    (8) -----> PPn  ---|
+25  PIO1_IRQ_0    (9) -----> PPn  ---|
+26  PIO1_IRQ_1    (10)-----> PPn  ---|
+27  DMA_IRQ_0     (11)-----> PPn  ---|
+28  DMA_IRQ_1     (12)-----> PPn  ---|
+29  IO_IRQ_BANK0  (13)-----> PPn  ---|
+30  IO_IRQ_QSPI   (14)-----> PPn  ---|
+31  SIO_IRQ_PROC0 (15)-----> PPn  ---|
+32  SIO_IRQ_PROC1 (16)-----> PPn  ---|
+33  CLOCKS_IRQ    (17)-----> PPn  ---|
+34  SPI0_IRQ      (18)-----> PPn  ---|
+35  SPI1_IRQ      (19)-----> PPn  ---|
+36  UART0_IRQ     (20)-----> PPn  ---|
+37  UART1_IRQ     (21)-----> PPn  ---|
+38  ADC_IRQ_FIFO  (22)-----> PPn  ---|
+39  I2C0_IRQ      (23)-----> PPn  ---|
+40  I2C1_IRQ      (24)-----> PPn  ---|
+41  RTC_IRQ       (25)-----> PPn  ---|
 
 PPn = Programmable number between 0-255
 ```
