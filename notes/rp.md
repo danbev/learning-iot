@@ -574,61 +574,9 @@ The boot loader used in embassy-pr is:
 #[used]
 static BOOT2: [u8; 256] = *include_bytes!("boot2.bin");
 ```
-This was added commit d938b954.
 
-Looking a little closer at the bootloader in embassy-rs there is a checked in
-binary of the boot loader which is available in src/boot2.bin. If we take a look
-at the commit that added it:
-```console
-$ git show d938b954
-commit d938b95430d543d8a97e611642ef09d803b7bdc1
-Author: Dario Nieuwenhuis <dirbaio@dirbaio.net>
-Date:   Mon Mar 29 22:28:36 2021 +0200
-
-    rp: add precompiled boot2 to avoid depending on gcc
-```
-we can see that the following dependency was removed:
-```console
--rp2040-boot2 = { git = "https://github.com/rp-rs/rp2040-boot2-rs", branch="main" }
-
-
-```
-so I think we can assume that the bootloader is taken from that repo. But there
-are several bootloaders in that repo
-```console
--#[link_section = ".boot2"]
--#[used]
--pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER;
-```
-Now, `rp2040_boot2::BOOT_LOADER` was the only version previousloy but now there
-are more versions available. To me it looks like [boot2_w25q080.S](https://github.com/rp-rs/rp2040-boot2/commit/c07cb25f720f743a350a719266ade8b046af80c1#diff-eb462092669d88d40de86102e876409eb7ed8e5c3b62452332f12f97e2dfa47a) was
-used. So if we needed to update this we would use the same binary of a newer
-build: 
-```console
-$ cargo -vv  b --features="assemble"
-```
-The binary files produced will be available in the `bin` directory. We can
-```console
-$ cp bin/boot2_w25q080.padded.bin ~/work/drougue/embassy/embassy-rp/src/boot2.bin 
-```
-Using this need bootloader still does not set the VTOR. But I also noticed that
-there is a condition in the code:
-```assembly
-check_return:
-    pop {r0}
-    cmp r0, #0
-    beq vector_into_flash
-    bx r0
-vector_into_flash:
-    ldr r0, =(XIP_BASE + 0x100)
-    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
-    str r0, [r1]
-    ldmia r0, {r0, r1}
-    msr msp, r0
-    bx r1
-```
-
-We can inspect the sections loaded in gdb using:
+We can inspect the sections loaded in gdb using to verify that the .boot2
+section is there:
 ```console
 (gdb) maintenance info sections 
 Exec file:
@@ -693,22 +641,40 @@ we know the program copied is 256kB
    0x2004100e:	str	r5, [r6, #88]	; 0x58
 ```
 
-I just realised that using the bootloader that updates VTOR that this happens
-during the initalisation of the device phase. So testing this is gdb would
-look like:
+<a name="vtor_issue"></a>
+This updating of the VTOR registry will happen when the devices boot sequence
+is run, which it will be upon a reset. For example doing a `monitor reset init`
+will do that, but using the gdb `load` command will not.
+
+Testing this is gdb would look like:
 ```console
 $ arm-none-eabi-gdb target/thumbv6m-none-eabi/debug/async_gpio
 (gdb) flash target/thumbv6m-none-eabi/debug/async_gpio
 (gdb) monitor reset init
-(gdb) checkint 
+(gdb) vtor 
 "VTOR:
 "0xe000ed08:	00000000000000000000000000000000
+```
+We can see that the VTOR register is zero. Now if we continue:
+```console
 (gdb) c
 CTRL+C
-(gdb) 
+(gdb) vtor
 "VTOR:
 "0xe000ed08:	00010000000000000000000100000000
 ``` 
+We can see that it is set. If we now just do the following, which is what I've
+unfortunately gotten into the habit of doing:
+```console
+$ arm-none-eabi-gdb target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) flash target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) load
+(gdb) vtor
+(gdb) c
+(gdb) vtor
+"VTOR:
+"0xe000ed08:	00000000000000000000000000000000
+```
 The problem is that I've been using the `load` command to 'restart' a debugging
 session but this will cause the VTOR register to be cleared and not able the
 interrupts will not be handled correctly. Lesson learned here for me it don't
