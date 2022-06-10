@@ -1,41 +1,115 @@
-set print asm-demangle on
-
 target remote localhost:3333
 monitor arm semihosting enable
 monitor reset halt
 #monitor debug_level -2
 
-define checkint
+set $NVIC_USER = 0xe000e100
+set $NVIC_ICER = 0xe000e180
+set $NVIC_ISPR = 0xe000e200
+set $NVIC_ICPR = 0xe000e280
+set $NVIC_IPR0 = 0xe000e400
+set $NVIC_IPR1 = 0xe000e404
+set $NVIC_IPR2 = 0xe000e408
+set $NVIC_IPR3 = 0xe000e40c
+set $NVIC_IPR4 = 0xe000e410
+set $NVIC_IPR5 = 0xe000e414
+set $NVIC_IPR6 = 0xe000e418
+set $NVIC_IPR7 = 0xe000e41c
+set $VTOR = 0xe000ed08
+set $ICSR = 0xe000ed04
+set $PROC0_NMI_MASK = 0x40014000
+
+define nvic_user
 echo "NVIC_ISER:\n"
-x/t 0xe000e100
+x/t $NVIC_USER
+end
+
+define nvic_icer
 echo "NVIC_ICER:\n"
-x/t 0xe000e180
+x/t $NVIC_ICER
+end
+
+define nvic_ispr
 echo "NVIC_ISPR:\n"
-x/t 0xe000e200
+x/t $NVIC_ISPR
+end
+
+define nvic_icpr
 echo "NVIC_ICPR:\n"
-x/t 0xe000e280
+x/t $NVIC_ICPR
+end
+
+define nvic_ipr0
 echo "NVIC_IPR0:\n"
-x/t 0xe000e400
+x/t $NVIC_IPR0
+end
+
+define nvic_ipr1
 echo "NVIC_IPR1:\n"
-x/t 0xe000e404
+x/t $NVIC_IPR1
+end
+
+define nvic_ipr2
 echo "NVIC_IPR2:\n"
-x/t 0xe000e408
+x/t $NVIC_IPR2
+end
+
+define nvic_ipr3
 echo "NVIC_IPR3:\n"
-x/t 0xe000e40c
+x/t $NVIC_IPR3
+end
+
+define nvic_ipr4
 echo "NVIC_IPR4:\n"
-x/t 0xe000e410
+x/t $NVIC_IPR4
+end
+
+define nvic_ipr5
 echo "NVIC_IPR5:\n"
-x/t 0xe000e414
+x/t $NVIC_IPR5
+end
+
+define nvic_ipr6
 echo "NVIC_IPR6:\n"
-x/t 0xe000e418
+x/t $NVIC_IPR6
+end
+
+define nvic_ipr7
 echo "NVIC_IPR7:\n"
-x/t 0xe000e41c
+x/t $NVIC_IPR7
+end
+
+define vtor
 echo "VTOR:\n"
-x/t 0xe000ed08
+x/t $VTOR
+end
+
+define icsr
 echo "ICSR:\n"
-x/t 0xe000ed04
+x/t $ICSR
+end
+
+define proc0_nmi_mask
 echo "PROC0_NMI_MASK:\n"
-x/t 0x40014000
+x/t $PROC0_NMI_MASK
+end
+
+define checkint
+nvic_user
+nvic_icer
+nvic_ispr
+nvic_icpr
+nvic_ipr0
+nvic_ipr1
+nvic_ipr2
+nvic_ipr3
+nvic_ipr4
+nvic_ipr5
+nvic_ipr6
+nvic_ipr7
+vtor
+icsr
+proc0_nmi_mask
 end
 
 define checkpin
