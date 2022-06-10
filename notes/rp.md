@@ -131,7 +131,7 @@ GPIO16_STATUS    0x40014080
 
 ### Troubleshooting interrupts
 We can see if any interrupts have been triggered for a pin, in this case pin 16
-which has entried in register `INTR2: 0x400140f8`. This register has four
+which has entries in register `INTR2: 0x400140f8`. This register has four
 entries for pin 16 which are bit positions 0-3.
 * 0 GPIO16_LEVEL_LOG
 * 1 GPIO16_LEVEL_HIGH
