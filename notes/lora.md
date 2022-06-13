@@ -165,24 +165,81 @@ So if we compare this to frequency modulation where the carrier signal will be
 modulates in its frequency depending on the symbol that is being represented. In
 this case chirp signals are the carrier.
 
-Lets say we have a bandwith of 125kHz which means that we have 125000
+Lets try to sort out some definitions here:
+#### Bandwidth
+Bandwidth is the range of fequencies occupied by a RF signal.
+
+#### Chip
+Lets say we have a bandwidth of 125kHz which means that we have 125000
 oscilations per second. In LoRa one such oscilation is called a chip and the
 chip rate (CR) in this case is the same also 125kHz chips/second. This is the
 width of spectrum occupied by the chrip. Recall that a chirp will use/span the
 entire spectrum.
 
-A symbol sent is determined by a spreading factor:
+#### Chirp
+Is a signal in which frequency increases or decreases as shown above.
+A basic chirp uses the entire bandwidth, the range of frequenies.
+
+```
+    0           125kHz
+                /
+              /
+            /
+          /
+        /
+      /
+    /
+```
+This above chirp starts from the lowest frequency and increases to the highest.
+Chirps wrap (think modulus) when reaching the lower/highest frequencies, for
+example:
+```
+    0           125kHz
+             /
+           /
+         /
+       /
+     /        
+                /
+              / 
+```
+Notice that the chirp did not start at the lowest frequency this time but
+instead a little higher frequency and then wrapped when it reached the max to
+got down to the lowest frequency and then increase again to the starting
+frequency, still using the entier frequency range.
+
+One chirp is equal one signal. 
+
+#### Spreading factor
+The spreading factor relates chips and symbols and is the number of bits encoded
+per symbol. This involved dividing the up the bandwidth in into groups of
+chips (oscillations) and this specifies one symbol:
 ```
  2ˢᶠ chips = 1 symbol
 
  2⁷ = 128 chips = 1 symbol
-
-0000000 = symbol_0
-0000001 = symbol_1
+```
+So we can have 0-127 different symbols with a spreading factor or 7:
+```
+0000000 = symbol 0
+0000001 = symbol 1
 ...
 
-1111111 = symbol_127
+1111111 = symbol 127
 ```
+
+For example, `0000010` might look like:
+```
+    0           125kHz
+              /
+            /
+          /
+        /
+      /        
+    /
+              / 
+```
+
 The symbol rate is the bandwitdh divided by 2ˢᶠ:
 ```
               bandwidth 
