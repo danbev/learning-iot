@@ -12,8 +12,10 @@ In Europe the frequencies for LoRa are 433MHz and 868MHz. Be carful when
 configuring this as it could be illegal to use 915MHz which is allowed in other
 places in the world.
 
-LoRa is the `physical layer` that enables a long-range communication link.
-LoRaWAN is a media access control (MAC) layer built on top of LoRa.
+LoRa is the `physical layer` that enables a long-range communication link and
+this is propriatary (was patented in June 2014).
+LoRaWAN is a media access control (MAC) layer built on top of LoRa and released
+in January 2015.
 
 ```
 +---------------------------------------+
@@ -59,8 +61,11 @@ RFID = Radio Frequency Identification
 ### Modulation
 Uses `compressed high intensity radar pulse (CHIRP)` spread spectrum (CSS)
 modulation.
-A chirp is also called sweep signal which is a signal that increases, called
-upchirp, or decreases, called downchrip , linearly with time.
+
+A chirp is a signal of continously changing frequence, either increasing or
+decreasing frequencied. This is also called a sweep signal which is a signal
+that increases, called upchirp, or decreases, called downchrip, linearly with
+time.
 
 ```
 Upchirp
@@ -118,7 +123,7 @@ Waterfall "diagram"
                                            |
 ```
 In FSK the frequency will shift or jump depending on the symbol being
-represented, on the above case the lower frequency could represent a logical 0
+represented, in the above case the lower frequency could represent a logical 0
 and the higher a logical 1.
 
 In CSS I think this would look like:
@@ -159,6 +164,38 @@ Waterfall "diagram"
 So if we compare this to frequency modulation where the carrier signal will be
 modulates in its frequency depending on the symbol that is being represented. In
 this case chirp signals are the carrier.
+
+Lets say we have a bandwith of 125kHz which means that we have 125000
+oscilations per second. In LoRa one such oscilation is called a chip and the
+chip rate (CR) in this case is the same also 125kHz chips/second. This is the
+width of spectrum occupied by the chrip. Recall that a chirp will use/span the
+entire spectrum.
+
+A symbol sent is determined by a spreading factor:
+```
+ 2ˢᶠ chips = 1 symbol
+
+ 2⁷ = 128 chips = 1 symbol
+
+0000000 = symbol_0
+0000001 = symbol_1
+...
+
+1111111 = symbol_127
+```
+The symbol rate is the bandwitdh divided by 2ˢᶠ:
+```
+              bandwidth 
+Symbol rate = ---------
+                2ˢᶠ
+
+              1250000 
+Symbol rate = --------- = 9765.625 symbols/sec
+                128
+```
+A chirp is a number of chips (oscillations) that together represent a symbol.
+
+A symbol is a chirp
 
 
 The modulation and demodulation is relatively simple and a device can do both.
