@@ -360,7 +360,7 @@ begin reading the bits in the dataframe at the frequency of the baud rate.
 Notice that the sender will get the data to be sent from the data bus, and
 likewise the reciever will place the received data on the data bus.
 
-So there are only two wires which is a nice property. And there is not clock
+So there are only two wires which is a nice property. And there is no clock
 signal required between two UARTs. There is also parity checking which is
 good for reliable communication.
 One thing to note is that the data being sent can be a maxium of 9 bits. 
@@ -2637,14 +2637,14 @@ Data signals are difficult to intercept as the frequency hopping pattern is not
 known.
 
 This was first invented in the second world war to get around the problem of
-radio jamming of torpedo and their controllers. Radio jamming is when too many
+radio jamming of torpedos and their controllers. Radio jamming is when too many
 competing signals are being transmitted over the same frequency. Actress Hedy
-Lamarr came up with the idea of when a wavelegth was jammed, enough information
+Lamarr came up with the idea when a wavelegth was jammed, enough information
 could still be sent by changing the frequence (hop) up or down.
-After the was it was realised the frequency jamming is not just for miltary
-usages but radio, tv and other wireless communication also experiences jamming.
-And its not just jamming but also makes the communiction more robost to noise
-and interference.
+After the was it was realised the frequency jamming is not just for military
+usages but  lso radio, tv and other wireless communication also experience
+jamming. And its not just jamming but also makes the communiction more robost to
+ noise and interference.
 
 Related to IoT is that very little computation power is requrired to send or
 receive signals over the spread spectrum. And also in IoT deployments one migth
