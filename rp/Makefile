@@ -11,7 +11,7 @@ PAD_CHECKSUM=${PICO_SDK_DIR}/src/rp2_common/boot_stage2/pad_checksum
 	$(AS) $(ASFLAGS) $< -asghl=$*.lst -o $@
 
 clean:
-	${RM} *.elf *.o *.elf.map *.lst *.hex *.map *.uf2
+	${RM} *.elf *.o *.elf.map *.lst *.hex *.map *.uf2 *.bin *_padded.s
 
 
 .PHONY openocd:
