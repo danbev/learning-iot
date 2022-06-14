@@ -411,7 +411,7 @@ information about this timer can be found in the
 [Cortex-M User Guide](https://developer.arm.com/documentation/dui0553/latest/)
 and not in the board manufactures documentation.
 
-This is a 24 bit count-down timer that counts down from value specified in the
+This is a 24 bit count-down timer that counts down from a value specified in the
 SYST_RVR (SysTick Reload Value Register). The value in that register is copied
 into the Current Value Register (CVR). It is the value in CVR that is counted
 down and once it reaches zero the value from the RVR registr will be copied
