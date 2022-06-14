@@ -211,9 +211,9 @@ frequency, still using the entier frequency range.
 One chirp is equal one signal. 
 
 #### Spreading factor
-The spreading factor relates chips and symbols and is the number of bits encoded
-per symbol. This involved dividing the up the bandwidth in into groups of
-chips (oscillations) and this specifies one symbol:
+The spreading factor relates chips and symbols and is the number of chips used
+to represent a symbol. This involved dividing the up the bandwidth into groups
+of chips (oscillations) and this specifies one symbol:
 ```
  2ˢᶠ chips = 1 symbol
 
@@ -239,6 +239,19 @@ For example, `0000010` might look like:
     /
               / 
 ```
+So lets think about what that means, this will be a signal that starts at a
+certain frequency, increased up to the max, and then restarts from the lowest
+frequency. And different symbols will start at differrent frequencies.
+
+#### Coding Rate
+
+
+
+The fast fourier transformation (FFT) can decompose a signal into its component
+frequencies. So think about a signal as a wave. What the FFT does for use is
+to split this into individual waves each with different frequencies (matching
+the original wave that is). If we split a signal in to the number of possible
+symbols (2ˢᶠ)...
 
 The symbol rate is the bandwitdh divided by 2ˢᶠ:
 ```
@@ -254,11 +267,14 @@ A chirp is a number of chips (oscillations) that together represent a symbol.
 
 A symbol is a chirp
 
-
-The modulation and demodulation is relatively simple and a device can do both.
+#### Encoding
+* Gray indexing which adds error tolerance.
+* Data whitening which introduces randomness.
+* Interleaving which scrables the bits within the frame.
+* Forward Error Correction which adds correcting parity bits.
 
 ## LoRaWAN                                                                         
-Is a Low power Wide Area Network (LPWAN), low power, long range, has geolocation
+Is a Low Power Wide Area Network (LPWAN), low power, long range, has geolocation
 so the network can determine the location of devices. Can have both public and
 private deployments. Supports fireware updates over the air (of the LoraWAN
 stack I'm guessing). Supports end-to-end security.
@@ -266,7 +282,7 @@ stack I'm guessing). Supports end-to-end security.
 * [v1.1 Specification][loraspec]
 
 ```
-Nodes:         Gateways           Network Server     Application servers
+Nodes          Gateways           Network Server     Application servers
 *------------->+-------+           +-----+             +-----+
   * *--+------>|       | --------> |     | ----------> |     |
        |       +-------+           |     |             +-----+
@@ -280,9 +296,6 @@ Nodes:         Gateways           Network Server     Application servers
 
 Protocol stack:
 ```
-
-
-
 +---------------------------------------------------------------+
 | Class A  Baseline | Class B baseline     | Class C baseline   | 
 +---------------------------------------------------------------+
@@ -293,6 +306,18 @@ Protocol stack:
 | EU 868  | EU 433 | US 915 | AS 430 |                          |
 +---------------------------------------------------------------+
 ```
+
+#### Class A (All) 
+Each device uplink to the gateway is followed by 2 short downlink recieve
+windows. Is used for battry powered devices.
+
+#### Class B (Beacon)
+Like class A but also have a scheduled window for recieving data.
+
+#### Class C (Continous)
+Is also like class A but will continously listen for data so it uses more power
+and more suited to devices with a non-battery power source.
+
 
 ## The Things Network (TTN)
 Coverage in [Stockholm](https://www.thethingsnetwork.org/community/stockholm)
