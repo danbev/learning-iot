@@ -784,10 +784,20 @@ Either way it was a good excersice to go through and write these examples.
 [drogue-device pull request](https://github.com/drogue-iot/drogue-device/pull/171)
 
 ### Drogue Cloud
+What Drogue Cloud provides is like a "broker" of sort enabling communication
+between devices and backend cloud services. It enables devices to send/publish
+data that can the be routed/brokered (is that a word?) to backend cloud apps
+that are listening or subscribed. It also enables these backends to send data
+to the devices, but I guess data in this case would be commands for the device
+to act upon.
+
 This is a connectivity layer for `forwarding` telemetry data (like senors
-reading from a remote device) from devices and sending the along to business
+reading from a remote device) from devices and sending them along to business
 applications. It can also send also allow business applications to send
-commands back to the devices (I think).
+commands back to the devices.
+
+Drogue Cloud does not contain a full MQTT broker, it only provides some
+dedicates topics and operations.
 
 ```console
 $ cargo install drg
@@ -847,15 +857,8 @@ Edit a device:
 ```console
 $ drg edit device --app danbev-app danbev-device
 ```
-
 Now, notice that in the application there is an integrations tab which
 has a list of integration protocols, like Kafka, MQTT, and WebSocket.
-What Drogue Cloud provides is like a "broker" of sort enabling communication
-between devices and backend cloud services. It enables devices to send/public
-data that can the be routed/brokered (is that a word?) to backend cloud apps
-that are listening or subscribed. It also enables these backends to send data
-to the devices, but I guess data in this case would be commands for the device
-to act upon.
 
 
 Install websocat (websocket cat tool):
@@ -863,5 +866,18 @@ Install websocat (websocket cat tool):
 $ cargo install --features=ssl websocat
 ```
 
+Create new API token:
+```console
+$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" -XPOST https://api.sandbox.drogue.cloud/api/tokens/v1alpha1 | jq
+{
+  "prefix": "drg_11HCSH",
+  "token": "xxxxxxxxxxxxxx"
+}
+```
+The prefix can be used later to delete the token.
 
+Get tokens:
+```console
+$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" https://api.sandbox.drogue.cloud/api/tokens/v1alpha1 | jq
+```
 
