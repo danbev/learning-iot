@@ -309,10 +309,34 @@ Protocol stack:
 
 #### Class A (All) 
 Each device uplink to the gateway is followed by 2 short downlink recieve
-windows. Is used for battry powered devices.
+windows. Is used for battry powered devices. This is called `All` because all
+class types can act as a class A device.
+So after a class A device has broadcasted a message (uplink transmission) the
+end node will listen for a response from the gateway. There end node will have
+two receive slots T₁ and T₂ seconds where it will listen for reponses from the
+gateway. The gateway can only use one of these slots and not both.
+```
+   +---------+ +----+ +----+
+   | node tx | | T₁ | | T₂ |
+   +---------+ +----+ +----+
+```
 
 #### Class B (Beacon)
 Like class A but also have a scheduled window for recieving data.
+```
+              { Same as Class A       }   { Ping Period }
+ +--------+   +---------+ +----+ +----+   +----+  +----+       +--------+
+ | beacon |   | node tx | | T₁ | | T₂ |   | rx |  | rx |       | beacon |
+ +--------+   +---------+ +----+ +----+   +----+  +----+       +--------+
+     ↑                                                              ↑
+  From Gateway                                                  From Gateway
+```
+In this case the end node will receive a time synchronized beacon from the
+gateway which enables the gateway to know when the node is listening. The end
+device uses this time reference to schedule when ping slots are to be opened.
+
+A gateway will broadcast the beacon every 128 seconds. The device must keep
+listening for a beacon for at least one beacon period. 
 
 #### Class C (Continous)
 Is also like class A but will continously listen for data so it uses more power
