@@ -316,18 +316,18 @@ end node will listen for a response from the gateway. There end node will have
 two receive slots T₁ and T₂ seconds where it will listen for reponses from the
 gateway. The gateway can only use one of these slots and not both.
 ```
-   +---------+ +----+ +----+
-   | node tx | | T₁ | | T₂ |
-   +---------+ +----+ +----+
+   +---------+ +-----+ +-----+
+   | node tx | | Rx₁ | | Rx₂ |
+   +---------+ +-----+ +-----+
 ```
 
 #### Class B (Beacon)
 Like class A but also have a scheduled window for recieving data.
 ```
               { Same as Class A       }   { Ping Period }
- +--------+   +---------+ +----+ +----+   +----+  +----+       +--------+
- | beacon |   | node tx | | T₁ | | T₂ |   | rx |  | rx |       | beacon |
- +--------+   +---------+ +----+ +----+   +----+  +----+       +--------+
+ +--------+   +---------+ +-----+ +-----+   +----+  +----+       +--------+
+ | beacon |   | node tx | | RX₁ | | Rx₂ |   | rx |  | rx |       | beacon |
+ +--------+   +---------+ +-----+ +-----+   +----+  +----+       +--------+
      ↑                                                              ↑
   From Gateway                                                  From Gateway
 ```
@@ -359,38 +359,145 @@ My username is `danbev`, and the cluster location I'm using is `eu1`.
 These are used to transport Media Access Control (MAC) layer commands as well
 as application data.
 
+
+#### Uplink message
 An `uplink` message is a message that is sent from a device to the network
 server via one or more gateways.
 
+Uplink Physical packet:
+```
+  +----------+-------+----------+------------+-----+
+  | Preamble | PHDR  | PHDR_CRC | PHYPayload | CRC |
+  +----------+-------+----------+------------+-----+
+```
+
+PHDR = Physical Header
+```
+The PHDR, PHDR_CRC, and the CRC are inserted by the radio transiever.
+
+#### Downlink message
 A `downlink` message is sent by the network server to one and only one end
 device.
 
-* Join-Request
-* Join-Accept
-* Rejoin-Request
-* Proprietary
-* Unconfirmated Data Up (non-acked uplink message)
-* Unconfirmated Data Down (non-acked downlink message)
-* Confirmated Data Up (acked uplink message)
-* Confirmated Data Down (acked downlink message)
-
-
-MAC payload:
+Downlink Physical packet:
 ```
-   |--------   FHDR   ---------------| 
-   22                               7
-   +--------------------------------------------------------+
-   | DevAddr | FCtrl | FCnt  | FOpts | FPort | FRMPayload
-   +--------------------------------------------------------+
+  +----------+-------+----------+------------+
+  | Preamble | PHDR  | PHDR_CRC | PHYPayload |
+  +----------+-------+----------+------------+
+```
+Notice that downlink messages do no contain a CRC which is to keep the messages
+as short as possible.
 
-FPort and FRMPayload are optional
+#### PHYPayload
+All uplink and downlink message have a physical payload as can be seen above.
+This packet contains the following elements:
+```
+PHYPayLoad:
+
+  +-------+-----------------------------------------+-----+
+  | MHDR  | MACPayload/Join-Request/Re-join-Request | MIC |
+  +-------+-----------------------------------------+-----+
+
+MHDR = Media Access Control Layer Header (MAC Header).
+MIC  = Message Integrity Code (same as Message Authentication Code but that
+       clashes with the definition of MAC in LoRa).
+
+A PHYPayLoad can also contains a Join-Accept entry which then does not have a
+MIC as the MIC field is encrypted with the payload:
+  +-------+-------------+
+  | MHDR  | Join-Accept |
+  +-------+-------------+
+```
+
+#### MHDR
+Media Access Control Layer Header.
+```
+  7       5
+  +-------+-----+-------+
+  | MType | RFU | Major |
+  +-------+-----+-------+
+
+MType is a 3 bit field:
+  000 = Join-Request
+  001 = Join-Accept
+  010 = Unconfirmated Data Up (non-acked uplink message)
+  011 = Unconfirmated Data Down (non-acked downlink message)
+  100 = Confirmated Data Up (acked uplink message)
+  101 = Confirmated Data Down (acked downlink message)
+  110 = Rejoin-Request
+  111 = Proprietary
+
+RFU = Reserved for Future Usage
+Major = the LoRaWAN specification that this message is encoded with.
+```
+
+#### MACPayload
+```
+   7..22    0..1   0..N           (bytes)
+  +------+-------+------------+
+  | FHDR | FPort | FRMPayload |
+  +------+-------+------------+
+
+FPort = If this field is 0 this indicates that the FRMPayload contains MAC
+        commands that should be handled by the LoRaWAN implementation.
+        Values 1..223 are application specific and are available to the app
+        layer. 224 reserved for the MAC Layer test protocol.
+        
 ```
 If `FPort` is 0 it means that this packet contains MAC commands in the
 FRMPayload field. A value greater then 0 indicated that FRMPayload contains
 application data.
-
 The MAC payload is then put into a physical layer packet.
 
+### MAC Commands
+These are messages exchanged between the network server and the MAC Layer on the
+device so these are not messages that an application will ever see. The `FPort`
+in the MACPayload specifies if the FRMPayload contains this type a message which
+are also called command, I guess command messages.
+
+#### FHDR
+Frame Header I guess?
+
+```
+   +---------------------------------+
+   | DevAddr | FCtrl | FCnt  | FOpts |
+   +---------------------------------+
+
+DevAddres = Short device address 4 bytes
+FCtrl     = Frame control  1 byte
+  FCtrl Downlink messages:
+      7     6      5      4          3-0
+    +-----+-----+-----+----------+----------+
+    | ADR | RFU | ACK | FPending | FOptsLen |
+    +-----+-----+-----+----------+----------+
+
+    ADR = Adaptive Data Rate, when enabled (1) the network will be optimized for
+          the fastest possible data rate. Since this is an uplink field it will
+          allow the network to send commands that control the data rate and tx
+          power. 
+    RFU = Reserved for Future Usage
+    ACK = This will be set for confirmed data messages.
+    FPending = Frame pending. Is this is set in a received message it means that
+               the network has more data pending and that can be sent and wants
+               the device to open another receive window asap. It does this by
+               sending another uplink message.
+
+  Fctrl Uplink messages:
+      7        6         5      4          3-0    
+    +-----+-----------+-----+----------+----------+
+    | ADR | ADRACKReq | ACK | ClassB   | FOptsLen |
+    +-----+-----------+-----+----------+----------+
+
+    ADR = Adaptive Data Rate
+    ADRACKReq = TODO: 
+    ACK = This will be set for confirmed data messages.
+    ClassB = If set to 1 signals to the Network server that this device has
+             switched to class b mode.
+
+FCnt      = Frame conter 0..15 bytes
+```
+
+### Drogue LoRaWAN workshop
 This following is just my notes while following the
 [ttn-lorawan-quarkus workshop](https://book.drogue.io/drogue-workshops/ttn-lorawan-quarkus/drogue-cloud.html).
 First we create a new application in Drogue Cloud
@@ -499,3 +606,5 @@ Is the modulation that LoRa uses.
 
 [loraspec]: https://lora-alliance.org/wp-content/uploads/2020/11/lorawantm_specification_-v1.1.pdf
 
+ABP = Activation By Personalization
+OTAA = Over-The-Air Activation
