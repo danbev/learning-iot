@@ -497,6 +497,19 @@ FCtrl     = Frame control  1 byte
 FCnt      = Frame conter 0..15 bytes
 ```
 
+### MAC commands
+These are listed in section 5 of the spec and like we mentioned above the
+messages are exchanged between the network server and the MAC layer on the
+devices but the application layer will never see or be able to access these
+messages.
+
+All MAC commands have a command identifier (CID) of size 1 byte.
+
+### Framing
+The packets send can either have an explicit header and variable payload or
+have an implicit header (which is known to the receiver) and a fixed lentgh
+payload.
+
 ### Drogue LoRaWAN workshop
 This following is just my notes while following the
 [ttn-lorawan-quarkus workshop](https://book.drogue.io/drogue-workshops/ttn-lorawan-quarkus/drogue-cloud.html).
