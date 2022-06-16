@@ -1387,14 +1387,14 @@ PPn = Programmable number between 0-255
 RP Pico a little easier. 
 
 It contains commands like showing the contents of registries without having to
-lookup the addresses. Since these are commands tab-completion works in gdb, 
-for example:
+lookup the addresses. Since these are commands, tab-completion works in gdb. 
+For example:
 ```console
-(gdb) nvic_
+(gdb) nvic_<tab>
 nvic_icer  nvic_icpr  nvic_ipr0  nvic_ipr1  nvic_ipr2  nvic_ipr3  nvic_ipr4  nvic_ipr5  nvic_ipr6  nvic_ipr7  nvic_ispr  nvic_user
 ```
 
-There is command named `vectab` that prints out mosts of the vectortable:
+There is command named `vectab` that prints out mosts of the vector table:
 ```console
 (gdb) vectab 
 "Interrupt vector:
@@ -1435,7 +1435,12 @@ These can be used with command like the print command:
 $4 = 0xe000e180
 ```
 
-The above are only one that I used while working on a specific issue regarding
-interrupt but this could be expanded upon to add more command and perhaps share
-these with others is it seems useful.
+To show all the commands:
+```console
+(gdb) show user
+```
+
+The above are only ones that I used while working on a specific issue regarding
+interrupt, but this could be expanded upon to add more command and perhaps share
+these with others if it seems useful.
 
