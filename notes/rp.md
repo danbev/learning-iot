@@ -1381,3 +1381,60 @@ And the above registers are duplicated for processor 1 (PROC1).
 
 PPn = Programmable number between 0-255
 ```
+
+### gdb commands for Pico PI
+[.gdbinit](rp_gdbinit) contains some user defined commands to make debugging
+RP Pico a little easier. 
+
+It contains commands like showing the contents of registries without having to
+lookup the addresses. Since these are commands tab-completion works in gdb, 
+for example:
+```console
+(gdb) nvic_
+nvic_icer  nvic_icpr  nvic_ipr0  nvic_ipr1  nvic_ipr2  nvic_ipr3  nvic_ipr4  nvic_ipr5  nvic_ipr6  nvic_ipr7  nvic_ispr  nvic_user
+```
+
+There is command named `vectab` that prints out mosts of the vectortable:
+```console
+(gdb) vectab 
+"Interrupt vector:
+"0x10000100:	0x20040000	0x100001a9	0x10001da5	0x1000ebf5
+0x10000110 <__EXCEPTIONS+8>:	0x00000000	0x00000000	0x00000000	0x00000000
+0x10000120 <__EXCEPTIONS+24>:	0x00000000	0x00000000	0x00000000	0x10001da5
+0x10000130 <__EXCEPTIONS+40>:	0x00000000	0x00000000	0x10001da5	0x10001da5
+0x10000140 <__INTERRUPTS>:	0x10006559	0x10006571	0x10006589	0x100065a1
+0x10000150 <__INTERRUPTS+16>:	0x10001da5	0x10001da5	0x10001da5	0x10001da5
+0x10000160 <__INTERRUPTS+32>:	0x10001da5	0x10001da5	0x10001da5	0x10001da5
+0x10000170 <__INTERRUPTS+48>:	0x10001da5	0x10003fe9	0x10001da5	0x10001da5
+0x10000180 <__INTERRUPTS+64>:	0x10001da5	0x10001da5	0x10001da5	0x10001da5
+0x10000190 <__INTERRUPTS+80>:	0x10001da5	0x10001da5	0x10001da5	0x10001da5
+```
+
+There are also some convienience variables defined:
+```console
+(gdb) show conv
+$PROC0_NMI_MASK = 1073823744
+$ICSR = 3758157060
+$VTOR = 3758157064
+$NVIC_IPR7 = 3758154780
+$NVIC_IPR6 = 3758154776
+$NVIC_IPR5 = 3758154772
+$NVIC_IPR4 = 3758154768
+$NVIC_IPR3 = 3758154764
+$NVIC_IPR2 = 3758154760
+$NVIC_IPR1 = 3758154756
+$NVIC_IPR0 = 3758154752
+$NVIC_ICPR = 3758154368
+$NVIC_ISPR = 3758154240
+$NVIC_ICER = 3758154112
+$NVIC_USER = 3758153984
+```
+These can be used with command like the print command:
+(gdb) p/x $NVIC_ICER
+$4 = 0xe000e180
+```
+
+The above are only one that I used while working on a specific issue regarding
+interrupt but this could be expanded upon to add more command and perhaps share
+these with others is it seems useful.
+
