@@ -1430,6 +1430,7 @@ $NVIC_ICER = 3758154112
 $NVIC_USER = 3758153984
 ```
 These can be used with command like the print command:
+```
 (gdb) p/x $NVIC_ICER
 $4 = 0xe000e180
 ```
