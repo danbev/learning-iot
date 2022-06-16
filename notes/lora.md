@@ -508,7 +508,8 @@ All MAC commands have a command identifier (CID) of size 1 byte.
 ### Framing
 The packets send can either have an explicit header and variable payload or
 have an implicit header (which is known to the receiver) and a fixed lentgh
-payload.
+payload. In this case the payload length, forward error correction coding rate
+and presence of the payload CRC must be configured on both sides.
 
 ### Drogue LoRaWAN workshop
 This following is just my notes while following the
@@ -621,3 +622,41 @@ Is the modulation that LoRa uses.
 
 ABP = Activation By Personalization
 OTAA = Over-The-Air Activation
+
+### SubGHz Radio in STM32WL
+Is a ultra low-power radio that operates in the 150-960MHz ISM band.
+Uses SPI to communicate with the CPU, and also has a set of interrupts
+available.
+
+Even if the device is in sleep mode, or standby, or one of the stop modes the
+RF will still be able to receive. So RF is available in all modes.
+
+[datasheat](https://www.st.com/resource/en/reference_manual/rm0453-stm32wl5x-advanced-armbased-32bit-mcus-with-subghz-radio-solution-stmicroelectronics.pdf)
+
+There are 4 modulations available
+* LoRa used by LoRaWAN
+* (G)FSK (Frequency Shift Keying) used by sigfox, MBus
+* (G)MSK (Minimum Shift Keying) (only supports transmission)
+* BPSK (Binary Phase Shift Keying) used by sigfox (only supports transmission)
+
+Signals from sub-GHz component:
+```
+RFO_LP  = RR Output Low-Power
+RFO_HP  = RF Output High-Power
+RFI_P   = RF Input differential P (what is this?)
+RFI_N   = RF Input differential N (what is this?)
+OSC_IN  = HSE32 Oscillator Input
+OSC_OUT = HSE32 Oscillator Output
+VDDPA   = Input supply for PA (Power Amplifier) regulator
+VRPA    = Regulated PA (Power Amplifier) supply output
+PB0_VDDTCXO = Regulated Temparatur Compensated Crystal Oscillator supply ouput
+hse32   = HSE32 clock signal to CPU
+HSEON   = HS Enable HSE32 clock for CPU usage
+HSEBYPPWR = Enable VDDTCXO regulator control
+HSERDY  = HSE ready indication
+SUBGHZSPI = Sub-GHz radio SPI interface
+BUSY    = Busy signal
+Intrrupts = IRQ Interrupts
+```
+
+TCXO = Temperature Compensated Crystal Oscillator regulator.
