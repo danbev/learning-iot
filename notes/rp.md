@@ -1444,3 +1444,81 @@ The above are only ones that I used while working on a specific issue regarding
 interrupt, but this could be expanded upon to add more command and perhaps share
 these with others if it seems useful.
 
+### embassy-rp async gpio task
+If we look at the current implementation for Input for embassy-rp we have
+methods like `is_high`, and `is_low`. With these functions we can do
+things like wait for a pin to go from low to high. But polling using one of
+those takes more CPU resources then neccessary. This task is about adding
+functions that will register an interrupt when a specific an event happens on a
+pin, for example the pin going from logical low to logical high which would be
+done by a function like `wait_for_high` where the CPU can be placed in sleep
+mode until the interrupt triggers.
+
+So is this just for Input pins then?  
+Yes, I believe this a concern for input pins as output pins are controlled by
+the programmer and he/she would know when they call a function like `set_high`,
+or `set_low`. At least this is my current assumpion.
+
+embedded-hal-async [embedded-hal-async](https://github.com/rust-embedded/embedded-hal/tree/master/embedded-hal-async)
+contains async versions of traits in embedded-hal. This task should add support
+for some/all of these traits.
+
+So lets take a closer look at these traits and start by looking at
+`src/digital.rs` as I'm going to look at implementing these for embassy-rp.
+
+One thing that confused me a little when looking through the code initially
+was that embassy-rp has the following dependencies:
+```
+rp2040-pac2 = { git = "https://github.com/embassy-rs/rp2040-pac2", rev="9ad7223a48a065e612bc7dc7be5bf5bd0b41cfc4", features = ["rt"] }
+embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
+embedded-hal-1 = { package = "embedded-hal", version = "1.0.0-alpha.8", optional = true}
+embedded-hal-async = { version = "0.1.0-alpha.0", optional = true}
+```
+Notice that `embedded-hal-02` is in the `v02.x` branch, but embedded-hal-async
+is in the master branch.
+
+Looking into the master branch is where we can find the traits for async which
+are in embedded-hal-async/src/digital.rs:
+```rust
+pub trait Wait: embedded_hal::digital::ErrorType {
+    /// The future returned by the `wait_for_high` function.                    
+    type WaitForHighFuture<'a>: Future<Output = Result<(), Self::Error>> where Self: 'a;
+
+    fn wait_for_high<'a>(&'a mut self) -> Self::WaitForHighFuture<'a>;
+
+    fn wait_for_low<'a>(&'a mut self) -> Self::WaitForLowFuture<'a>;
+
+    fn wait_for_falling_edge<'a>(&'a mut self) -> Self::WaitForFallingEdgeFuture<'a>;
+
+    fn wait_for_any_edge<'a>(&'a mut self) -> Self::WaitForAnyEdgeFuture<'a>;
+}
+```
+
+The wait trait provides is to have implementations that do not block. Instead we
+can call wait_for_high which will return a future. So we would need
+` wait_for_high()` to return a Future.
+
+Now, these are interrupts available for these functions:
+```
+wait_for_high         -> Level High: The pin is a logical 1
+wait_for_low          -> Level Low: The pin is a logical 0
+wait_for_falling_edge -> Edge High: The pin transistioned from logical 0 to 1
+wait_for_any_edge     -> ??
+
+There is also a Edge Low: The pin transistioned from logical 1 to 0
+```
+So lets take `wait_for_high` and think through what it should do.
+1) We need to register our interrest in a Level High interrupt.
+2) When that interrupt is handled we need to be notified.
+
+#### Things think consider:
+* RP2040 has two cores and interrupts can be handled by both. Is this an issue,
+like is embassy even aware of multiple cores or does it just run on proc0?  
+
+* There is one interrupt `IO_IRQ_BANK0` for all pins. But we want to be able
+  to call `wait_for_high` for more than one pin at a time. How do we handle this
+  when we only have one interrupt handler. How can we know which pin that
+  triggerred the interrupt request?
+
+Lets start with our first concern which is registering interest in the
+interrupt.
