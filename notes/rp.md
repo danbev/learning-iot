@@ -1386,7 +1386,7 @@ PPn = Programmable number between 0-255
 [.gdbinit](rp_gdbinit) contains some user defined commands to make debugging
 RP Pico a little easier. 
 
-It contains commands like showing the contents of registries without having to
+It contains commands like showing the contents of registers without having to
 lookup the addresses. Since these are commands, tab-completion works in gdb. 
 For example:
 ```console
