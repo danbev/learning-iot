@@ -922,3 +922,115 @@ The parts of the device name are as follows:
 * 6 temperatur range -40..85C, 7 -40..105C
 
 I'm not sure what type package `E` is or I've missed something here.
+
+So to run I was expecting it to be possible to set the `PROBE_RUN_CHIP`
+environment variable but I got the same error:
+```console
+$ env PROBE_RUN_CHIP=STM32L072CZTx cargo r --release
+```
+
+```console
+$ probe-run --list-probes
+the following probes were found:
+[0]: STLink V2-1 (VID: 0483, PID: 374b, Serial: 0667FF505349898281143009, StLink)
+
+```
+
+### drogue-device stm32l0 lora-discovery issue
+This example is in the main branch of drogue-device and I'm currently seeing
+the folling link error:
+```console
+$ cargo b --release
+   Compiling lora-discovery v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery)
+error: linking with `rust-lld` failed: exit status: 1
+  |
+  = note: "rust-lld" "-flavor" "gnu" "/tmp/rustcE3d78f/symbols.o" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/lora_discovery-4bea665be24bde1e.lora_discovery.ac80e2c6-cgu.0.rcgu.o" "--as-needed" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/release/deps" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/build/cortex-m-e6b764a750418f37/out" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/build/cortex-m-rt-25cd07c968480796/out" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/build/defmt-c9d88f9f0247898b/out" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/build/stm32-metapac-cb7b02eb7fe6652d/out/src/chips/stm32l072cz" "-L" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/build/stm32-metapac-cb7b02eb7fe6652d/out/src/chips/stm32l072cz/memory_x/" "-L" "/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/thumbv6m-none-eabi/lib" "-Bstatic" "/tmp/rustcE3d78f/libcortex_m_rt-3cecb41477e22dbb.rlib" "--start-group" "/tmp/rustcE3d78f/libcortex_m-99a7722181c20220.rlib" "--end-group" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib" "-Bdynamic" "--eh-frame-hdr" "-znoexecstack" "-L" "/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/thumbv6m-none-eabi/lib" "-o" "/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/lora_discovery-4bea665be24bde1e" "--gc-sections" "--nmagic" "-Tlink.x" "-Tdefmt.x"
+  = note: rust-lld: error: undefined symbol: core::intrinsics::const_eval_select::hbf83374ba4cb02aa
+          >>> referenced by f64.rs:934 (/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/f64.rs:934)
+          >>>               compiler_builtins-6326b44316fd805a.compiler_builtins.42fdec05-cgu.0.rcgu.o:(compiler_builtins::float::cmp::cmp::hf7fe6cc7136cc059) in archive /home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib
+          >>> referenced by f64.rs:934 (/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/f64.rs:934)
+          >>>               compiler_builtins-6326b44316fd805a.compiler_builtins.42fdec05-cgu.0.rcgu.o:(compiler_builtins::float::cmp::cmp::hf7fe6cc7136cc059) in archive /home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib
+          >>> referenced by f64.rs:934 (/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/f64.rs:934)
+          >>>               compiler_builtins-6326b44316fd805a.compiler_builtins.42fdec05-cgu.0.rcgu.o:(compiler_builtins::float::cmp::cmp::hf7fe6cc7136cc059) in archive /home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib
+          >>> referenced 11 more times
+          
+          rust-lld: error: undefined symbol: core::intrinsics::const_eval_select::h4c3f1d9ac29a50b4
+          >>> referenced by f64.rs:1027 (/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/f64.rs:1027)
+          >>>               compiler_builtins-6326b44316fd805a.compiler_builtins.42fdec05-cgu.0.rcgu.o:(compiler_builtins::float::conv::__floatunsidf::hf57927b41d126d62) in archive /home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib
+          >>> referenced by uint_macros.rs:0 (/home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/num/uint_macros.rs:0)
+          >>>               compiler_builtins-6326b44316fd805a.compiler_builtins.42fdec05-cgu.0.rcgu.o:(compiler_builtins::float::div::__divdf3::h3f7dd1a712655361) in archive /home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery/target/thumbv6m-none-eabi/release/deps/libcompiler_builtins-6326b44316fd805a.rlib
+          
+
+error: could not compile `lora-discovery` due to previous error
+```
+This project is using link time optimizations which can be seen in Cargo.toml:
+```rust
+  [profile.release]
+  codegen-units = 1
+  debug = 2
+  opt-level = "s"
+  lto = "fat"
+  ...
+```
+Commenting out `lto` enables the project to build.
+
+Running will still produce an error about multiple chips matching `STM32L072CZ`:
+```console
+$ cargo r --release
+    Finished release [optimized + debuginfo] target(s) in 0.16s
+     Running `probe-run --chip STM32L072CZ --measure-stack target/thumbv6m-none-eabi/release/lora-discovery`
+Error: Found multiple chips matching 'STM32L072CZ', unable to select a single chip.
+```
+We can list the chips using:
+```console
+$ probe-run --list-chips | grep STM32L072CZ
+        STM32L072CZEx
+        STM32L072CZTx
+        STM32L072CZYx
+```
+Now, we should be able to set an environment variable named `PROBE_RUN_CHIP`
+with the specific chip name from the list above, which for me is `STM32L072CZTx`
+, I've not been able to get that to work. Another option is to update
+`./cargo/config.toml` which the specific chip.
+
+After that I get the following error when trying to run:
+```console
+$ cargo r --release
+    Finished release [optimized + debuginfo] target(s) in 0.17s
+     Running `probe-run --chip STM32L072CZTx --measure-stack target/thumbv6m-none-eabi/release/lora-discovery`
+Error: An error with the usage of the probe occured
+
+Caused by:
+    0: An error specific to a probe type occured
+    1: Command failed with status SwdApWait
+```
+It is possible to connect if I press and hold the `Reset` button. 
+I was able to get this to work using the following openocd configuration file:
+```
+$ cat openocd.cfg 
+source [find interface/stlink.cfg]
+transport select hla_swd
+
+reset_config srst_only srst_nogate connect_assert_srst
+set CONNECT_UNDER_RESET 1
+set CORE_RESET 0
+
+source [find target/stm32l0.cfg]
+```
+And the starting openocd using:
+```console
+$ openocd -f openocd.cfg 
+Open On-Chip Debugger 0.11.0-g610f137 (2022-05-06-14:16)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : The selected transport took over low-level target control. The results might differ compared to plain JTAG/SWD
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : clock speed 300 kHz
+Info : STLINK V2J28M18 (API v2) VID:PID 0483:374B
+Info : Target voltage: 3.259960
+Info : stm32l0.cpu: hardware has 4 breakpoints, 2 watchpoints
+Info : starting gdb server for stm32l0.cpu on 3333
+Info : Listening on port 3333 for gdb connection
+```
