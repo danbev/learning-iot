@@ -881,3 +881,44 @@ Get tokens:
 $ curl -vs -H "Authorization: Bearer $(drg whoami --token)" https://api.sandbox.drogue.cloud/api/tokens/v1alpha1 | jq
 ```
 
+
+### drogue-device /stm32l0xx/lora-discovery issue
+This example is used as part of the
+[ttn-lorawan-quarkus](https://book.drogue.io/drogue-workshops/ttn-lorawan-quarkus/firmware.html).
+This example is in the `0.3.0` tag so it must be checked out before building.
+
+The instructions in the above workshop are as follows to build:
+```console
+$ cargo run --release
+...
+Error: Found multiple chips matching 'STM32L072CZ', unable to select a single chip.
+```
+Note: the instructions in the README.adoc are different and will not work.
+
+For the above error about multiple chips we can use probe-run to list all the
+chips:
+```console
+$ probe-run --list-chips | grep STM32L072CZ
+        STM32L072CZEx
+        STM32L072CZTx
+        STM32L072CZYx
+```
+So, I need to figure out which one I've got which is `STM32L072CZ` but what
+about. I found these `Ex`, `Tx`, and `Yx` prefixes?
+
+![STM32L072CZ chip image](./img/stm32l072cz.jpg "Image of STM32L072CZ")
+
+Zooming in on that I think what I can see that it ends with `T6` which I think
+matches `Tx`. 
+
+The parts of the device name are as follows:
+* STM32 is the family name.
+* L is for Low-Power
+* 0 is for ARM Cortex M0
+* 72 line (???)
+* C is for the number of pins which is 48
+* Z
+* T is for package type (LQFP). P: TSOOP, H: BGA, U: VFQFPN, T: LQFP, Y: WLCSP
+* 6 temperatur range -40..85C, 7 -40..105C
+
+I'm not sure what type package `E` is or I've missed something here.
