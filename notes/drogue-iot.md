@@ -1034,3 +1034,25 @@ Info : stm32l0.cpu: hardware has 4 breakpoints, 2 watchpoints
 Info : starting gdb server for stm32l0.cpu on 3333
 Info : Listening on port 3333 for gdb connection
 ```
+
+To flash the device:
+```console
+$ telnet localhost 4444
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+Open On-Chip Debugger
+> reset halt
+Unable to match requested speed 300 kHz, using 240 kHz
+Unable to match requested speed 300 kHz, using 240 kHz
+target halted due to debug-request, current mode: Thread
+xPSR: 0xf1000000 pc: 0x080000d4 msp: 0x200008d8
+
+> flash write_image erase target/thumbv6m-none-eabi/release/lora-discovery
+Device: STM32L0xx (Cat.5)
+STM32L flash has dual banks. Bank (0) size is 96kb, base address is 0x8000000
+Padding image section 1 at 0x0800f954 with 12 bytes
+Padding image section 2 at 0x08014734 with 4 bytes
+auto erase enabled
+wrote 86016 bytes from file target/thumbv6m-none-eabi/release/lora-discovery in 19.084391s (4.402 KiB/s)
+```
