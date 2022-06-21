@@ -1120,4 +1120,4 @@ stack backtrace:
 From the configuration in the above log we can see that the device is using
 `EU868`
 
-![LoRa Gqrx Waterfall image](./img/lora0686.png "Image of LoRa Gqrx waterfall")
+![LoRa Gqrx Waterfall image](./img/lora-686.png "Image of LoRa Gqrx waterfall")
