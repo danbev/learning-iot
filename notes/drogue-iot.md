@@ -1117,3 +1117,7 @@ stack backtrace:
   19: Reset
 (HOST) ERROR the program panicked
 ```
+From the configuration in the above log we can see that the device is using
+`EU868`
+
+![LoRa Gqrx Waterfall image](./img/lora0686.png "Image of LoRa Gqrx waterfall")
