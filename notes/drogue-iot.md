@@ -1005,6 +1005,7 @@ Caused by:
     1: Command failed with status SwdApWait
 ```
 It is possible to connect if I press and hold the `Reset` button. 
+
 I was able to get this to work using the following openocd configuration file:
 ```
 $ cat openocd.cfg 
@@ -1055,4 +1056,64 @@ Padding image section 1 at 0x0800f954 with 12 bytes
 Padding image section 2 at 0x08014734 with 4 bytes
 auto erase enabled
 wrote 86016 bytes from file target/thumbv6m-none-eabi/release/lora-discovery in 19.084391s (4.402 KiB/s)
+```
+
+
+### JoinError
+The first time I ran the `lora-discovery` example I got the following error:
+```console
+$ probe-run --chip STM32L072CZTx --measure-stack target/thumbv6m-none-eabi/release/lora-discovery
+(HOST) INFO  flashing program (82 pages / 82.00 KiB)
+(HOST) INFO  success!
+(HOST) INFO  painting 17.22 KiB of RAM for stack usage estimation
+────────────────────────────────────────────────────────────────────────────────
+INFO  Configuring with config LoraConfig { spreading_factor: Some(SF12), region: Some(EU868), lora_mode: Some(WAN) }
+└─ lora_discovery::____embassy_main_task::{async_fn#0} @ src/main.rs:42
+INFO  Joining LoRaWAN network
+└─ drogue_lorawan_app::{impl#3}::on_mount::{async_block#0} @ /home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan/src/lib.rs:213
+ERROR panicked at 'error joining lora network: JoinError', /home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan/src/lib.rs:217:18
+└─ panic_probe::print_defmt::print @ /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/panic-probe-0.3.0/src/lib.rs:91
+────────────────────────────────────────────────────────────────────────────────
+(HOST) INFO  reading 17.22 KiB of RAM for stack usage estimation
+(HOST) INFO  program has used at least 3.40/17.22 KiB (19.7%) of stack space
+stack backtrace:
+   0: HardFaultTrampoline
+      <exception entry>
+   1: cortex_m::asm::inline::__udf
+        at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-0.7.5/src/../asm/inline.rs:181:5
+   2: cortex_m::asm::udf
+        at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-0.7.5/src/asm.rs:43:5
+   3: rust_begin_unwind
+        at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/panic-probe-0.3.0/src/lib.rs:72:9
+   4: core::panicking::panic_fmt
+        at /home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/panicking.rs:142:14
+   5: core::result::unwrap_failed
+        at /home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:1785:5
+   6: <drogue_lorawan_app::App<B> as ector::actor::Actor>::on_mount::{{closure}}
+   7: <core::future::from_generator::GenFuture<T> as core::future::future::Future>::poll
+        at /home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/future/mod.rs:91:19
+   8: embassy::executor::raw::TaskStorage<F>::poll
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/raw/mod.rs:195:15
+   9: core::cell::Cell<T>::get
+        at /home/danielbevenius/.rustup/toolchains/nightly-2022-05-24-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/cell.rs:443:18
+  10: embassy::executor::raw::timer_queue::TimerQueue::update
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/raw/timer_queue.rs:35:12
+  11: embassy::executor::raw::Executor::poll::{{closure}}
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/raw/mod.rs:424:13
+  12: embassy::executor::raw::run_queue::RunQueue::dequeue_all
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/raw/run_queue.rs:71:13
+  13: embassy::executor::raw::Executor::poll
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/raw/mod.rs:403:9
+  14: cortex_m::asm::inline::__wfe
+        at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-0.7.5/src/../asm/inline.rs:186:5
+  15: cortex_m::asm::wfe
+        at /home/danielbevenius/.cargo/registry/src/github.com-1ecc6299db9ec823/cortex-m-0.7.5/src/asm.rs:49:5
+  16: embassy::executor::arch::Executor::run
+        at /home/danielbevenius/.cargo/git/checkouts/embassy-9312dcb0ed774b29/77c7d8f/embassy/src/executor/arch/cortex_m.rs:54:13
+  17: lora_discovery::__cortex_m_rt_main
+        at src/main.rs:34:1
+  18: main
+        at src/main.rs:34:1
+  19: Reset
+(HOST) ERROR the program panicked
 ```
