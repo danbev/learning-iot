@@ -1121,3 +1121,9 @@ From the configuration in the above log we can see that the device is using
 `EU868`
 
 ![LoRa Gqrx Waterfall image](./img/lora-868.png "Image of LoRa Gqrx waterfall")
+
+Looking at the [coverage map](https://www.thethingsnetwork.org/community/stockholm/)
+of where I live I'm very close to the center of a coverage zone (antenna range).
+
+I'm wondering if I might need to get a gateway?
+
