@@ -1118,12 +1118,22 @@ stack backtrace:
 (HOST) ERROR the program panicked
 ```
 From the configuration in the above log we can see that the device is using
-`EU868`
+`EU868`. Taking a look at this frequency using Gqrx I can see the following:
 
 ![LoRa Gqrx Waterfall image](./img/lora-868.png "Image of LoRa Gqrx waterfall")
+
+If I'm reading this correctly what this is showing is that the device is
+transmitting but not getting anything in response. 
 
 Looking at the [coverage map](https://www.thethingsnetwork.org/community/stockholm/)
 of where I live I'm very close to the center of a coverage zone (antenna range).
 
-I'm wondering if I might need to get a gateway?
+I'm wondering if I might need to get a local gateway?
+
+Lets sample some data and store it so that we can use `inspectrum` to take a
+closer look:
+```console
+$ rtl_sdr -f 868000000 -s 2000000  outfile.cu8
+```
+_work in progress_
 
