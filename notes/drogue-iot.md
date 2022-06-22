@@ -1129,6 +1129,8 @@ Looking at the [coverage map](https://www.thethingsnetwork.org/community/stockho
 of where I live I'm very close to the center of a coverage zone (antenna range).
 
 I'm wondering if I might need to get a local gateway?
+Just in case I've ordered an indoor TTN gateway which I should be getting
+2022-06-27.
 
 When creating the device using `drg` we specify the 
 [frequency_plan_id](https://github.com/TheThingsNetwork/lorawan-frequency-plans)
