@@ -1130,6 +1130,54 @@ of where I live I'm very close to the center of a coverage zone (antenna range).
 
 I'm wondering if I might need to get a local gateway?
 
+When creating the device using `drg` we specify the 
+[frequency_plan_id](https://github.com/TheThingsNetwork/lorawan-frequency-plans)
+which I've been using `EU_863_870_TTN`. And if we look at the specific
+frequencies for [EU863-870](https://www.thethingsnetwork.org/docs/lorawan/frequency-plans/#eu863-870)
+we find:
+```
+Uplink:
+
+868.1 - SF7BW125 to SF12BW125
+868.3 - SF7BW125 to SF12BW125 and SF7BW250
+868.5 - SF7BW125 to SF12BW125
+867.1 - SF7BW125 to SF12BW125
+867.3 - SF7BW125 to SF12BW125
+867.5 - SF7BW125 to SF12BW125
+867.7 - SF7BW125 to SF12BW125
+867.9 - SF7BW125 to SF12BW125
+868.8 - FSK
+Downlink:
+
+Uplink channels 1-9 (RX1)
+869.525 - SF9BW125 (RX2)
+```
+And in the code we have:
+```rust
+#[embassy::main(config = "LoraDiscovery::config()")]
+async fn main(spawner: Spawner, p: Peripherals) {
+    let board = LoraDiscovery::new(p);
+    let config = LoraConfig::new()
+        .region(LoraRegion::EU868)
+        .lora_mode(LoraMode::WAN)
+        .spreading_factor(SpreadingFactor::SF12);
+```
+In lorawan-device-0.7.1/src/region/eu868/mod.rs we can see the join channels
+that can be used:
+```rust
+ const JOIN_CHANNELS: [u32; 3] = [868_100_000, 868_300_000, 868_500_000];
+```
+I notice that in the Drogue Cloud console I see the following message in the
+yaml for the device I created:
+```yaml
+ttn:
+    reconcile:
+      observedGeneration: 4
+      reason: "Request failed: 400 Bad Request: {\"code\":3,\"message\":\"unmarshal error at path \\\"end_device\\\": failed to unmarshal ttn.lorawan.v3.EndDeviceIdentifiers from JSON: error:pkg/types:invalid_eui (invalid EUI)\"}"
+      state: Failed
+```
+
+
 Lets sample some data and store it so that we can use `inspectrum` to take a
 closer look:
 ```console
