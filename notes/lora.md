@@ -293,6 +293,43 @@ Nodes          Gateways           Network Server     Application servers
       wireless          3G/4G/5G/Ehternet
                           
 ```
+The nodes, which are end devices like sensors sends out messages (uplink) to
+all gateways that are listening, are in range. This communication uses wireless
+technology (LoRa). The gateways operate at the physcial layer and only checks
+the integrity of the incoming message (check the Message Integrity Code (MIC)).
+
+### LoRaWAN Network Servers (LNS)
+These servers control the network, which is not static but conditions change,
+which they adapt to.
+
+### Activation of devices
+A device can be activate in two ways:
+* ABP = Activation By Personalization
+Device ID's and keys are personalized at manufactoring time. These devices can
+simply be powered on and are good to go, there is no need to join activation
+messages. 
+These devices are tied to a specific network/service, the NetID is a portion
+of the device network address.
+
+* OTAA = Over-The-Air Activation
+Device ID's and keys can be updated and also renewed which inhances security.
+
+Each end device has root keys that are security stored on the device. The join
+server has matching keys.
+The ende device sends a JoinRequest to the Gateway:
+```
+  Device     JoinRequest       Gateway        JoinServer
+         ------------------->          ------>
+   
+      8       8        2
+   JoinEUI  DevEUI  DevNounce
+```
+The JoinServer will authenticate the device and send a JoinAccept message back
+to the device.
+JoinEUI was previously named AppEUI
+
+### JoinServer
+These managed
 
 Protocol stack:
 ```
@@ -511,6 +548,8 @@ have an implicit header (which is known to the receiver) and a fixed lentgh
 payload. In this case the payload length, forward error correction coding rate
 and presence of the payload CRC must be configured on both sides.
 
+
+
 ### Drogue LoRaWAN workshop
 This following is just my notes while following the
 [ttn-lorawan-quarkus workshop](https://book.drogue.io/drogue-workshops/ttn-lorawan-quarkus/drogue-cloud.html).
@@ -518,6 +557,8 @@ First we create a new application in Drogue Cloud
 ```console
 $ drg create app danbev-ttn-app
 ```
+
+Next, add the `.spec.ttn` section to the above app that we created:
 ```console
 $ drg create app danbev-ttn-app --spec '{
     "ttn": {
@@ -530,6 +571,7 @@ $ drg create app danbev-ttn-app --spec '{
     }
 }'
 ```
+
 Next we create a device and enable The Things Network synchronization.
 ```console
 $ drg create device danbev-ttn-device --app danbev-ttn-app --spec '{
@@ -543,12 +585,13 @@ $ drg create device danbev-ttn-device --app danbev-ttn-app --spec '{
     }
 }'
 ```
-Generate the 16 byte device identifier:
+Generate the 16 byte device identifier (dev_eui):
 ```console
 $ openssl rand -hex 16 | tr [a-z] [A-Z]
 xxxxxxx
 ```
 
+Generate the 32 byte app_key (app_key):
 ```console
 $ openssl rand -hex 32 | tr [a-z] [A-Z]
 xxxxxxxxxxxxxxxxx
@@ -559,6 +602,22 @@ For the `frequency_plan_id` one can look at the
 Sweden	EU863-870        Svenska frekvensplanen, CEPT Rec. 70-03
         EU433	
 ```
+
+To be able to run the [lora-discovery](https://github.com/drogue-iot/drogue-device/blob/main/examples/stm32l0/lora-discovery/README.adoc)
+example we need to add some configuration properties into `~/.drogue/config.toml:
+```toml
+dev-eui = "danbev-ttn-app"                                                                    
+app-eui = ""                                                                    
+app-key = ""
+```
+The `dev-eui` can be found in the console part of the The Things Network.
+https://eu1.cloud.thethings.network/console/applications/danbev-ttn-app
+
+The `app-key` is the application encryption key. This is used to encrypt the
+application data being sent from the end device to the application server/
+service, and the application data sent from the application server/service. 
+
+The `app-eui` is a 
 
 ### Organizationally Unique Identifier (OUI)
 Is a 24 bit number that uniquely identifies a vendor, manufacturer, or an
@@ -614,6 +673,9 @@ it.
    +-----------+
 ```
 
+### IQ Inversion
+I/Q is an abbreviation for `in-phase` and `quadrature` and revers to two
+sinusoids that have the same frequency and are 90 degrees out of phase.
 
 ### Frequency Shift Chirp Modulation (FSCM)
 Is the modulation that LoRa uses.
@@ -660,3 +722,32 @@ Intrrupts = IRQ Interrupts
 ```
 
 TCXO = Temperature Compensated Crystal Oscillator regulator.
+
+### Binary Phase Shift Keying (BPSK)
+Phase shift keying is where the phase of a digial signal is switched (simliar
+to analog phase modulation) to represent different symbols. So the carrier
+signal will be switch phase when it modulates the carrier signal to represent a
+0 or a 1. Like it might shift the phase 180 degrees when to represent 1 for
+example. When there are only two symbols this is called binary phase shift
+keying.
+
+
+### Analysing LoRa
+```console
+$ gqrx
+```
+Now we need to configure the frequency used. I'm in 
+
+### peer-to-peer
+There is a lora_mode option in lorawan-device which in the example in
+Drogue IoT is using LoraMode::WAN:
+```rust
+let config = LoraConfig::new()                                              
+        .region(LoraRegion::EU868)                                              
+        .lora_mode(LoraMode::WAN)                                               
+        .spreading_factor(SpreadingFactor::SF12);
+```
+But there is also another member of that enum which is named `LoraMode::P2P`
+which stands for peer-to-peer. In this case LoraWAN is not using but just LoRa
+using raw MAC communication to send commands and messages directly like in a
+P2P network.
