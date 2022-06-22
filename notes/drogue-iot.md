@@ -1169,6 +1169,23 @@ that can be used:
 ```rust
  const JOIN_CHANNELS: [u32; 3] = [868_100_000, 868_300_000, 868_500_000];
 ```
+We can also use ttn-lw-cli to list the frequency plans:
+```console
+$ ttn-lw-cli end-devices list-frequency-plans
+[{
+  "id": "EU_863_870",
+  "name": "Europe 863-870 MHz (SF12 for RX2)",
+  "base_frequency": 868
+}
+, {
+  "id": "EU_863_870_TTN",
+  "base_id": "EU_863_870",
+  "name": "Europe 863-870 MHz (SF9 for RX2 - recommended)",
+  "base_frequency": 868
+}
+...
+```
+
 I notice that in the Drogue Cloud console I see the following message in the
 yaml for the device I created:
 ```yaml
@@ -1178,8 +1195,29 @@ ttn:
       reason: "Request failed: 400 Bad Request: {\"code\":3,\"message\":\"unmarshal error at path \\\"end_device\\\": failed to unmarshal ttn.lorawan.v3.EndDeviceIdentifiers from JSON: error:pkg/types:invalid_eui (invalid EUI)\"}"
       state: Failed
 ```
+This was an error on my part where I had created the `dev_eui` with an incorrect
+size. The following is the propery way to generate these ids:
+```console
+### dev_eui:
+$ head -c 8 /dev/urandom | od -An -tx8 | tr a-z A-Z
+```
+```console
+# Generate 32 byte app_key:
+$ openssl rand -hex 32 | tr [a-z] [A-Z
+```
 
+That took care of the issue with above but there is still one more:
+```
+"reason": "Request failed: 400 Bad Request: {\"code\":3,\"message\":\"error:pkg/rpcmiddleware/validator:field_mask_paths (forbidden path(s) in field mask)\",\"details\":[{\"@type\":\"type.googleapis.com/ttn.lorawan.v3.ErrorDetails\",\"namespace\":\"pkg/rpcmiddleware/validator\",\"name\":\"field_mask_paths\",\"message_format\":\"forbidden path(s) in field mask\",\"attributes\":{\"forbidden_paths\":[\"ids.dev_eui\",\"ids.join_eui\"]},\"correlation_id\":\"6c085ca7174647f2a797749437990374\",\"code\":3}]}",
+```
+The following [issue](https://github.com/drogue-iot/drogue-cloud/issues/298) was
+created to track this.
 
+I'm still not able to join the TTN network and I still can't see any traffic
+in gqrx. So I'm still suspecting this to be an issue with the gateway in my
+area. 
+ 
+### sampling lora traffic
 Lets sample some data and store it so that we can use `inspectrum` to take a
 closer look:
 ```console
@@ -1187,3 +1225,33 @@ $ rtl_sdr -f 868000000 -s 2000000  outfile.cu8
 ```
 _work in progress_
 
+
+### gr-lora
+```console
+$ sudo dnf install -y gnuradio-devel log4cpp-devel pybind11-devel libsndfile-devel
+$ git clone https://github.com/rpp0/gr-lora.git
+$ cd gr-lora
+$ mkdir build
+$ cd build
+$ cmake ..
+```
+I also need to set up a few paths so that dynamically linked libraries can be
+found for libgnuradio-lora and libliquid:
+```
+$ export LD_LIBRARY_PATH=/usr/local/lib64/:/usr/local/lib:$LD_LIBRARY_PATH
+```
+Now, we can start gnuradio:
+```console
+$ gnuradio-companion
+```
+And open the file `apps/lora_receive_realtime.grc` (grc = GNU Radion Companion).
+
+
+### ttn-lw-cli
+This is a command line interface for The Things Network LoRaWAN.
+
+There is command to decode a lorawan join request:
+```console
+$ echo 'AFP6A9B+1bNwFgIcAAujBABERDaumME=' | ttn-lw-cli lorawan decode --input-format base64
+{"message":{"m_hdr":{},"mic":"Nq6YwQ==","join_request_payload":{"join_eui":"70B3D57ED003FA53","dev_eui":"0004A30B001C0216","dev_nonce":"4444"}}}
+```
