@@ -1622,13 +1622,6 @@ moved to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and
 `GPIO<pin_nr>_LEVEL_LOW` are of type `WC` which I think stands for write clear.
 So writing to anything to these fields will clear them if I'm not mistaken.
 
-
-### WC
-This is a single bit that is typically set by a piece of hardware and then
-written to by the processor to clear the bit. The bit is cleared by writing a 1,
-using either a normal write or the clear alias.
-
-
 #### Example
 [async_gpio](https://github.com/danbev/embassy/blob/embassy-rp-async/examples/rp/src/bin/async_gpio.rs)
 
@@ -1673,3 +1666,8 @@ IO_IRQ_BANK0 pin 16 LevelHigh triggered
 AsyncInputFuture::poll pin 16 is high so clear the interrupt flag
 AsyncInputFuture::poll return Poll::Ready
 ```
+
+### WC
+This is a single bit that is typically set by a piece of hardware and then
+written to by the processor to clear the bit. The bit is cleared by writing a 1,
+using either a normal write or the clear alias.
