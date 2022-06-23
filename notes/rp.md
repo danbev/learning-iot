@@ -1523,7 +1523,7 @@ So lets take `wait_for_high` and think through what it should do.
   when we only have one interrupt handler. How can we know which pin that
   triggerred the interrupt request?
 
-I tooked a look at `pico-sdk` as they have this kind of support and their
+I looked a look at `pico-sdk` as they have this kind of support and their
 implementation looks like this:
 ```c
 static void gpio_irq_handler(void) {                                            
