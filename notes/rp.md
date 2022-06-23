@@ -1447,27 +1447,34 @@ these with others if it seems useful.
 ### embassy-rp async gpio task
 If we look at the current implementation for Input for embassy-rp we have
 methods like `is_high`, and `is_low`. With these functions we can do
-things like wait for a pin to go from low to high. But polling using one of
-those takes more CPU resources then neccessary. This task is about adding
-functions that will register an interrupt when a specific an event happens on a
-pin, for example the pin going from logical low to logical high which would be
-done by a function like `wait_for_high` where the CPU can be placed in sleep
-mode until the interrupt triggers.
+things like wait for a pin to go from low to high. But continously polling using
+one of those functions takes more CPU resources then neccessary.
 
+This task is about adding functions that will register an interrupt when a
+specific an event happens on a pin, for example the pin going from logical low
+to logical high which would be done by a function like `wait_for_high` where the
+CPU can be placed in sleep mode until the interrupt triggers.
+
+#### Assumptions
 So is this just for Input pins then?  
 Yes, I believe this a concern for input pins as output pins are controlled by
-the programmer and he/she would know when they call a function like `set_high`,
+the programmer, and he/she would know when they call a function like `set_high`,
 or `set_low`. At least this is my current assumpion.
 
+
+#### Implementation
 embedded-hal-async [embedded-hal-async](https://github.com/rust-embedded/embedded-hal/tree/master/embedded-hal-async)
 contains async versions of traits in embedded-hal. This task should add support
 for some/all of these traits.
+
+Code can be found in this branch:
+https://github.com/danbev/embassy/tree/embassy-rp-async
 
 So lets take a closer look at these traits and start by looking at
 `src/digital.rs` as I'm going to look at implementing these for embassy-rp.
 
 One thing that confused me a little when looking through the code initially
-was that embassy-rp has the following dependencies:
+was that `embassy-rp` has the following dependencies:
 ```
 rp2040-pac2 = { git = "https://github.com/embassy-rs/rp2040-pac2", rev="9ad7223a48a065e612bc7dc7be5bf5bd0b41cfc4", features = ["rt"] }
 embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
@@ -1494,8 +1501,8 @@ pub trait Wait: embedded_hal::digital::ErrorType {
 }
 ```
 
-The wait trait provides is to have implementations that do not block. Instead we
-can call wait_for_high which will return a future. So we would need
+What the Wait trait provides is to have implementations that do not block.
+Instead we can call `wait_for_high` which will return a future. So we would need
 ` wait_for_high()` to return a Future.
 
 Now, these are interrupts available for these functions:
@@ -1511,14 +1518,76 @@ So lets take `wait_for_high` and think through what it should do.
 1) We need to register our interrest in a Level High interrupt.
 2) When that interrupt is handled we need to be notified.
 
-#### Things think consider:
-* RP2040 has two cores and interrupts can be handled by both. Is this an issue,
-like is embassy even aware of multiple cores or does it just run on proc0?  
-
+#### Questions
 * There is one interrupt `IO_IRQ_BANK0` for all pins. But we want to be able
   to call `wait_for_high` for more than one pin at a time. How do we handle this
   when we only have one interrupt handler. How can we know which pin that
   triggerred the interrupt request?
 
-Lets start with our first concern which is registering interest in the
-interrupt.
+I took a look at `pico-sdk` as they have this kind of support and their
+implementation looks like this:
+```c
+static void gpio_irq_handler(void) {                                            
+    io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?                          
+                                           &iobank0_hw->proc1_irq_ctrl : &iobank0_hw->proc0_irq_ctrl;
+    for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio++) {                       
+        io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];                  
+        uint events = (*status_reg >> 4 * (gpio % 8)) & 0xf;                    
+        if (events) {                                                           
+            // TODO: If both cores care about this event then the second core won't get the irq?
+            gpio_acknowledge_irq(gpio, events);                                 
+            gpio_irq_callback_t callback = _callbacks[get_core_num()];          
+            if (callback) {                                                     
+                callback(gpio, events);                                         
+            }                                                                   
+        }                                                                       
+    }                                                                           
+}             
+```
+So it first gets the core it is on, this can be done by using the 
+```rust
+    SIO.cpuid().read()
+```
+
+#### Example
+```console
+$ cd examples/rp
+$ cargo b --bin async_gpio
+```
+
+I've been using openocd as I've not been successful in getting probe-run to
+work with PicoProbe. 
+```console
+$ env OPENOCD_DIR=~/work/iot/rp/openocd $OPENOCD_DIR/src/openocd -l openocd.log -f interface/picoprobe.cfg -f target/rp2040.cfg -s $OPENOCD_DIR/tcl
+```
+And the we can tail the log to see the semihosting output:
+```console
+$ tail -f openocd.log
+```
+The start a gdb session:
+```console
+$ arm-none-eabi-gdb target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) target remote localhost:3333
+(gdb) monitor arm semihosting enable
+(gdb) monitor reset halt
+(gdb) monitor flash write_image erase target/thumbv6m-none-eabi/debug/async_gpio
+(gdb) continue
+```
+We should now see the following in `openocd.log`:
+```console
+AsyncInput::wait_for_high
+AsyncInputFuture::new enable LevelHigh for pin 16 
+AsyncInputFuture::poll return Poll::Pending
+```
+
+I have an external power supply that can be enabled by pressing the white
+button:
+
+![Intertupt test hookup](./img/interrupt.jpg "Interrupt test hookup")
+
+And when doing this the following will be displayed in `openocd.log`:
+```console
+IO_IRQ_BANK0 pin 16 LevelHigh triggered
+AsyncInputFuture::poll pin 16 is high so clear the interrupt flag
+AsyncInputFuture::poll return Poll::Ready
+```
