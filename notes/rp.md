@@ -1461,14 +1461,13 @@ Yes, I believe this a concern for input pins as output pins are controlled by
 the programmer, and he/she would know when they call a function like `set_high`,
 or `set_low`. At least this is my current assumpion.
 
+#### Working branch
+[embassy-rp-async](https://github.com/danbev/embassy/tree/embassy-rp-async)
 
 #### Implementation
-embedded-hal-async [embedded-hal-async](https://github.com/rust-embedded/embedded-hal/tree/master/embedded-hal-async)
+[embedded-hal-async](https://github.com/rust-embedded/embedded-hal/tree/master/embedded-hal-async)
 contains async versions of traits in embedded-hal. This task should add support
 for some/all of these traits.
-
-Code can be found in this branch:
-https://github.com/danbev/embassy/tree/embassy-rp-async
 
 So lets take a closer look at these traits and start by looking at
 `src/digital.rs` as I'm going to look at implementing these for embassy-rp.
@@ -1621,6 +1620,9 @@ position of the start of the group/events is determined and then the events are
 moved to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and
 `GPIO<pin_nr>_LEVEL_LOW` are of type `WC` which I think stands for write clear.
 So writing to anything to these fields will clear them if I'm not mistaken.
+
+I've tried to mimic this code in
+[gpio.rs](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L172).
 
 #### Example
 [async_gpio](https://github.com/danbev/embassy/blob/embassy-rp-async/examples/rp/src/bin/async_gpio.rs)
