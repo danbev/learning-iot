@@ -1545,20 +1545,20 @@ static void gpio_irq_handler(void) {
 }             
 ```
 Notice that `irq_ctrl_base` is either `io_bank0_hw->proc1_irq_ctrl` or
-`io_bank0_hw->proc0_irq_ctrl` or depeding on which CPU this is executing.
+`io_bank0_hw->proc0_irq_ctrl` depeding on which CPU that is executing this code.
 
 `iobank0_hw` can be found in
-rp2040/hardware_structs/include/hardware/structs/iobank0.h:
+`rp2040/hardware_structs/include/hardware/structs/iobank0.h`:
 ```c
 #define iobank0_hw ((iobank0_hw_t *const)IO_BANK0_BASE)
 ```
-And `IO_BANK0_BASE in
-src/rp2040/hardware_regs/include/hardware/regs/addressmap.h:
+And `IO_BANK0_BASE` can be found in
+`src/rp2040/hardware_regs/include/hardware/regs/addressmap.h`:
 ```c
 #define IO_BANK0_BASE _u(0x40014000)
 ```
 And `io_bank0_hw->proc0_irq_ctrl` can also be found in
-rp2040/hardware_structs/include/hardware/structs/iobank0.h:
+`rp2040/hardware_structs/include/hardware/structs/iobank0.h`:
 ```c
 io_irq_ctrl_hw_t proc1_irq_ctrl;
 ```
@@ -1570,7 +1570,7 @@ typedef struct {
     _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
 ```
 And IO_BANK0_PROC0_INTE0_OFFSET is defined in
-src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h:
+`src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h`:
 ```c
 #define IO_BANK0_PROC0_INTE0_OFFSET _u(0x00000100)
 ```
@@ -1601,7 +1601,7 @@ void gpio_acknowledge_irq(uint gpio, uint32_t events) {
 ```
 Now, we saw earlier that `iobank0_hw` is the IO_BANK0_BASE 0x40014000
 
-src/rp2040/hardware_structs/include/hardware/structs/iobank0.h
+`src/rp2040/hardware_structs/include/hardware/structs/iobank0.h`
 ```
 typedef struct {
     iobank0_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
@@ -1610,16 +1610,17 @@ typedef struct {
     io_rw_32 intr[4];
 ```
 `intr`  is an array of size 4 (registers).
-src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h:
+`src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h`:
 ```
 #define IO_BANK0_INTR0_OFFSET _u(0x000000f0)
 ```
 0x400140f0 which is the INTR0 register (raw interrupts register).
+
 So this is setting the raw interrupt for the current pin. First the location/
-position of the start of the group is determined and then the events are moved
-to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and `GPIO<pin_nr>_LEVEL_LOW`
-are of type `WC` which I think stands for write clear. So writing to anything
-to these fields will clear them if I'm not mistaken.
+position of the start of the group/events is determined and then the events are
+moved to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and
+`GPIO<pin_nr>_LEVEL_LOW` are of type `WC` which I think stands for write clear.
+So writing to anything to these fields will clear them if I'm not mistaken.
 
 
 ### WC
