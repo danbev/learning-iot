@@ -1524,7 +1524,7 @@ So lets take `wait_for_high` and think through what it should do.
   when we only have one interrupt handler. How can we know which pin that
   triggerred the interrupt request?
 
-I took a look at `pico-sdk` as they have this kind of support and their
+I tooked a look at `pico-sdk` as they have this kind of support and their
 implementation looks like this:
 ```c
 static void gpio_irq_handler(void) {                                            
@@ -1544,12 +1544,93 @@ static void gpio_irq_handler(void) {
     }                                                                           
 }             
 ```
-So it first gets the core it is on, this can be done by using the 
-```rust
-    SIO.cpuid().read()
+Notice that `irq_ctrl_base` is either `io_bank0_hw->proc1_irq_ctrl` or
+`io_bank0_hw->proc0_irq_ctrl` or depeding on which CPU this is executing.
+
+`iobank0_hw` can be found in
+rp2040/hardware_structs/include/hardware/structs/iobank0.h:
+```c
+#define iobank0_hw ((iobank0_hw_t *const)IO_BANK0_BASE)
+```
+And `IO_BANK0_BASE in
+src/rp2040/hardware_regs/include/hardware/regs/addressmap.h:
+```c
+#define IO_BANK0_BASE _u(0x40014000)
+```
+And `io_bank0_hw->proc0_irq_ctrl` can also be found in
+rp2040/hardware_structs/include/hardware/structs/iobank0.h:
+```c
+io_irq_ctrl_hw_t proc1_irq_ctrl;
+```
+And `io_irq_crtl_hw_t` can be found in the same file and contains the arrays
+`inte` (intertupt enable), `intf` (interrupt force), and `ints`
+(interrupt status).
+```c
+typedef struct {
+    _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
+```
+And IO_BANK0_PROC0_INTE0_OFFSET is defined in
+src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h:
+```c
+#define IO_BANK0_PROC0_INTE0_OFFSET _u(0x00000100)
 ```
 
+```
+IO_BANK0_BASE 0x40014000 + IO_BANK0_PROC0_INTE0_OFFSET (0x00000100) =
+0x40014000 + 0x00000100 = 0x40014100 = PROC0_INTE0
+```
+
+Next we have:
+```
+        io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];                  
+```
+This is accessing the interrupt status register for the current pin registers
+which will be one of INTS0, INTS1, INTS2, or INTS3.
+Each of these registers are devided into groups (called events in the code
+above) of four values for each pin which LEVEL_LOW, LEVEL_HIGH, EDGE_LOW, and
+EDGE_HIGH. And if there was an event (interrupt) triggered for any of those
+four, the if block will be entered.
+
+
+The first thing that happens is the acknowledgment of the irq which looks like
+this:
+```c
+void gpio_acknowledge_irq(uint gpio, uint32_t events) {                         
+    iobank0_hw->intr[gpio / 8] = events << 4 * (gpio % 8);                      
+}
+```
+Now, we saw earlier that `iobank0_hw` is the IO_BANK0_BASE 0x40014000
+
+src/rp2040/hardware_structs/include/hardware/structs/iobank0.h
+```
+typedef struct {
+    iobank0_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
+                                                                                
+    _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
+    io_rw_32 intr[4];
+```
+`intr`  is an array of size 4 (registers).
+src/rp2040/hardware_regs/include/hardware/regs/io_bank0.h:
+```
+#define IO_BANK0_INTR0_OFFSET _u(0x000000f0)
+```
+0x400140f0 which is the INTR0 register (raw interrupts register).
+So this is setting the raw interrupt for the current pin. First the location/
+position of the start of the group is determined and then the events are moved
+to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and `GPIO<pin_nr>_LEVEL_LOW`
+are of type `WC` which I think stands for write clear. So writing to anything
+to these fields will clear them if I'm not mistaken.
+
+
+### WC
+This is a single bit that is typically set by a piece of hardware and then
+written to by the processor to clear the bit. The bit is cleared by writing a 1,
+using either a normal write or the clear alias.
+
+
 #### Example
+[async_gpio](https://github.com/danbev/embassy/blob/embassy-rp-async/examples/rp/src/bin/async_gpio.rs)
+
 ```console
 $ cd examples/rp
 $ cargo b --bin async_gpio
