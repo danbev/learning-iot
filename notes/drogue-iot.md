@@ -1216,6 +1216,30 @@ created to track this.
 I'm still not able to join the TTN network and I still can't see any traffic
 in gqrx. So I'm still suspecting this to be an issue with the gateway in my
 area. 
+
+With The Things Network Indoor Gateway I was able to join the network:
+```console
+$ cargo build --release
+   Compiling drogue-lorawan-app v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan)
+   Compiling lora-discovery v0.1.0 (/home/danielbevenius/work/drougue/drogue-device/examples/stm32l0/lora-discovery)
+    Finished release [optimized + debuginfo] target(s) in 2.82s
+$ probe-run --chip STM32L072CZTx --measure-stack target/thumbv6m-none-eabi/release/lora-discovery
+(HOST) INFO  flashing program (83 pages / 83.00 KiB)
+(HOST) INFO  success!
+(HOST) INFO  painting 17.22 KiB of RAM for stack usage estimation
+────────────────────────────────────────────────────────────────────────────────
+INFO  Configuring with config LoraConfig { spreading_factor: Some(SF12), region: Some(EU868), lora_mode: Some(WAN) }
+└─ lora_discovery::____embassy_main_task::{async_fn#0} @ src/main.rs:42
+INFO  Joining LoRaWAN network
+└─ drogue_lorawan_app::{impl#3}::on_mount::{async_block#0} @ /home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan/src/lib.rs:213
+INFO  Joining LoRaWAN network: 48DB50404D9184C1A2E7ACD3B08087FC
+└─ drogue_lorawan_app::{impl#3}::on_mount::{async_block#0} @ /home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan/src/lib.rs:214
+INFO  LoRaWAN network joined
+└─ drogue_lorawan_app::{impl#3}::on_mount::{async_block#0} @ /home/danielbevenius/work/drougue/drogue-device/examples/apps/lorawan/src/lib.rs:219
+```
+But this was only possible when tethering with my mobil and did not work when
+using my wifi.
+
  
 ### sampling lora traffic
 Lets sample some data and store it so that we can use `inspectrum` to take a
