@@ -751,3 +751,14 @@ But there is also another member of that enum which is named `LoraMode::P2P`
 which stands for peer-to-peer. In this case LoraWAN is not using but just LoRa
 using raw MAC communication to send commands and messages directly like in a
 P2P network.
+
+### The Things Network Gateway
+I got an indoor The Things Network Gateway as I was not able to connect to a
+public gateway in my area. 
+
+When configuring the gateway I ran into an issue where after connecting to the
+device using http://192.168.4.1/ and adding my wifi network the green led on the
+gateway would just blink about every second and nothing else would happen.
+What I ended up doing is tethering via my phone and then it was able to connect
+and a steady green light came on after a while. But I don't want to have this
+kind of set up.
