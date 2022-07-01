@@ -345,6 +345,11 @@ and reading a `1` means that a particular event has occurred. The event can be
 cleared by writing `0`.
 
 ### General Purpose I/0 Task and Events (GPIOTE)
+Is is way of having some instructions/code be run when there is a specific
+input on a GPIO pin. This is similar to interrupts but the difference is that
+interrupts will stop the currently executing code, and then resume after the
+interrupt handler has been run.
+
 Is a way of accessing GPIO pins using tasks and events. So a GPIOTE channel
 would be associated with a pin and we can enable it so that when a state change
 occurs a task will automatically created.
@@ -389,3 +394,11 @@ This is most likly due to not having enabled
 #define NRF_CRYPTO_RNG_STATIC_MEMORY_BUFFERS_ENABLED 1                          
 #endif
 ```
+
+### embassy-nrf interrupts
+This section will take a look at how interrupts work in embassy-nrf.
+
+If we take a look at the file src/gpiote.rs we can find the interrupt
+handler:
+
+
