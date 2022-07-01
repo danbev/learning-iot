@@ -350,6 +350,26 @@ input on a GPIO pin. This is similar to interrupts but the difference is that
 interrupts will stop the currently executing code, and then resume after the
 interrupt handler has been run.
 
+A Task in this context is a peripheral register. Writing a 1 to an entry in this
+register will cause the peripheral to do something. These registers are
+readonly. So in this case writing to the register is what triggers the Task,
+but a Task can also be triggered by an event happening. 
+
+An Event is a peripheral register which is used to indicate to the
+firmware/hardware that an event has happend. For example, this could be an GPIO
+input pin going from low to high. This is like an interrupt and these are
+enabled using the `INTENSET` register and disabled using `INTENCLR`.
+
+So we can connect a GPIO pin to a GPIOTE channel and configure it to generate
+an interrupt on the GPIO pin state changes. 
+
+GPIOTE is a peripheral as well which has 8 channels as mentioned above.
+Each channel can be configured to connect to a GPIO pin.
+If a channel is connected to a GPIO input an interrupt can be trigger when a
+state change happends.
+If a channel is connected to a GPIO output pin, it can control its output by
+setting it high/low by writing to the GPIOTE register.
+
 Is a way of accessing GPIO pins using tasks and events. So a GPIOTE channel
 would be associated with a pin and we can enable it so that when a state change
 occurs a task will automatically created.
@@ -362,12 +382,27 @@ options available. After this we can write to this channel (I'm really not sure
 if I'm using the right terminology here but hopefully this makes sense just the
 same) using the register `TASKS_OUT[n]` or `TASKS_SET[n]`.
 
+There are 8 GPIOTE channels and up to 3 tasks can be configured for each
+channel. There are two fixed tasks which are `SET` and `CLR`, and `OUT` which
+can be configured to be one of `Set`, `Clear`, or `Toggle`.
+
+Each channel can generate events for the following triggers:
+* Rising Edge
+* Falling Edge
+* Any change
+
 ### Timers
 * Real Time Counter (RTC)
 Low power and low frequency
 * Timer
 High power and high frequency
 
+CONFIG0 to CONFIG7 registers configure the channels:
+* Mode: Event (input pin) or Task mode (output pin).
+* GPIO pin: the pin that is to be connected to the channel.
+* Initial value for pin in Task mode.
+* Operation when in Task mode for the OUT task.
+* Configure the operation that that will trigger an IN event when in Event mode.
 
 ### nrfx
 These are standalone drivers for nrf peripherals which were originally in the
@@ -401,4 +436,36 @@ This section will take a look at how interrupts work in embassy-nrf.
 If we take a look at the file src/gpiote.rs we can find the interrupt
 handler:
 
+```
+#[interrupt]                                                            
+fn GPIOTE() {                                                          
+  unsafe { handle_gpiote_interrupt() };                               
+}     
+```
+So lets start with what is GPIOTE?  
+We can find GPIOTE in the pac, `pac::GPIOTE`
 
+If we take a look in [nrf52833-pac](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac) and src/lib.rs we can find the following:
+```rust
+pub enum Interrupt {
+ ...
+ #[doc = "6 - GPIOTE"]
+    GPIOTE = 6,
+ ...
+}
+
+#[doc = "GPIO Tasks and Events"]
+pub struct GPIOTE {
+    _marker: PhantomData<*const ()>,
+}
+
+impl GPIOTE {
+    #[doc = r"Pointer to the register block"]
+    pub const PTR: *const gpiote::RegisterBlock = 0x4000_6000 as *const _;
+    #[doc = r"Return the pointer to the register block"]
+    #[inline(always)]
+    pub const fn ptr() -> *const gpiote::RegisterBlock {
+        Self::PTR
+    }
+}
+```
