@@ -213,9 +213,9 @@ also the master boot record. When an exception is triggered then the mbr
 boot record's SVCHandler will be called which will delegate to the softdevice
 SVCHandler depending on the number passed to `svc`.
 
-All interrupts are routed througth the MBR and the SoftDevice. The Supervisor
+All interrupts are routed througt the MBR and the SoftDevice. The Supervisor
 Call (SVC) interrupt is always intercepted by the SoftDevice regardless of
-whether it is enabled or disabled. The SoftDevice inspects the SVC number, and
+whether it is enabled or not. The SoftDevice inspects the SVC number, and
 if it is equal or greater than 0x10, the interrupt is processed by the
 SoftDevice. SVC numbers below 0x10 are forwarded to the application's SVC
 interrupt handler. 
@@ -240,10 +240,10 @@ So this would then be set as entry `11` in the SoftDevice's interrupt vector
 table and called when svc calls is issued. 
 Looking at the above assembly there is first a test using `tst` using the link
 (lr) register. Next we have the `it` instruction, which is like if-then and then
-and can be `ITT` if then, or `ITE` if else, and the two instruction following
-this instruction is the block for the if-then. So depending on the test either
-MSP (Main Stack Pointer) or PSP (Processor Stack Pointer) will be placed in r0
-which is the argument to `nrf_svc_handler_c`. 
+and can be `ITT` for `if then`, or `ITE` for `if else`, and the two instruction
+following this instruction is the block for the if-then. So depending on the
+test either MSP (Main Stack Pointer) or PSP (Processor Stack Pointer) will be
+placed in r0 which is the argument to `nrf_svc_handler_c`. 
 
 ```c
 void nrf_svc_handler_c(uint32_t* p_svc_args) {
