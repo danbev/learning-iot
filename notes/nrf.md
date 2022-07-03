@@ -437,50 +437,11 @@ This is most likly due to not having enabled
 #endif
 ```
 
-### embassy-nrf interrupts
-This section will take a look at how interrupts work in embassy-nrf.
+### embassy-nrf GPIOTE interrupts
+This section will take a look at how GPIOTE interrupts work in embassy-nrf.
 
 If we take a look at the file `src/gpiote.rs` we can find the interrupt
-handler:
-
-```
-#[interrupt]                                                            
-fn GPIOTE() {                                                          
-  unsafe { handle_gpiote_interrupt() };                               
-}     
-```
-So lets start with what is `GPIOTE`?  
-We can find GPIOTE (GPIO Tasks and Events, see section on this earlier in this
-document) in the pac, `pac::GPIOTE`
-
-If we take a look in
-[nrf52833-pac](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac)
-and `src/lib.rs` we can find the following:
-```rust
-pub enum Interrupt {
- ...
- #[doc = "6 - GPIOTE"]
-    GPIOTE = 6,
- ...
-}
-
-#[doc = "GPIO Tasks and Events"]
-pub struct GPIOTE {
-    _marker: PhantomData<*const ()>,
-}
-
-impl GPIOTE {
-    #[doc = r"Pointer to the register block"]
-    pub const PTR: *const gpiote::RegisterBlock = 0x4000_6000 as *const _;
-    #[doc = r"Return the pointer to the register block"]
-    #[inline(always)]
-    pub const fn ptr() -> *const gpiote::RegisterBlock {
-        Self::PTR
-    }
-}
-```
-So, look again in embassy-nrf src/gpiote.rs we have the following interrupt
-defined (I've removed some of the cfg conditional features to simply this):
+handler (I've removed some of the cfg conditional features to simply this):
 ```rust
 #[interrupt]
 fn GPIOTE() {
@@ -538,24 +499,51 @@ pub struct RegisterBlock {
 ```
 So `events_in` is an array of size 8 (8 channels) and the type that this array
 stores is `events_in::EVENTS_IN_SPEC>`. The for loop it is iterating over the
-GPIOTE channels (8 of them) and for each channel will check if the `events_in_x`
- has any bits set, and if the channel does disable the interrupt by writing to
-INTENCLR. After that it will call the waker for the current channel.
+GPIOTE channels (8 of them) and for each channel it will check if the
+`events_in_x` has any bits set, and if the channel does disable the interrupt by
+writing to INTENCLR. After that it will call the waker for the current channel.
 
-Next, we have the `events_port` which is about nrf `SENSE` feature which is
-similar to events (see GPIO SENSE section for details). EVENTS_PORTS is a 32 bit
-register with an entry for each pin, so the above code is checking if any value
-is set in that register (otherwise it would be 0). Next, `events_ports` will be
-cleared. Then all the ports (two on some nrfs) and iterated over.
+Next, we have the `events_port` which is about the nrf `SENSE` feature which is
+similar to events (see GPIO SENSE section for details). `EVENTS_PORTS` is a 32
+bit register with an entry for each pin, so the above code is checking if any
+value is set in that register (otherwise it would be 0). Next, `events_ports`
+will be cleared. Then all the ports (two on some nrfs) and iterated over.
 
-Now, the next part is where the LATCH register is read which provides
-information about which pin(s) triggered the DETECT signal to be set. This will
-return a bit patterns of the register. What BitIter is doing is that is is
-is working backwards through a binary number starting from the least significant
-bit and only returning the bits that have are set. For example if we have 101
-this function will first return 0 as that bit position was set, After that
-self.0 will be 100 and the next call will return 2 as that is the next bit that
-is set.
+Now, the next part is where the `LATCH` register is read which provides
+information about which pin(s) triggered the `DETECT` signal to be set. This
+will return a bit patterns of the register. This bit patterns will be used
+to create a BitIter:
+```rust  
+struct BitIter(u32);
+
+impl Iterator for BitIter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.0.trailing_zeros() {
+            32 => None,
+            b => {
+                self.0 &= !(1 << b);
+                Some(b)
+            }
+        }
+    }
+}
+```
+What `next` is doing is that it is is working backwards through a binary number
+starting from the least significant bit and only returning the bits that have
+are set. For example if we have `101` this function will first return `0` as
+that bit position was set, after that self.0 will be 100 and the next call will
+return 2 as that is the next bit that is set. So this will only perform the
+following for bits that were set:
+```rust
+            for pin in BitIter(bits) {
+                p.pin_cnf[pin as usize].modify(|_, w| w.sense().disabled());
+                PORT_WAKERS[port * 32 + pin as usize].wake();
+            }
+```
+And this is disableing SENSE for the bit, and then calling wake on the port
+wakers.
 
 ### GPIO SENSE
 This is a feature of gpio pins which can be used for detecting/sensing change
