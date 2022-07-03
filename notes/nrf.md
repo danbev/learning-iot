@@ -335,8 +335,8 @@ And we can add log statement using:
 RTT stands for Real Time Transfer.
 
 ### Task registers
-Task are registers as are events. Writing to a task register will start some
-task (what ever that might mean to some module in the system that is interested
+Task are registers just like events. Writing to a task register will start some
+task (whatever that might mean to some module in the system that is interested
 (reads the task register value).
 
 ### Event registers
@@ -404,6 +404,13 @@ CONFIG0 to CONFIG7 registers configure the channels:
 * Operation when in Task mode for the OUT task.
 * Configure the operation that that will trigger an IN event when in Event mode.
 
+EVENTS_IN0 to EVENTS-7 are 32 bit registers that are updated when an
+event happens in one of the GPIOTE channels.
+
+TASKS_SET0 to TASKS_SET7 are used for GPIO output pins that are connected
+to a GPIOTE channel. If we write to one of these registers it will place
+the output port to high.
+
 ### nrfx
 These are standalone drivers for nrf peripherals which were originally in the
 nRF5 SDK and have been extracted to standalone modules/libraries.
@@ -433,7 +440,7 @@ This is most likly due to not having enabled
 ### embassy-nrf interrupts
 This section will take a look at how interrupts work in embassy-nrf.
 
-If we take a look at the file src/gpiote.rs we can find the interrupt
+If we take a look at the file `src/gpiote.rs` we can find the interrupt
 handler:
 
 ```
@@ -442,10 +449,13 @@ fn GPIOTE() {
   unsafe { handle_gpiote_interrupt() };                               
 }     
 ```
-So lets start with what is GPIOTE?  
-We can find GPIOTE in the pac, `pac::GPIOTE`
+So lets start with what is `GPIOTE`?  
+We can find GPIOTE (GPIO Tasks and Events, see section on this earlier in this
+document) in the pac, `pac::GPIOTE`
 
-If we take a look in [nrf52833-pac](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac) and src/lib.rs we can find the following:
+If we take a look in
+[nrf52833-pac](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac)
+and `src/lib.rs` we can find the following:
 ```rust
 pub enum Interrupt {
  ...
@@ -469,3 +479,100 @@ impl GPIOTE {
     }
 }
 ```
+So, look again in embassy-nrf src/gpiote.rs we have the following interrupt
+defined (I've removed some of the cfg conditional features to simply this):
+```rust
+#[interrupt]
+fn GPIOTE() {
+    unsafe { handle_gpiote_interrupt() };
+}
+```
+And `handle_gpiote_interrupts()` looks like this:
+```rust
+unsafe fn handle_gpiote_interrupt() {
+    let g = regs();
+
+    for i in 0..CHANNEL_COUNT {
+        if g.events_in[i].read().bits() != 0 {
+            g.intenclr.write(|w| w.bits(1 << i));
+            CHANNEL_WAKERS[i].wake();
+        }
+    }
+
+    if g.events_port.read().bits() != 0 {
+        g.events_port.write(|w| w);
+
+        let ports = &[&*pac::P0::ptr(), &*pac::P1::ptr()];
+        for (port, &p) in ports.iter().enumerate() {
+            let bits = p.latch.read().bits();
+            for pin in BitIter(bits) {
+                p.pin_cnf[pin as usize].modify(|_, w| w.sense().disabled());
+                PORT_WAKERS[port * 32 + pin as usize].wake();
+            }
+            p.latch.write(|w| w.bits(bits));
+        }
+    }
+}
+```
+First, `regs()` will return (simplifed a little):
+```rust
+fn regs() -> &'static pac::gpiote::RegisterBlock {
+    unsafe { &*pac::GPIOTE::ptr() }
+}
+```
+So this will return a pointer to a RegisterBlock and stores that in variable `g`
+for RegisterBlock I think. Lets take a closer look at
+[RegisterBlock](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac/src/gpiote.rs):
+```rust
+pub struct RegisterBlock {
+  ...
+
+  pub events_in: [crate::Reg<events_in::EVENTS_IN_SPEC>; 8],
+   _reserved4: [u8; 0x5c],
+
+  #[doc = "0x17c - Event generated from multiple input GPIO pins with SENSE mechanism enabled"]
+  pub events_port: crate::Reg<events_port::EVENTS_PORT_SPEC>,
+  _reserved5: [u8; 0x0184],
+  ...
+}
+```
+So `events_in` is an array of size 8 (8 channels) and the type that this array
+stores is `events_in::EVENTS_IN_SPEC>`. The for loop it is iterating over the
+GPIOTE channels (8 of them) and for each channel will check if the `events_in_x`
+ has any bits set, and if the channel does disable the interrupt by writing to
+INTENCLR. After that it will call the waker for the current channel.
+
+Next, we have the `events_port` which is about nrf `SENSE` feature which is
+similar to events (see GPIO SENSE section for details). EVENTS_PORTS is a 32 bit
+register with an entry for each pin, so the above code is checking if any value
+is set in that register (otherwise it would be 0). Next, `events_ports` will be
+cleared. Then all the ports (two on some nrfs) and iterated over.
+
+Now, the next part is where the LATCH register is read which provides
+information about which pin(s) triggered the DETECT signal to be set. This will
+return a bit patterns of the register. What BitIter is doing is that is is
+is working backwards through a binary number starting from the least significant
+bit and only returning the bits that have are set. For example if we have 101
+this function will first return 0 as that bit position was set, After that
+self.0 will be 100 and the next call will return 2 as that is the next bit that
+is set.
+
+### GPIO SENSE
+This is a feature of gpio pins which can be used for detecting/sensing change
+to the pins state. This sounds similar to events but I think that events are
+also hooked into the tasks and PPI which might be the difference.
+
+Each GPIO Pin can be configured using the PIN_CNF_x registers (0..31).
+* Direction
+* Drive strength
+* Enabing pull up/down reistors.
+* Pin sensing
+* Input buffer disconnect
+* Analog input
+
+The sence feature allows the pin to detect either a high or low level on the
+pins input. If enabled and there is a change to high/low then the DETECT signal
+will be set high. The DETECT signal will be set if any GPIO pin which has sense
+enabled has been triggered. In addition the LATCH register will be updated and
+the pin that triggered the change will be set.
+
