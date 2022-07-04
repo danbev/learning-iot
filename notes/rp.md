@@ -1622,8 +1622,39 @@ determined and then the events are moved to that location (4 * (gpio % 8). The
 I think stands for write clear.  So writing to anything to these fields will
 clear them if I'm not mistaken.
 
-I've tried to mimic this code in
-[gpio.rs](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L172).
+#### Suggestion walk through
+This is just to help me present this to someone else and find a good way of
+explaining.
+
+##### 1) Lets begin with the [async_gpio.rs](https://github.com/danbev/embassy/blob/embassy-rp-async/examples/rp/src/bin/async_gpio.rs#L20) example
+```rust
+    let mut async_input = AsyncInput::new(p.PIN_16, Pull::None);
+    async_input.wait_for_high().await;
+```
+The struct `AsyncInput` should probably be merged into the `Input` struct but when
+I started I found it simpler to have a separate struct. So we create the
+AsyncInput and then call `wait_for_high` and then await it.
+
+##### 2) [wait_for_high](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L147-L153)
+Creates a new `AsyncInputFuture` and then awaits it:
+```rust
+AsyncInputFuture::new(&mut self.input.pin, InterruptTrigger::LevelHigh).await;
+```
+
+##### 3) [new](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L225)
+Will first disble interrupts and then the level_high in this case, and finally
+enable interrupts again.
+
+##### 4) [IO_IRQ_BANK0](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L173)
+I've commented this function quite heavily to explain what is going on but
+the basic idea it to iterate over the pins and figure out which have any events
+triggered. If there has been a specify event the code will disable that event
+for the pin and then call wake.
+
+##### 5) [poll](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L282)
+When poll now gets called by the executor it will check the level it was created
+with and if that level has been disabled, which is done by the IRQ handler, it
+will return `Poll::Ready`, and otherwise return `Poll::Pending`.
 
 #### Example
 [async_gpio](https://github.com/danbev/embassy/blob/embassy-rp-async/examples/rp/src/bin/async_gpio.rs)
