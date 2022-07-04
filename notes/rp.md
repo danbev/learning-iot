@@ -1648,7 +1648,7 @@ enable interrupts again.
 ##### 4) [IO_IRQ_BANK0](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L173)
 I've commented this function quite heavily to explain what is going on but
 the basic idea it to iterate over the pins and figure out which have any events
-triggered. If there has been a specify event the code will disable that event
+triggered. If there has been a specific event the code will disable that event
 for the pin and then call wake.
 
 ##### 5) [poll](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L282)
