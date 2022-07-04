@@ -482,7 +482,7 @@ fn regs() -> &'static pac::gpiote::RegisterBlock {
 }
 ```
 So this will return a pointer to a RegisterBlock and stores that in variable `g`
-for RegisterBlock I think. Lets take a closer look at
+for GPIOTE I think. Lets take a closer look at
 [RegisterBlock](https://github.com/nrf-rs/nrf-pacs/blob/master/pacs/nrf52833-pac/src/gpiote.rs):
 ```rust
 pub struct RegisterBlock {
