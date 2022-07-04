@@ -1615,11 +1615,12 @@ typedef struct {
 ```
 0x400140f0 which is the INTR0 register (raw interrupts register).
 
-So this is setting the raw interrupt for the current pin. First the location/
-position of the start of the group/events is determined and then the events are
-moved to that location. The `GPIO<pin_nr>_LEVEL_HIGH`, and
-`GPIO<pin_nr>_LEVEL_LOW` are of type `WC` which I think stands for write clear.
-So writing to anything to these fields will clear them if I'm not mistaken.
+So `gpio_acknowledge_irq` this is setting the raw interrupt for the current pin.
+First the location/position of the start of the group/events (gpio/8) is
+determined and then the events are moved to that location (4 * (gpio % 8). The
+`GPIO<pin_nr>_LEVEL_HIGH`, and `GPIO<pin_nr>_LEVEL_LOW` are of type `WC` which
+I think stands for write clear.  So writing to anything to these fields will
+clear them if I'm not mistaken.
 
 I've tried to mimic this code in
 [gpio.rs](https://github.com/danbev/embassy/blob/embassy-rp-async/embassy-rp/src/gpio.rs#L172).
@@ -1673,3 +1674,85 @@ AsyncInputFuture::poll return Poll::Ready
 This is a single bit that is typically set by a piece of hardware and then
 written to by the processor to clear the bit. The bit is cleared by writing a 1,
 using either a normal write or the clear alias.
+
+
+### rp2040pac2 gpio interrupt notes
+```rust
+impl Io {
+    pub fn gpio(self, n: usize) -> Gpio {
+        assert!(n < 30usize);
+        unsafe { Gpio(self.0.add(0usize + n * 8usize)) }
+    }
+    #[doc = "Raw Interrupts"]
+    pub fn intr(self, n: usize) -> crate::common::Reg<regs::Int, crate::common::RW> {
+        assert!(n < 4usize);
+        unsafe { crate::common::Reg::from_ptr(self.0.add(240usize + n * 4usize)) }
+    }
+    pub fn int_dormant_wake(self) -> Int {
+        unsafe { Int(self.0.add(352usize)) }
+    }
+    pub fn int_proc(self, n: usize) -> Int {
+        assert!(n < 2usize);
+        unsafe { Int(self.0.add(256usize + n * 48usize)) }
+    }
+}
+```
+IO_IRQ_BANK0 is 0x40014000
+
+
+#### intr
+Raw interrupt.
+```
+let raw_int = pac::IO_BANK0.intr(pin / 8);
+```
+Lets say that our pin is 16. 16 / 8 = 2. So we are passing 2 into `intr` which
+is the register that this pin belongs to.
+```rust
+    pub fn intr(self, n: usize) -> crate::common::Reg<regs::Int, crate::common::RW> {
+        unsafe { crate::common::Reg::from_ptr(self.0.add(240usize + n * 4usize)) }
+    }
+```
+So `self.0` would be 0x40014000 and we are adding to that:
+```
+0x40014000 + 240 + (2 * 4) =
+0x40014000 + 248           =
+
+In hex:
+0x40014000 + F8            = 0x400140F8 = INTR2 (offset 0x0f8)
+```
+
+#### inte_proc
+```rust
+let cpu = SIO.cpuid().read() as usize;
+let int_proc: pac::io::Int = pac::IO_BANK0.int_proc(cpu);
+```
+I find it a little confusing that the function name is `int_proc` and not
+`inte_proc` or event better `proc_inte` which closer to the actual name of the
+registers, like `PROC0_INTE0).
+
+So cpu can be either 0 or 1 which is passed into `int_proc`:
+```rust
+    pub fn int_proc(self, n: usize) -> Int {
+        unsafe { Int(self.0.add(256usize + n * 48usize)) }
+    }
+```
+So `self.0` would be 0x40014000 and we are adding to that:
+```
+0x40014000 + 256 + (0 * 48) =
+0x40014000 + 256 + 0        =
+
+In hex:
+0x40014000 + 100            = 0x40014100 = PROC0_INTE0 (offset 0x100)
+```
+And if we pass in 1:
+```
+```
+0x40014000 + 256 + (1 * 48) =
+0x40014000 + 256 + 48       =
+0x40014000 + 304            =
+
+In hex:
+0x40014000 + 130            = 0x40014130 = PROC1_INTE0 (offset 0x130)
+```
+
+```
