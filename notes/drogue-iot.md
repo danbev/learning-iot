@@ -868,7 +868,7 @@ $ cargo install --features=ssl websocat
 
 Create new API token:
 ```console
-$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" -XPOST https://api.sandbox.drogue.cloud/api/tokens/v1alpha1 | jq
+$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" -XPOST https://api-drogue-dev.apps.wonderful.iot-playground.org/api/tokens/v1alpha1 | jq
 {
   "prefix": "drg_11HCSH",
   "token": "xxxxxxxxxxxxxx"
@@ -878,7 +878,7 @@ The prefix can be used later to delete the token.
 
 Get tokens:
 ```console
-$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" https://api.sandbox.drogue.cloud/api/tokens/v1alpha1 | jq
+$ curl -vs -H "Authorization: Bearer $(drg whoami --token)" https://api-drogue-dev.apps.wonderful.iot-playground.org/api/tokens/v1alpha1 | jq
 ```
 
 
