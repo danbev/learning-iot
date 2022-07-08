@@ -1787,3 +1787,34 @@ In hex:
 ```
 
 ```
+
+### rp2040_pac2 common Reg
+The Reg `write` function confused me for a while and I was not sure if I was
+supposed to return a value or not. For example:
+```rust
+proc_intx.inte(pin / 8).write(|w|
+    w.set_edge_high((pin % 8) as usize, false);
+);
+```
+or
+```rust
+proc_intx.inte(pin / 8).write(|w|
+    w.set_edge_high((pin % 8) as usize, false)
+);
+```
+Teh write function itself looks like this:
+```rust
+impl<T: Default + Copy, A: Write> Reg<T, A> {
+    pub unsafe fn write<R>(&self, f: impl FnOnce(&mut T) -> R) -> R {
+        let mut val = Default::default();
+        let res = f(&mut val);
+        self.write_value(val);
+        res
+    }
+}
+```
+Now, notice that `val` is passed into the closure, and this is also what is
+written/passed to `write_value`. The actual returned value from the closure
+is then returned from `write` functions itself. If we don't really indend to
+return a value then not specifying any will just return the unit type `()`.
+
