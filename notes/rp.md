@@ -1701,6 +1701,45 @@ AsyncInputFuture::poll pin 16 is high so clear the interrupt flag
 AsyncInputFuture::poll return Poll::Ready
 ```
 
+### probe-run with Pico
+Instead of using PicoProbe as the programmer, which I've not been able get
+working `probe-run`, using [](https://github.com/majbthrd/DapperMime/) did work.
+Follow the
+[instructions](https://github.com/rp-rs/rp2040-project-template/blob/main/debug_probes.md) 
+for flashing the Pico PI programmer device. The you should be able to list
+the probe using:
+```console
+$ probe-run --list-probes
+the following probes were found:
+[0]: RP2040 CMSIS-DAP (VID: cafe, PID: 4005, Serial: 6E0685833874D513, CmsisDap)
+```
+And running the embassy-rp examples should no work:
+```console
+$ cargo run --bin blinky
+   Compiling embassy-rp-examples v0.1.0 (/home/danielbevenius/work/drougue/embassy/examples/rp)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.30s
+     Running `probe-run --chip RP2040 target/thumbv6m-none-eabi/debug/blinky`
+(HOST) INFO  flashing program (16 pages / 64.00 KiB)
+(HOST) INFO  success!
+────────────────────────────────────────────────────────────────────────────────
+0.009386 INFO  led on!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:17
+1.010551 INFO  led off!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:21
+2.011407 INFO  led on!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:17
+3.012112 INFO  led off!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:21
+4.012854 INFO  led on!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:17
+5.013545 INFO  led off!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:21
+6.014279 INFO  led on!
+└─ blinky::____embassy_main_task::{async_fn#0} @ src/bin/blinky.rs:17
+7.014991 INFO  led off!
+```
+
+
 ### WC
 This is a single bit that is typically set by a piece of hardware and then
 written to by the processor to clear the bit. The bit is cleared by writing a 1,
