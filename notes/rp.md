@@ -1857,3 +1857,24 @@ written/passed to `write_value`. The actual returned value from the closure
 is then returned from `write` functions itself. If we don't really indend to
 return a value then not specifying any will just return the unit type `()`.
 
+
+### Teleprobe
+[Teleprobe]([https://github.com/embassy-rs/teleprobe) is a testing application
+for embedded programs.
+
+Install `teleprobe`:
+```console
+$ cargo install --path .
+$ teleprobe --version
+teleprobe 1.0
+```
+The we should be able to list probes using:
+```console
+$ teleprobe local list-probes
+cafe:4005:6E0685833874D513 -- CmsisDap RP2040 CMSIS-DAP
+```
+And we should then be able to run a program using:
+```console
+$ teleprobe local run --elf target/thumbv6m-none-eabi/debug/async_gpio --chip RP2040 --probe cafe:4005
+```
+
