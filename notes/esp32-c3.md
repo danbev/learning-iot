@@ -47,7 +47,7 @@ Error: Unknown target arch!
 I misunderstood things completly and thought that it would be possible to simply
 connect an USB cable and be good to go. But we need an additional USB cable, or
 just one if we can power the device with it as well, which should be connected
-to `D-`, `D+`, `VBUS`, and `GND`. Is is also possible to use an external JTAG
+to `D-`, `D+`, `VBUS`, and `GND`. It is also possible to use an external JTAG
 adapter. 
 
 I went with the first option of using a single USB and connected the wires like
