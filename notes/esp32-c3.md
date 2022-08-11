@@ -398,11 +398,23 @@ Please visit https://rainmaker.espressif.com for additional information.
 ####################################################################################################
 I (1338) app_wifi: Provisioning Started. Name : PROV_adc0d2, POP : adbd1dde
 ```
-I think I got this all wrong and that I still need a jtag programmer...going
-to read through the technical reference. Perhaps I should have started by
-reading it :( 
+I misunderstood this completly and thought that it would be possible to simply
+connect an USB cable and be good to go. But we need an additional USB cable
+, or just one if we can power the device with it as well) which should be
+connected to `D-`, `D+`, `VBUS`, and `GND`. Is is also possible to use an
+external JTAG adapter. 
+
 _wip_
 
+### USB Serial/JTAG Controller (USB_SERIAL_JTAG)
+This can program the system of chips flash, read program output, and also attach
+as a debugger to a running program. The docs say that this is prossible without
+from an USB host without any additional external components.
+The serial port communication is a two-wire interface which is mainly used to
+flash new firmware (program the device). The USB Serial part of this controller
+is what converts/transforms/translates from USB to serial format. When an error
+occurs the JTAG debugging port is used which requires interfacing with the JTAG
+debug port which usually requires an external JTAG adapter.
 
 ### eFuse Controller (eFuse)
 This component is a 4096-bit eFuse controller for one-time programmable storage
