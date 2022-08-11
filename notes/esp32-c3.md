@@ -113,6 +113,20 @@ Info : starting gdb server for esp32c3 on 3333
 Info : Listening on port 3333 for gdb connections
 ```
 
+### gdb
+```console
+$ wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
+$ gunzip -dc xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz | tar xvf -
+```
+The we need place update our PATH and add the `bin` directory. After doing that
+we should then be able to connect in gdb using:
+```console
+$ xtensa-esp32-elf-gdb
+(gdb) target remote localhost:3333
+```
+In this case I don't have the source (just using the program that came with
+flashed on the board by default.
+
 ### USB Serial/JTAG Controller (USB_SERIAL_JTAG)
 This can program the system of chips flash, read program output, and also attach
 as a debugger to a running program. The docs say that this is prossible without
