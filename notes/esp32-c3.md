@@ -407,7 +407,7 @@ external JTAG adapter.
 I went with the first option of using a single USB and connected the wires like
 this:
 
-![ESP32-C3-MINI-1 USB connection image](./img/esp32-c3-usb.jpg "Image of ESP32-C3-MINI-1 USB connection")
+![ESP32-C3-MINI-1 USB connection image](./img/esp32-c3-mini1-usb.jpg "Image of ESP32-C3-MINI-1 USB connection")
 
 Now, if I do a `lsusb` I get:
 ```console
