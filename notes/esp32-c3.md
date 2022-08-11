@@ -438,6 +438,11 @@ rules to `/etc/udev/rules.d/60-openocd.rules`:
 ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="660", GROUP="plugdev", TAG+="uaccess"
 ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1002", MODE="660", GROUP="plugdev", TAG+="uaccess"
 ```
+And the reload the rules:
+```console
+$ sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
 After that I was able to start openocd:
 ```console
 $ esp32-openocd -f board/esp32c3-builtin.cfg 
