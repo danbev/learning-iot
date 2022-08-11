@@ -398,4 +398,18 @@ Please visit https://rainmaker.espressif.com for additional information.
 ####################################################################################################
 I (1338) app_wifi: Provisioning Started. Name : PROV_adc0d2, POP : adbd1dde
 ```
+I think I got this all wrong and that I still need a jtag programmer...going
+to read through the technical reference. Perhaps I should have started by
+reading it :( 
 _wip_
+
+
+### eFuse Controller (eFuse)
+This component is a 4096-bit eFuse controller for one-time programmable storage
+parameters. eFuse is a microscopic fuse that is placed on a chip. This
+technology was invented by IBM in 2004 and allows for dynamic reprogramming of a
+chip. So instead of hard wiring this allows changes to be made during operation.
+If one of these parameter are written with a 1, it can never be reverted back to
+0. The values of parameters can only be read by using the eFuse Controller.
+
+
