@@ -7,7 +7,6 @@ version = "0.1.0"
 cortex-m = "0.7.3"
 cortex-m-rt = "0.7.0"
 embedded-hal = "0.2.6"
-embassy = { git = "https://github.com/embassy-rs/embassy.git" }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", features=["nightly"]}
 embassy-stm32 = { git = "https://github.com/embassy-rs/embassy.git", features = ["memory-x", "stm32f070rb"] }
-#embassy = { git = "https://github.com/embassy-rs/embassy.git", features = ["defmt", "memory-x", "stm32f070rb"] }
 panic-halt = "0.2.0"
