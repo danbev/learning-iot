@@ -125,7 +125,22 @@ $ xtensa-esp32-elf-gdb
 (gdb) target remote localhost:3333
 ```
 In this case I don't have the source (just using the program that came with
-flashed on the board by default.
+flashed on the board by default).
+
+Example of flashing the device:
+```console
+(gdb) monitor reset halt
+JTAG tap: esp32c3.cpu tap/device found: 0x00005c25 (mfg: 0x612 (Espressif Systems), part: 0x0005, ver: 0x0)
+Reset cause (3) - (Software core reset)
+
+(gdb) monitor flash write_image erase hello.elf.hex
+PROF: Erased 4096 bytes in 672.454 ms
+PROF: Compressed 4096 bytes to 22 bytes in 0.083000ms
+PROF: Data transferred in 36.64 ms @ 0.586364 KB/s
+PROF: Wrote 4096 bytes in 5495.14 ms (data transfer time included)
+auto erase enabled
+wrote 4096 bytes from file hello.elf.hex in 6.172287s (0.648 KiB/s)
+```
 
 ### USB Serial/JTAG Controller (USB_SERIAL_JTAG)
 This can program the system of chips flash, read program output, and also attach
