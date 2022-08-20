@@ -1878,3 +1878,17 @@ And we should then be able to run a program using:
 $ teleprobe local run --elf target/thumbv6m-none-eabi/debug/async_gpio --chip RP2040 --probe cafe:4005
 ```
 
+### Pico Pi W (WiFi)
+This board has a [CYW43439](./cyw43439.md) component which provides WiFi and
+Bluetooth support. 
+
+I've connected a RP Pico Pi W with a RP Pico which is used as the programmer:
+
+![RP Pico W connections](./img/rp-pico-w-connections.jpg "RP Pico W connections")
+
+With connected to my laptop `probe-run` will detect the probe:
+```console
+$ probe-run --list-probes
+the following probes were found:
+[0]: RP2040 CMSIS-DAP (VID: cafe, PID: 4005, Serial: 6E0685833874D513, CmsisDap)
+```
