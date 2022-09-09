@@ -1880,7 +1880,8 @@ $ teleprobe local run --elf target/thumbv6m-none-eabi/debug/async_gpio --chip RP
 
 ### Pico Pi W (WiFi)
 This board has a [CYW43439](./cyw43439.md) component which provides WiFi and
-Bluetooth support. 
+Bluetooth support and contains a ARM Cortex M3 microprocessor. The wireless
+interface is connected via SPI to the RP2040.
 
 I've connected a RP Pico Pi W with a RP Pico which is used as the programmer:
 
@@ -1892,3 +1893,10 @@ $ probe-run --list-probes
 the following probes were found:
 [0]: RP2040 CMSIS-DAP (VID: cafe, PID: 4005, Serial: 6E0685833874D513, CmsisDap)
 ```
+
+The pins GPIO23, GPIO24, GPIO25, and GPIO29 are used for internal board
+functions on PICO PI W:
+* GPIO23 Wireless power on Signal
+* GPIO24 Wireless SPI data/IRQ
+* GPIO25 Wireless SPI CS
+* GPIO29 Wireless SPI CLK/ADC mode 
