@@ -107,7 +107,7 @@ Address
 ...
 0x09-0x0B  Common CIS pointer
 ```
-For example take `I/O Enable` it has 7 entries for functions (not that function
+For example take `I/O Enable` it has 7 entries for functions (note that function
 0 is not included which is the function for the Common I/O Area itself.
 I think how this works is that this common area, which remember is at a fixed
 address can be used to check what functions are available and also enable them,
