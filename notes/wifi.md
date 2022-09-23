@@ -41,3 +41,49 @@ TODO: WPA/WPA2
 #### 802.11X
 TODO: Authenitcation protocol
 
+
+### Wireless Supplicant
+Is a program that is responsible for making login requests to a wireless
+network. It passes the login and encryption credentials to an authentication
+server.
+
+### Drogue WiFi
+I've got a task that enable the usage of https://github.com/embassy-rs/cyw43
+with drogue IoT.
+
+There are a few traits in drogue-device/src/traits/wifi.rs:
+```rust
+pub enum Join<'a> {
+    Open,
+    Wpa { ssid: &'a str, password: &'a str },
+}
+
+pub enum JoinError {
+    Unknown,
+    InvalidSsid,
+    InvalidPassword,
+    UnableToAssociate,
+}
+
+pub trait WifiSupplicant {
+    type JoinFuture<'m>: Future<Output = Result<IpAddr, JoinError>>
+    where
+        Self: 'm;
+    fn join<'m>(&'m mut self, join: Join<'m>) -> Self::JoinFuture<'m>;
+}
+```
+
+### Access Point (ap)
+This mode means that the device is acting like a wireless router and has an
+SSID. So another device will be able to connect to it.
+
+
+### Station (sta)
+This mode means that the device can act as a wireless client and connect to
+a wireless router.
+
+### Service Set ID (SSID)
+This is a unique name for a WLAN on a network. This is what we specify when we
+want to join a network.
+
+
