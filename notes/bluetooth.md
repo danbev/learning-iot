@@ -252,7 +252,6 @@ Lower Guard Band (LGB): 2.0
 Upper Guard Band:(UGB) 3.5
 
 Channels:
-```
     =  2,402.0 <--+
 0   =  2,404.0    |
 1   =  2,406.0    |
