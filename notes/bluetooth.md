@@ -969,6 +969,7 @@ connection.
 ```
  Central      PAIRING_REQ                  Peripheral
           <------------------------------
+```
 
 
 ### BR/EDR Secure Connection Pairing
