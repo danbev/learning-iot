@@ -295,7 +295,7 @@ encrypted secure link can be switched to. This key is not stored and not reused.
 
 Bonding is a sequence of pairing followed by the generation and exchange of
 permanent keys which are stored in non-volotile memory (so this is an example
-of what non-volatile memory can be used for). With these setup there is not
+of what non-volatile memory can be used for). With these set up there is no
 need to go through this bonding process again.
 
 Encryption Re-establishment uses the keys from a previous bonding to establish
@@ -329,33 +329,29 @@ key generation. This type of pairing algorithm is called `Just Works`.
 `Passkey Display` can also be used where one of the peers randomally generates
 a 6-digit passkey and the other side is asked to enter it.
 
-`Out Of Bound (OOB)` this way additional data is transferred outside of BLE,
+`Out Of Bound (OOB)` in this mode additional data is transferred outside of BLE,
 like Near Field Communication (NFC).
 
 Security Keys:
 * Encryption Information (Long Term Key (LTK)) and Master Information (EDIV, Rand)
 
-### WiFi Direct
-Is  a peer-to-peer connection and and does not need a wifi access point. It uses
-the same frequency and similar bandwidth and speed as normal WiFi.
-
 ### Near-Field Communication (NFC)
 Other wireless devices emit radio signals but NFC communicate with an EM field
 (not a wave that is) between two coils. So these two coils need to be very
 close to each other for this to work.
-There can be passive tags don't have any power source of their own and instead
-get their power from the reader over the EM field.
+There can be passive tags that don't have any power source of their own and
+instead get their power from the reader over the EM field.
 
 ### Low-Power, Short-Range, Low-Data, Mesh technologies
-Mesh means many-to-many so with these technologies we can send a message to a
+Mesh means `many-to-many` so with these technologies we can send a message to a
 destination device without being directly connected to that device:
 ```
  A ---> B --> C
 ```
-In this case A want to send a message to device C but is only sending to B which
-migth be closer. A might be too far away to even be able to send to C. There
-can be many hops here and they can be spread out over fairly long distance and
-still have low power consuption for the devices.
+In this case A wants to send a message to device C but is only sending to B
+which migth be closer. A might be too far away to even be able to send to C.
+There can be many hops here and they can be spread out over fairly long distance
+and still have low power consuption for the devices.
 
 Examples: BlueTooth Low-Energy, ZigBee, Z-Wave, and 6LoWPAN.
 
@@ -369,14 +365,19 @@ Undirected advertisements accept connections from any peer.
 These have a specific format in the BLE specification:
 ```
 [<Where is it used>_]<When is it used>_<What does it do>_[Version_]<How is it used>
-
+```
+Notice that the `Where is it used` and `Version ` are optional. The fields are
+described below:
 Where is it used:
+```
 Is optional and the default is NONE:
 [<NONE|AUX>_]
-NONE = nothing which is the default and means the primary channelr
+NONE = nothing which is the default and means the primary channel
 AUX  = is used on the secondary physical channel
+```
 
 When is it used:
+```
 ADV = Normal Advertising
 SYNC = Periodic Advertising
 SCAN = Scanning
@@ -387,14 +388,18 @@ BIG =  TODO: Isochronous
 DATA = Reliable data
 CIS = TODO:
 BIS = TODO:
+```
 
 What does it do:
+```
 NONE
 DIRECT = directly connectable
 NONCONN = Non-connectable and non-scannable undirected
 SCAN = Scannable undirected.
+```
 
 Version:
+```
 None = original version of the PDU
 EXT = extended version of the PDU
 
@@ -404,11 +409,11 @@ REQ = A request that requires a response
 RSP = A response to a request.
 ```
 I found that initially when reading documentation and seeing something like
-ADV_IND we can understand that this is an advertisment PDU and that it is used
+`ADV_IND` we can understand that this is an advertisment PDU and that it is used
 as an indication that does not require a reply.
 
-The packet format for all PDU the same header and the payload varies depending
-on the type specified:
+The packet format for all PDU have the same header and the payload varies
+depending on the type specified:
 ```
  +-----------+------------------+
  | Header    | Payload          |
@@ -419,11 +424,24 @@ on the type specified:
  | Type  | RFU | ChSel | TxAdd | RxAdd | Length |
  +-------+-----+-------+-------+-------+--------+
 
+Type:
+     0000 ADV_IND                   Primary Advertising Channel
+     0001 ADV_DIRECT_IND            Primary Advertising Channel
+     0010 ADV_NONCONN_IND           Primary Advertising Channel
+     0011 SCAN_REQ                  Primary Advertising Channel
+     0011 AUX_SCAN_REQ              Secondary Advertising Channel
+     0100 SCAN_RSP                  Primary Advertising Channel
+     0101 CONNECT_IND               Primary Advertising Channel
+     0101 AUX_CONNECT_REQ           Secondary Advertising Channel
+     0110 ADV_SCAN_IND              Primary Advertising Channel
+     0111 ADV_EXT_IND               Primary Advertising Channel
+     0111 ADV_ADV_IND               Secondary Advertising Channel
 RFU = Reserved for Future Use
+
 ```
 
 ### Advertisement
-As mentioned earler in this document there BLE uses 40 different RF channels
+As mentioned earler in this document BLE uses 40 different RF channels
 and of these 40, 3 are called primary advertising channels. These are channels
 37, 38, and 39 and are closen to be furthest away from the WiFi channels.
 These channels are used for `advertisements`, `scan requests`, `scan responses`
@@ -647,7 +665,7 @@ channels except the primary channels. So even if we are using ubertooth to
 sniff/listen to one of the primary advertising channels, one ubertooth device
 can only listen to one channel with the default being channel 37, we might not
 see the CONNECT_IND as there is a 1/3 chanse of capturing it. We can try
-multiple times an hope to get lucky or invest in three ubertooth devices and
+multiple times and hope to get lucky or invest in three ubertooth devices and
 listen to all 3 primary channels.
 
 
@@ -751,7 +769,7 @@ which is sending out advertisements which is indicated by LED1 coming on.
 When we press the `Connect` button we will be paired and bonded with central
 which is the nrf-connect app if I'm understanding things correctly.
 
-This peripheras has a service that it is advertising named `Nordic LED and
+This peripheral has a service that it is advertising named `Nordic LED and
 Button Service`. In the attribute table we can find an attribute named
 `Blinky LED State` which is `Read and Write`. If we press on the up arrow we
 can send a new value. For example write a Bool value of true will turn on
@@ -761,23 +779,23 @@ LED3.
 Is a network allowing BLE Many-to-many communication. So it is based on BLE and
 uses something called managed flooding where messages/packets will get relayed
 by nodes in the network. This is managed in that there are ways to control how
-long the message can live, remeber packets to avoid bouncing. 
+long the message can live, and remember packets to avoid bouncing. 
 
-Devices in the mesh have difference roles. A Node is just a normal BLE device
-which broadcasts messages. The mesh also needs Releay Nodes which is what is
+Devices in the mesh have difference roles. A `Node` is just a normal BLE device
+which broadcasts messages. The mesh also needs `Releay Nodes` which is what is
 sounds like, a node that can receive a packet and then relay it in the network.
 The relay node needs to scan for packets continously and therefor requires a
 high amount of power so these nodes are mostly connected to a power source and
-not powered by batteries. There is also cache of messages that are stored so
+not powered by batteries. There is also a cache of messages that are stored so
 that the same message is not relayed over and over again. 
 
-Low Power Node (LPN) is a battery driven node that can switch off and only
-check for packets once in a while. But not risk missing messages these nodes
-are associated with a Friend Node which will is a node that can store messages
+`Low Power Node (LPN)` is a battery driven node that can switch off, and only
+check for packets once in a while. To not risk missing messages these nodes
+are associated with a `Friend Node` which will is a node that can store messages
 for a LPN.
 
 For a mobile phone to communicate with the BLE Mesh it needs to create a
-point-to-point connection with a node called a Proxy Node (implements the
+point-to-point connection with a node called a `Proxy Node` (implements the
 Proxy Node Role).
 
 The Link Layer and Physical Layer are the same for BLE Mesh as they are for
@@ -808,11 +826,11 @@ BLE but the host layer is completely different.
 
 
 When a device/node wants to be included in the mesh it needs to first be
-provisioned. This device wanting to join is called the provisionee and it will
-contact a devices that has the Provisioning Role.
+`provisioned`. This device wanting to join is called the provisionee and it will
+contact a devices that has the `Provisioning Role`.
 The provisionee needs to obtain/receive the following items:
 * Unicast Address
-* network key
+* Network key
 * IV index
 * IV update flag
 * Key Refresh flag
@@ -834,10 +852,10 @@ This process starts with the unprovisioned device sending out a new type of
 advertisement PDU called `mesh beacon`
 
 When a provisioner discovers the mesh beacon it will send an `invitation` to the
-unprovisioned device which is also a new PDU called provisioning invite PDU.
+unprovisioned device which is also a new PDU called `provisioning invite` PDU.
 
 When the unprovisioned device receives the `provisioning invite` it will in turn
-send a provision capabilities PDU which include:
+send a `provision capabilities` PDU which include:
 * The number of elements that it has
 * The security algorightms it supports
 * Input/Ouput capabilites
@@ -845,7 +863,7 @@ send a provision capabilities PDU which include:
 Next, the unprovisioned device will sends its public key to the provisioner and
 it will also send it's public key.
 
-The next step is authentication 
+The next step is authentication... 
 __wip__
 
 ### Connectionless Packet Switching
@@ -906,7 +924,7 @@ accessible (read/write), and also defines the services security requirements
 TODO: document how this actually work.
 
 A connection starts out without any security so the initial packets are sent
-in plain text. But the information in these packets are.
+in plain text.
 
 After a secure link has been established then every data packet sent will be
 protected by AES-CCM. 
@@ -1009,7 +1027,7 @@ encryption:
     
 ```
 Now, only someone with access to the key can decrypt the message. But it might
-be possible for someone to changed the content of the message in transit.
+be possible for someone to change the content of the message in transit.
 
 For example, if instead of hello above we had a message that was "Pay out 300"
 ```
