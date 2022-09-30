@@ -1075,3 +1075,113 @@ Bluetooth monitor ver 5.62
 = Index Info: 84:FD:D1:5C:FE:7B (Intel Corp.)                                                                                                  [hci0] 0.153006
 @ MGMT Open: bluetoothd (privileged) version 1.20                                                                                            {0x0001} 0.153006
 ```
+
+### blueZ
+This is the official Linux Bluetooth Protocol Stack. It is like mentioned above
+also split into two blocks, one is the Host and the other the Controller.
+blueZ implements the Host layer part which recall contains the GAP, GATT, EATT,
+SMP, and L2CAP. The Host and the Controller communicate using the Host
+Controller Interface which can be done using UART, USB, Secure Digital (SD), or
+3-wire UART.
+
+If the Linux computer is going to host 
+
+A linux computer is going to host GAP/GATT applications then a daemon is
+required named `bluetoothd`. And if the linux computer is going to host an
+BLE mesh node then a daemon named `bluetooth-meshd` needs to be running.
+So its one or the other, a single linux computer cannot host both at the same
+time it seems. The daemon serializes and handles all the HCI communication.
+
+Now, applications on linux do not communicate directly with these daemons but
+instead usd `dbus` which is an IPC system on linux. So an application does not
+have to include any blueZ header files but is decoupled from it by using the
+IPC/messaging and the application instead used dbus apis.
+```
+ +--------------------------------------------+
+ |  +------+               +------+           |
+ |  | app1 |               | app2 |           |
+ |  +------+               +------+           |
+ |     | remote metod call     ↑ signal       |
+ |     ↓                       |              |
+ |  +---------------------------------+       |
+ |  |              D-Bus (daemon)     |       |
+ |  +---------------------------------+       |
+ |                   ↑                        |
+ |                   ↓                        |
+ |  +---------------------------------+       |
+ |  |              D-Bus (daemon)     |       |
+ |  |    bluetoothd | bluetooth-meshd |       |
+ |  +---------------------------------+       |
+ |                                            |
+ +--------------------------------------------+
+                     ↑ HCI
+                     ↓
+ +--------------------------------------------+
+ |        Bluetooth Controller                |
+ +--------------------------------------------+
+ 
+```
+
+The blueZ api is contains in a number of text files which can be found here:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc
+
+### D-Bus
+TODO: extract this to a separate document if it gets too long.
+The central concept/component in dbus is the message bus and there are two types
+, the `system` and the `session` bus.
+There is a single instance of the system bus but there is one session bus per
+logged in session on linux.
+
+An applications connects to the dbus will then be allocated a unique connection
+name which starts with a `:`. Communication is done by sending dbus messages.
+
+Dbus is object oriented in there are objects which implment interfaces. These
+interfaces have dot-separated names like 'se.something.Test`. If one application
+creates an Object it can export it do dbus making it available for other
+applications to call by sending a special message to the bus. Each Object also
+has a unique identifier that looks like a path and is how dbus routes messages
+to the correct application. So the Object `se.something.Test` migth be in the
+`/se/something' application.
+An object can also send out a message without the message being a response to
+a method call. These are called signals which are events that applications can
+register interest in of receiving.
+An object can also have properties which can be get/set.
+
+We can monitor the system bus using:
+```console
+$ sudo dbus-monitor --system
+```
+And we can monitor the session bus using:
+```console
+$ sudo dbus-monitor --session
+```
+
+### Node
+Is a device that has joined a mesh network, which means the device has been
+provisioned. If a device has not joined it is simply called an unprovisioned
+node.
+
+### Relay Node
+A device that supports the relay feature so it can retransmit broadcasted
+message. This increases the reach of the network and allows the message to
+travel further than is possible by a single node (the sender).
+
+### Proxy Node
+Does translation between proxy protocol PDUs and mesh PDUs and enables non-mesh
+BLE devices to communicate with the mesh network using GATT.
+
+### Low Power Node (LPN) and Friend Nodes
+Are devices that run on batteries and need to preserves as much power as
+possible only using its radio at a minimum. Now my first thought was that this
+might be to limit the time the device sends out data, but it turns out that it
+is often related to receiving updates of a setting for example. If the device
+can be have a setting changed it would need to listen/receive these messages. If
+it has to listen at certain constantly to not risk missing a message with an
+update. This is where a Friend Node comes into play which caches messages that
+are destined for the LPN device. The LPN device can then wakeup and poll for
+messages from the Friend without risking missing any messages.
+
+
+
+### Friend Node
+
