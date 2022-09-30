@@ -1181,7 +1181,36 @@ update. This is where a Friend Node comes into play which caches messages that
 are destined for the LPN device. The LPN device can then wakeup and poll for
 messages from the Friend without risking missing any messages.
 
+### Mesh Arch
+In contast to BLE where devices connect directly to each other, in BLE-mesh
+devices use advertisements and scanning states to relay messages to each other.
 
+#### Layers:
+From bottom to to layers.
 
-### Friend Node
+##### Bluetooth Low Energy Layer
+Same as BLE and needs a BLE stack. Mesh used advertisments and scanning states
+and the connected state when Proxy Nodes are used.
 
+##### Bearer Layer
+Defines how different PDUs are handled. There is an Advertsing Bearer which
+handles adv and scanning states.
+There is also a GATT Bearer
+
+##### Lower Transport Layer
+This layer takes care of re-assembling packets from the bearer layer, and also
+splitting of large packets coming from the Upper Transport layer.
+
+##### Upper Transport Layer
+Is responsible for handling Encryption, Decryption, Authentication, and
+Transport Control messages like heartbeats for example.
+
+##### Access Layer
+Handles application data format, encryption and decryption, and data
+verification.
+
+##### Foundation Models Layer
+Handles network configuration and management models.
+
+##### Models Layer
+TODO: look closer at what this actually is
