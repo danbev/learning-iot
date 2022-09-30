@@ -847,24 +847,6 @@ But other groups can be defined during by configuring application.
 Is an address that is assigned to one or more elements, and it can span multiple
 nodes.
 
-#### Provisioning
-This process starts with the unprovisioned device sending out a new type of
-advertisement PDU called `mesh beacon`
-
-When a provisioner discovers the mesh beacon it will send an `invitation` to the
-unprovisioned device which is also a new PDU called `provisioning invite` PDU.
-
-When the unprovisioned device receives the `provisioning invite` it will in turn
-send a `provision capabilities` PDU which include:
-* The number of elements that it has
-* The security algorightms it supports
-* Input/Ouput capabilites
-
-Next, the unprovisioned device will sends its public key to the provisioner and
-it will also send it's public key.
-
-The next step is authentication... 
-__wip__
 
 ### Connectionless Packet Switching
 Each packet contains the complete routing infomation in its header section, like
@@ -1177,9 +1159,10 @@ might be to limit the time the device sends out data, but it turns out that it
 is often related to receiving updates of a setting for example. If the device
 can be have a setting changed it would need to listen/receive these messages. If
 it has to listen at certain constantly to not risk missing a message with an
-update. This is where a Friend Node comes into play which caches messages that
-are destined for the LPN device. The LPN device can then wakeup and poll for
-messages from the Friend without risking missing any messages.
+update. This is where a Friend Node, always-on device, comes into play which
+caches messages that are destined for the LPN device. The LPN device can then
+wakeup and poll for messages from the Friend without risking missing any
+messages.
 
 ### Mesh Arch
 In contast to BLE where devices connect directly to each other, in BLE-mesh
@@ -1199,18 +1182,166 @@ There is also a GATT Bearer
 
 ##### Lower Transport Layer
 This layer takes care of re-assembling packets from the bearer layer, and also
-splitting of large packets coming from the Upper Transport layer.
+splitting of large packets coming from the Upper Transport layer into multiple
+Lower Transport PDUs.
 
 ##### Upper Transport Layer
 Is responsible for handling Encryption, Decryption, Authentication, and
-Transport Control messages like heartbeats for example.
+Transport Control messages like heartbeats for example. The keys used here
+are the network keys.
+A subnet is a group of nodes that can communicate with each other if they share
+a network key.
 
 ##### Access Layer
 Handles application data format, encryption and decryption, and data
-verification.
+verification. The keys used in this layer are application keys.
 
 ##### Foundation Models Layer
 Handles network configuration and management models.
 
 ##### Models Layer
 TODO: look closer at what this actually is
+
+#### Provisioning
+This process is about adding a unprovisioned device to the mesh network. The
+unprovisioned device gets added to the network by a node (an already provisioned
+device) capable of adding it to the network. This node, the provisioner, is
+usually a PC, a phone, or a tablet.
+
+There are 5 steps involved in provision:
+##### 1) Beaconing
+The unprovisioned device sends out a message saying that it is available to be
+provisioned. This is done a new type of advertisement PDU called `mesh beacon`
+
+##### 2) Invitation
+When a provisioner discovers the mesh beacon it will send an `invitation` to the
+unprovisioned device which is also a new PDU called `provisioning invite` PDU.
+
+When the unprovisioned device receives the `provisioning invite` it will in turn
+send a `provision capabilities` PDU in response which include:
+* The number of elements that it has
+* The security algorightms it supports
+* Input/Ouput capabilites
+  - Can the device display output to the user
+  - Can the device receive an input from the user (like button or something)
+* Ability to use Out-of-Band (OOB) technology
+
+##### 3) Public Key Exchange
+When ECDH is used public keys are exchange between the provisioner and the
+unprovisioned device.
+
+##### 4) Authentication
+This step is about authenticating the unprovisioned device. How this done
+depends on the capabilities of the device.
+
+In `output OOB` the unprovisioned device might be able to display a random
+number to the user, or blink an LED, output a beep. The user then takes that
+number and inputs it to the provisioner device or confirms that it seen the
+the number of blinks, heard the number of beeps etc.
+
+In `input OOB` is when the provisioner generates a random number which is then
+entered/inputted into the unprovisioned device. 
+
+In `static OOB` k
+5.4.2.4 in Mesh Profile v1.0
+
+
+Next, the unprovisioned device will sends its public key to the provisioner and
+it will also send it's public key.
+
+The next step is authentication... 
+__wip__
+
+### Messages
+All communication in BLE mesh is done by sending messages which operate on
+states.
+
+A message is defined as having; opcode, associated parameters, and behaviour.
+
+A message has an opcode which can be a single octet, a single byte, or it can
+be two bytes (used for standard messages), or three bytes for vendor specific
+messages. So those are just the number of bytes uses for the opcode, the fewer
+bytes used for the opcode means that there is more room for other things.
+
+It is the Transport Layer that determines the total message size, which the
+opcode is part of. If the max message size if overriden then the transport layer
+will use Segmentation and Reassembly (SAR) to split the message into multiple
+packets before sending and receiving side will have to reassemble the packets
+which is a performance cost and something that is good to avoid with low powered
+devices.
+
+11 bytes are provided by the transport layer for non-segmented messages, so if
+we have a 1 byte opcode that leaves 10 bytes for the additional message, and
+for a 2 byte opcode it leaves 9 bytes, and for a 3 byte opcode it leaves 8
+bytes.
+
+### Addresses
+There are `unicast addresses`, `virtual addresses`, `group addresses`, and a
+special values that represents an unassigned address (not used in messages
+though).
+
+A `unicast` address is allocated to an element by the provisioner. These can
+appear in the source or destination address fields of a message. Messages sent
+to a unicast address are only processed by one element.
+Example:
+```
+ 00000000 00000001
+```
+
+A `group` address represents elements from one or more nodes. There are two
+types, dynamically assigned which are 0xC000-0xFEFF, and fixed addresses which
+are assigned by the SIG and divided into 5 segments
+```
+0xFFFF - All Nodes
+0xFFFC - All Proxies Nodes
+0xFFFD - All Friend Nodes
+0xFFFE - All Relay Nodes
+```
+Example:
+```
+ 11 000000 00000000
+```
+There are 16384 group addresses per mesh network. This seems like a large
+number but remember that each device can have more than one element and this
+the group addess might get used up. Virtual addresses are used to extend this
+number (at least that is my current understanding).
+
+A `virtual` address is a multicast address and can be used to address multiple
+elements on one or more nodes.
+Each virtual address represents a `Label UUID` .
+```rust
+pub struct VirtualAddress(u16);
+```
+
+Example:
+```
+     13              0
+     [ hash value    ] 
+ 10  00 0000 0000 0000
+  ↑
+10 indicate this is a virtual address
+```
+The hash value is derived from a Label UUID which is 128-bits. So if I have two
+devices that both use the same Label UUID they would get the virtual address.
+
+An `unassinged` address can look like this:
+```
+ 00000000 00000000
+```
+
+
+### Label UUID
+Is a 128-bit value.
+```rust
+pub struct LabelUuid {
+    uuid: [u8; 16],
+    address: VirtualAddress,
+} 
+```
+
+### Configuration Client
+Is responsible for generating and distributing network and application keys and
+makes sure that devices that need to communicate with each other share the
+correct keys for both the network (Upper Transport Layer?) and access layers.
+It can also remove a node from the network, turning it back into an
+unprovisioned device.
