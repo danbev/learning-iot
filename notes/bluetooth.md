@@ -775,14 +775,21 @@ Button Service`. In the attribute table we can find an attribute named
 can send a new value. For example write a Bool value of true will turn on
 LED3.
 
+### Elements
+I an addressable entity within a node. Every node has at the very least one
+element which is called the primary element, and the rest are called secondary
+elements. There are static and do not change for as long as the node is part
+of the network. I think it can change if the device gets unprovisioned and
+then reprovisioned.
+
 ### BLE Mesh
 Is a network allowing BLE Many-to-many communication. So it is based on BLE and
 uses something called managed flooding where messages/packets will get relayed
 by nodes in the network. This is managed in that there are ways to control how
-long the message can live, and remember packets to avoid bouncing. 
+long the message can live, and remember/cache packets to avoid bouncing. 
 
 Devices in the mesh have difference roles. A `Node` is just a normal BLE device
-which broadcasts messages. The mesh also needs `Releay Nodes` which is what is
+which broadcasts messages. The mesh also needs `Releay Nodes` which is what it
 sounds like, a node that can receive a packet and then relay it in the network.
 The relay node needs to scan for packets continously and therefor requires a
 high amount of power so these nodes are mostly connected to a power source and
@@ -827,7 +834,7 @@ BLE but the host layer is completely different.
 
 When a device/node wants to be included in the mesh it needs to first be
 `provisioned`. This device wanting to join is called the provisionee and it will
-contact a devices that has the `Provisioning Role`.
+contact a device that has the `Provisioning Role`.
 The provisionee needs to obtain/receive the following items:
 * Unicast Address
 * Network key
@@ -836,11 +843,14 @@ The provisionee needs to obtain/receive the following items:
 * Key Refresh flag
 
 #### Unicast Address
-Is assigned during provisioning and uniquely identify a node.
+Is assigned during provisioning and uniquely identify a single element of and
+node. We send a message to an element of a node. This was actually not clear to
+be in the begining that it it actually elements and not nodes that we are
+addressing.
 
 #### Group Address
-Is used to identify a group of nodes. There are groups that are defined by the
-Bluetooth SIG for things like All-proxies, All-friends, and All-nodes.
+Is used to identify a group of one or more elements. There are groups that are
+defined by the Bluetooth SIG for things like All-proxies, All-friends, and All-nodes.
 But other groups can be defined during by configuring application.
 
 #### Virtual Address
@@ -1058,6 +1068,11 @@ Bluetooth monitor ver 5.62
 @ MGMT Open: bluetoothd (privileged) version 1.20                                                                                            {0x0001} 0.153006
 ```
 
+### Models
+The concept of models are there to enable less data having to be specified into
+the protocol data packets. By using specific models the devices know how to
+handle messages.
+
 ### blueZ
 This is the official Linux Bluetooth Protocol Stack. It is like mentioned above
 also split into two blocks, one is the Host and the other the Controller.
@@ -1137,6 +1152,8 @@ And we can monitor the session bus using:
 ```console
 $ sudo dbus-monitor --session
 ```
+For a standalone (not related to bluetooth) example of DBus see
+[learning-c/dbus](https://github.com/danbev/learning-c/tree/master/dbus).
 
 ### Node
 Is a device that has joined a mesh network, which means the device has been
@@ -1329,7 +1346,6 @@ An `unassinged` address can look like this:
  00000000 00000000
 ```
 
-
 ### Label UUID
 Is a 128-bit value.
 ```rust
@@ -1339,9 +1355,242 @@ pub struct LabelUuid {
 } 
 ```
 
+### Keys
+There are three types of keys, device key (DevKey), application key (AppKey),
+and network key (NetKey).
+
+The DevKey allows for secure communication between a Configuration Client and a
+single node. It is simlar to an application key as it also transfers data from
+the upper transport layer securely but this key is only know by the device and
+the Configuration Client and no other devices. The Configuration Client allows
+for new application and network keys to be distributed which can be required to
+avoid transcan attacks (where a discared device is used to retrieve the network
+and/or application keys). So the devices that are still using those network keys
+and application keys I guess can be updated using the Configuration Client in
+that case and it does not matter if someone gets access to the old keys. Hmm,
+would it be possible to still retrieve the keys to decrypt old messages?
+
+
 ### Configuration Client
 Is responsible for generating and distributing network and application keys and
 makes sure that devices that need to communicate with each other share the
 correct keys for both the network (Upper Transport Layer?) and access layers.
 It can also remove a node from the network, turning it back into an
 unprovisioned device.
+
+### BLE Mesh example
+First we need to start the BLE Mesh Daemon, and before that we need to stop
+bluetoothd daemon which was mentioned earlier in this document:
+```console
+$ make stop-bluetoothd
+$ make start-bluetoothd-meshd
+sudo /usr/libexec/bluetooth/bluetooth-meshd --config . --storage ./lib --debug
+D-Bus ready
+Loading node configuration from ./lib
+mesh/mesh-mgmt.c:mesh_mgmt_list() send read index_list
+mesh/mesh.c:mesh_init() io 0x5576ed9c8080
+mesh/mesh-mgmt.c:read_index_list_cb() Number of controllers: 1
+mesh/mesh-mgmt.c:read_info_cb() hci 0 status 0x00
+mesh/mesh-mgmt.c:read_info_cb() settings: supp 0003feff curr 00000080
+mesh/mesh-io-generic.c:hci_init() Started mesh on hci 0
+mesh_ready_callback
+Added Network Interface on /org/bluez/mesh
+Hci dev 0000 removed
+```
+Notice that we passed a config parameter of `.` which will pick up the
+configuration file `config_db.json`. This file describes the mesh network which
+is called a Mesh Object.
+
+Next, we can start a ble mesh example:
+```console
+$ cd ~/work/eclipse-hackaton/firmware
+$ cargo r --release
+```
+(HOST) INFO  flashing program (35 pages / 140.00 KiB)
+(HOST) INFO  success!
+────────────────────────────────────────────────────────────────────────────────
+0.119781 INFO  btmesh: starting up
+└─ btmesh_driver::{impl#1}::run_driver::{async_fn#0} @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.121032 INFO  ========================================================================
+└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.121063 INFO  =  Unprovisioned                                                       =
+└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.121093 INFO  ------------------------------------------------------------------------
+└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.121124 INFO  uuid: 466349B95B3D4F50A39A04B15B0FA2F7
+└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.121276 INFO  ========================================================================
+└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+```
+
+Next, start use `mesh-cfgclient`:
+```console
+$ mesh-cfgclient --config config/config_db.json
+Mesh configuration loaded from config/config_db.json
+Proxy added: org.bluez.mesh.Node1 (/org/bluez/mesh/nodeb67cef0dd1b2451fa54f8d34edba371b)
+Proxy added: org.bluez.mesh.Management1 (/org/bluez/mesh/nodeb67cef0dd1b2451fa54f8d34edba371b)
+Attached with path /org/bluez/mesh/nodeb67cef0dd1b2451fa54f8d34edba371b
+```
+From here we can list unprovisioned devices:
+```console
+[mesh-cfgclient]# list-unprovisioned 
+Unprovisioned devices:
+```
+There are none so far as we need to scan for them first:
+```console
+[mesh-cfgclient]# discover-unprovisioned on
+Unprovisioned scan started
+```
+After that we can then list the unprovisioned nodes:
+```console
+Scan result:
+	rssi = -49
+	UUID = 466349B95B3D4F50A39A04B15B0FA2F7
+	OOB = A040
+```
+We can see that the `UUID` matches our device output and in this case is
+`466349B95B3D4F50A39A04B15B0FA2F7`. We can use this UUID to provision this
+unprovisioned device so that it becomes a node using:
+```console
+[mesh-cfgclient]# provision 466349B95B3D4F50A39A04B15B0FA2F7
+Provisioning started
+Assign addresses for 3 elements
+Provisioning done:
+Mesh node:
+	UUID = FE8817CB1D0D4250B35DE88939277C3A
+	primary = 00aa
+
+
+	elements (3):
+		element 0:
+			SIG model: 0000 "Configuration Server"
+			SIG model: 1001 "Generic OnOff Client"
+			SIG model: 1003 "Generic Level Client"
+			SIG model: 100d "Generic Battery Client"
+			SIG model: 1102 "Sensor Client"
+		element 1:
+			SIG model: 1000 "Generic OnOff Server"
+		element 2:
+			SIG model: 1000 "Generic OnOff Server"
+
+```
+The provisioner has assigned a primary unicast address which is `00aa` in our
+case.
+
+Switch to the `config` menu:
+```console
+[mesh-cfgclient]# menu config
+```
+And then we set the target unicast UUID that will be used for commands:
+```console
+[mesh-cfgclient]# target 00aa
+Configuring node 00aa
+[config: Target = 00aa]#
+```
+
+If we look at the device code:
+```rust
+use btmesh_nrf_softdevice::{BluetoothMeshDriverConfig, Driver};
+
+
+        // An instance of the Bluetooth Mesh stack                                           
+        let mut driver = Driver::new(                                                        
+            "drogue",                                                                        
+            unsafe { &__storage as *const u8 as u32 },                                       
+            Some(unsafe { &__storage_extra as *const u8 as u32 }),                           
+            100,                                                                             
+            BluetoothMeshDriverConfig {                                                      
+                uuid: None,                                                                  
+                persist_interval: Some(Duration::from_secs(10)),                             
+            },                                                                               
+        );
+```
+Now `Driver` is 
+```rust
+#[cfg(feature = "gatt")]
+  pub use driver::NrfSoftdeviceAdvertisingAndGattDriver as Driver;
+
+  #[cfg(not(feature = "gatt"))]
+  pub use driver::NrfSoftdeviceAdvertisingOnlyDriver as Driver;
+```
+In this case the `gatt` feature is not enabled so `Driver` will be of type
+`driver::NrfSoftdeviceAdvertisingOnlyDriver` which we can find in 
+`btmesh-nrf-softdevice/src/driver.rs`.
+```rust
+pub struct NrfSoftdeviceAdvertisingOnlyDriver(
+      NrfSoftdeviceDriver<AdvertisingOnlyNetworkInterfaces<SoftdeviceAdvertisingBearer>>,
+);
+```
+
+And in the devices console we see:
+```console
+163.603057 INFO  ========================================================================
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603088 INFO  =  Provisioned                                                         =
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603149 INFO  ------------------------------------------------------------------------
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603179 INFO  seq: 800
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603240 INFO  primary unicast address: 00ab
+└─ btmesh_driver::stack::provisioned::network::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603302 INFO  iv_index: 0
+└─ btmesh_driver::stack::provisioned::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603363 INFO  iv_update_flag: Normal
+└─ btmesh_driver::stack::provisioned::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603393 INFO  device_key: 0x824E36109919CD3EA806E2ECF1146550
+└─ btmesh_driver::stack::provisioned::secrets::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603607 INFO  network_key[0]: 0x0B5E6760156116BAB83115D4C1BFB480 Nid(124)
+└─ btmesh_driver::stack::provisioned::secrets::network::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603881 INFO  == app-key bindings ==
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603912 INFO  elements[0]
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.603942 INFO    SIG(0x1000)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604003 INFO    SIG(0x1002)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604064 INFO    SIG(0x100c)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604125 INFO    SIG(0x1101)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604187 INFO  elements[1]
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604217 INFO    SIG(0x1001)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604278 INFO  elements[2]
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604339 INFO    SIG(0x1001)
+└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604400 INFO  == subscriptions ==
+└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604431 INFO  elements[0]
+└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604492 INFO  elements[1]
+└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604522 INFO  elements[2]
+└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604583 INFO  == publications ==
+└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604614 INFO  elements[0]
+└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604675 INFO  elements[1]
+└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604736 INFO  elements[2]
+└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604797 INFO  = foundation
+└─ btmesh_driver::storage::provisioned::foundation::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604827 INFO    beacon: true
+└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604858 INFO    relay: RelayConfig { relay: SupportedEnabled, relay_retransmit_count: 1, relay_retransmit_interval_steps: 20 }
+└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604919 INFO    default_ttl: Ttl(127)
+└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+163.604949 INFO  ========================================================================
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+
+
+```
+
+### Mesh Configuration Database format
+[mesh-configuration-database-profile-1-0](https://www.bluetooth.com/specifications/specs/mesh-configuration-database-profile-1-0)
