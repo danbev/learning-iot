@@ -1370,13 +1370,26 @@ and application keys I guess can be updated using the Configuration Client in
 that case and it does not matter if someone gets access to the old keys. Hmm,
 would it be possible to still retrieve the keys to decrypt old messages?
 
+An application key is used for secure communication of application data sent
+between nodes. An appkey can only be used with a single network key. These are
+per model and each model can have a number of appkeys bound to it.
+
+The network key provides security of the lower layer for network messages. It
+allows nodes to be able to relay the packets without having access to the
+application data. Each appkey is associated with a single netkey which is called
+a key binding.
+
+So a single node will have a one devkey, one or more appkeys, and one or more
+network keys I think.
+
 
 ### Configuration Client
 Is responsible for generating and distributing network and application keys and
 makes sure that devices that need to communicate with each other share the
 correct keys for both the network (Upper Transport Layer?) and access layers.
 It can also remove a node from the network, turning it back into an
-unprovisioned device.
+unprovisioned device. It uses the device key to communicate with the nodes (one
+for each node).
 
 ### BLE Mesh example
 First we need to start the BLE Mesh Daemon, and before that we need to stop
@@ -1384,7 +1397,7 @@ bluetoothd daemon which was mentioned earlier in this document:
 ```console
 $ make stop-bluetoothd
 $ make start-bluetoothd-meshd
-sudo /usr/libexec/bluetooth/bluetooth-meshd --config . --storage ./lib --debug
+$ sudo /usr/libexec/bluetooth/bluetooth-meshd --config . --storage ./lib --debug
 D-Bus ready
 Loading node configuration from ./lib
 mesh/mesh-mgmt.c:mesh_mgmt_list() send read index_list
@@ -1400,6 +1413,7 @@ Hci dev 0000 removed
 Notice that we passed a config parameter of `.` which will pick up the
 configuration file `config_db.json`. This file describes the mesh network which
 is called a Mesh Object.
+We will be `mesh-cfgclient` which will communicate with this daemon.
 
 Next, we can start a ble mesh example:
 ```console
@@ -1409,18 +1423,17 @@ $ cargo r --release
 (HOST) INFO  flashing program (35 pages / 140.00 KiB)
 (HOST) INFO  success!
 ────────────────────────────────────────────────────────────────────────────────
-0.119781 INFO  btmesh: starting up
+0.119506 INFO  btmesh: starting up
 └─ btmesh_driver::{impl#1}::run_driver::{async_fn#0} @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-0.121032 INFO  ========================================================================
-└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-0.121063 INFO  =  Unprovisioned                                                       =
-└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-0.121093 INFO  ------------------------------------------------------------------------
-└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-0.121124 INFO  uuid: 466349B95B3D4F50A39A04B15B0FA2F7
-└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-0.121276 INFO  ========================================================================
-└─ btmesh_driver::storage::unprovisioned::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.344207 INFO   =====================================================================
+		=  ProvisionedConfiguration                                         =
+		---------------------------------------------------------------------
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.344238 INFO  seq: 3100
+└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.344329 INFO  primary unicast address: 00ab
+└─ btmesh_driver::stack::provisioned::network::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
+0.344360 INFO  number of elements: 3
 ```
 
 Next, start use `mesh-cfgclient`:
@@ -1488,6 +1501,8 @@ Configuring node 00aa
 [config: Target = 00aa]#
 ```
 
+#### firmware/src/main.rs walkthrough
+
 If we look at the device code:
 ```rust
 use btmesh_nrf_softdevice::{BluetoothMeshDriverConfig, Driver};
@@ -1504,8 +1519,11 @@ use btmesh_nrf_softdevice::{BluetoothMeshDriverConfig, Driver};
                 persist_interval: Some(Duration::from_secs(10)),                             
             },                                                                               
         );
+        ...
+        let _ = driver.run(&mut device).await;
 ```
-Now `Driver` is 
+Now `Driver` in this case is of type `NrfSoftdeviceAdvertisingOnlyDriver`
+because we are note specifying the `gatt` feature:
 ```rust
 #[cfg(feature = "gatt")]
   pub use driver::NrfSoftdeviceAdvertisingAndGattDriver as Driver;
@@ -1521,76 +1539,78 @@ pub struct NrfSoftdeviceAdvertisingOnlyDriver(
       NrfSoftdeviceDriver<AdvertisingOnlyNetworkInterfaces<SoftdeviceAdvertisingBearer>>,
 );
 ```
-
-And in the devices console we see:
-```console
-163.603057 INFO  ========================================================================
-└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603088 INFO  =  Provisioned                                                         =
-└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603149 INFO  ------------------------------------------------------------------------
-└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603179 INFO  seq: 800
-└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603240 INFO  primary unicast address: 00ab
-└─ btmesh_driver::stack::provisioned::network::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603302 INFO  iv_index: 0
-└─ btmesh_driver::stack::provisioned::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603363 INFO  iv_update_flag: Normal
-└─ btmesh_driver::stack::provisioned::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603393 INFO  device_key: 0x824E36109919CD3EA806E2ECF1146550
-└─ btmesh_driver::stack::provisioned::secrets::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603607 INFO  network_key[0]: 0x0B5E6760156116BAB83115D4C1BFB480 Nid(124)
-└─ btmesh_driver::stack::provisioned::secrets::network::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603881 INFO  == app-key bindings ==
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603912 INFO  elements[0]
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.603942 INFO    SIG(0x1000)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604003 INFO    SIG(0x1002)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604064 INFO    SIG(0x100c)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604125 INFO    SIG(0x1101)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604187 INFO  elements[1]
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604217 INFO    SIG(0x1001)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604278 INFO  elements[2]
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604339 INFO    SIG(0x1001)
-└─ btmesh_driver::storage::provisioned::bindings::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604400 INFO  == subscriptions ==
-└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604431 INFO  elements[0]
-└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604492 INFO  elements[1]
-└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604522 INFO  elements[2]
-└─ btmesh_driver::storage::provisioned::subscriptions::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604583 INFO  == publications ==
-└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604614 INFO  elements[0]
-└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604675 INFO  elements[1]
-└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604736 INFO  elements[2]
-└─ btmesh_driver::storage::provisioned::publications::{impl#1}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604797 INFO  = foundation
-└─ btmesh_driver::storage::provisioned::foundation::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604827 INFO    beacon: true
-└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604858 INFO    relay: RelayConfig { relay: SupportedEnabled, relay_retransmit_count: 1, relay_retransmit_interval_steps: 20 }
-└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604919 INFO    default_ttl: Ttl(127)
-└─ btmesh_driver::storage::provisioned::foundation::configuration::{impl#0}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-163.604949 INFO  ========================================================================
-└─ btmesh_driver::storage::provisioned::{impl#2}::display @ /home/danielbevenius/.cargo/git/checkouts/btmesh-e14acedbce757b27/cd4be51/btmesh-driver/src/fmt.rs:138
-
-
+And in the same source file we find:
+```rust
+pub struct NrfSoftdeviceDriver<N: NetworkInterfaces> {
+    sd: &'static Softdevice,
+    driver: BaseDriver<N, SoftdeviceRng, FlashBackingStore<Flash>>,
+}
 ```
+And BaseDriver is imported like this from btmesh_driver:
+```rust
+use btmesh_driver::{BluetoothMeshDriver, Driver as BaseDriver, BluetoothMeshDriverConfig, DriverError};
+```
+
+```rust
+pub struct Driver<N: NetworkInterfaces, R: RngCore + CryptoRng, B: BackingStore> {
+    network: Option<N>,
+    rng: Option<R>,
+    storage: Storage<B>,
+    persist_interval: Option<Duration>,
+```
+
+Then `driver.run` will call the following function:
+```rust
+    fn run<'r, D: BluetoothMeshDevice>(&'r mut self, device: &'r mut D) -> Self::RunFuture<'_, D> {
+        async move {                                                            
+            InnerDriver::new(                                                   
+                network: unwrap!(self.network.take()),                          
+                rng: unwrap!(self.rng.take()),                                  
+                &self.storage,                                                  
+                self.persist_interval,                                          
+            ) InnerDriver<N, R, B>                                              
+            .run(device) impl Future<Output = Result<…>>                        
+            .await                                                              
+        }                                                                       
+    } 
+```
+
+
+### Composition Data
+Contains info about a node, like the elements it includes and the models it
+supports. This contains a company id, vendor productd id, ventor product version
+a field named CRPL (Count Replay Protection List?).
+
+#### CRPL (Count Replay Protection List?)
+Is a 16 bit-value which is the minium number of replay protection list entries
+that a the device has. This can be found in section 4.2.1 Composition Data of
+the Mesh Profile specification:
+```
+CRPL  Contains a 16-bit value representing the minimum number of replay
+      protection list entries in a device
+```
+I've 
+```rust
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct Composition<X: Default = ()> {
+    pub(crate) cid: CompanyIdentifier,
+    pub(crate) pid: ProductIdentifier,
+    pub(crate) vid: VersionIdentifier,
+    pub(crate) crpl: u16, // Count Reply Protection List
+    pub(crate) features: Features,
+    pub(crate) elements: Vec<ElementDescriptor<X>, 4>,
+}
+```
+
+
+### BLE Mesh Replay protection
+If someone intercepts a message from a device to the network they could respond
+that message as it was encrypted with valid appkey/netkeys. This is called a
+replay attack and to protect against such attacks each element will increment
+the sequence number for each new message that is sends out. So each node that
+receives a message needs to store the latest sequence number is has seens from
+a node, and check it to avoid/drop messages that have already been seen.
 
 ### Mesh Configuration Database format
 [mesh-configuration-database-profile-1-0](https://www.bluetooth.com/specifications/specs/mesh-configuration-database-profile-1-0)
