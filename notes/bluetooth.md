@@ -1637,7 +1637,6 @@ And we know that `driver.run` can be found in NrfSoftdeviceAdvertisingOnlyDriver
 Now, `Device` is a struct in main.rs which does not implement any traits so how
 can this actually be calling this run method?
 
-
 ```rust
     fn run<'r, D: BluetoothMeshDevice>(&'r mut self, device: &'r mut D) -> Self::RunFuture<'_, D> {
         async move {                                                            
