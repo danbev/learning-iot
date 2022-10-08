@@ -1507,6 +1507,8 @@ If we look at the device code:
 ```rust
 use btmesh_nrf_softdevice::{BluetoothMeshDriverConfig, Driver};
 
+async fn main(_s: Spawner) {
+        ...
 
         // An instance of the Bluetooth Mesh stack                                           
         let mut driver = Driver::new(                                                        
@@ -1521,9 +1523,11 @@ use btmesh_nrf_softdevice::{BluetoothMeshDriverConfig, Driver};
         );
         ...
         let _ = driver.run(&mut device).await;
+        ...
+}
 ```
 Now `Driver` in this case is of type `NrfSoftdeviceAdvertisingOnlyDriver`
-because we are note specifying the `gatt` feature:
+because we are not specifying the `gatt` feature:
 ```rust
 #[cfg(feature = "gatt")]
   pub use driver::NrfSoftdeviceAdvertisingAndGattDriver as Driver;
@@ -1531,26 +1535,28 @@ because we are note specifying the `gatt` feature:
   #[cfg(not(feature = "gatt"))]
   pub use driver::NrfSoftdeviceAdvertisingOnlyDriver as Driver;
 ```
-In this case the `gatt` feature is not enabled so `Driver` will be of type
-`driver::NrfSoftdeviceAdvertisingOnlyDriver` which we can find in 
-`btmesh-nrf-softdevice/src/driver.rs`.
+So `Driver` will be of type `driver::NrfSoftdeviceAdvertisingOnlyDriver` which
+we can find in `btmesh-nrf-softdevice/src/driver.rs`.
 ```rust
 pub struct NrfSoftdeviceAdvertisingOnlyDriver(
       NrfSoftdeviceDriver<AdvertisingOnlyNetworkInterfaces<SoftdeviceAdvertisingBearer>>,
 );
 ```
-And in the same source file we find:
+So this is struct has one member of type `NrSoftdeviceDriver`:
 ```rust
 pub struct NrfSoftdeviceDriver<N: NetworkInterfaces> {
     sd: &'static Softdevice,
     driver: BaseDriver<N, SoftdeviceRng, FlashBackingStore<Flash>>,
 }
 ```
-And BaseDriver is imported like this from btmesh_driver:
+So we have a Softdevice which is the of type nrf_softdevice::Softdevice which
+is the ble device from nrf, well at least then the api for it.
+Next we have the `driver` field which is of Type `BaseDriver` which is imported
+like this from btmesh_driver (btmesh-driver/src/lib.rs):
 ```rust
-use btmesh_driver::{BluetoothMeshDriver, Driver as BaseDriver, BluetoothMeshDriverConfig, DriverError};
+use btmesh_driver::{Driver as BaseDriver};
 ```
-
+And `Driver` in btmesh-driver/src/lib.rs looks like this:
 ```rust
 pub struct Driver<N: NetworkInterfaces, R: RngCore + CryptoRng, B: BackingStore> {
     network: Option<N>,
@@ -1558,8 +1564,80 @@ pub struct Driver<N: NetworkInterfaces, R: RngCore + CryptoRng, B: BackingStore>
     storage: Storage<B>,
     persist_interval: Option<Duration>,
 ```
+If we look back at NrfSoftdeviceDriver is specified with a generic parameter:
+```rust
+    NrfSoftdeviceDriver<AdvertisingOnlyNetworkInterfaces<SoftdeviceAdvertisingBearer>>,
+```
 
-Then `driver.run` will call the following function:
+```rust
+pub struct AdvertisingOnlyNetworkInterfaces<B: AdvertisingBearer> {             
+    interface: AdvertisingBearerNetworkInterface<B>,                            
+}
+```
+There can possbily be multiple network interfaces which I think is the reason
+for NetworkInterfaces (multiple).
+
+```rust
+pub struct AdvertisingBearerNetworkInterface<B: AdvertisingBearer> {               
+    bearer: B,                                                                     
+    segmentation: Segmentation,                                                    
+    link_id: Cell<Option<u32>>,                                                    
+    inbound_transaction_number: Cell<Option<u8>>,                                  
+    acked_inbound_transaction_number: Cell<Option<u8>>,                            
+    outbound_pdu: RefCell<Option<OutboundPDU>>,                                    
+    outbound_transaction_number: Cell<u8>,                                         
+} 
+```
+The bearer in this case if `SoftdeviceAdvertisingBearer` which uses the
+softdevice.
+
+Alright so after that we now know that `Driver::new` will be calling:
+```rust
+impl NrfSoftdeviceAdvertisingOnlyDriver {
+    pub fn new(
+        name: &'static str,
+        base_address: u32,
+        extra_base_address: Option<u32>,
+        sequence_threshold: u32,
+        config: BluetoothMeshDriverConfig,
+    ) -> Self {
+        let sd: &'static Softdevice = enable_softdevice(name);
+        let rng = SoftdeviceRng::new(sd);
+        let backing_store =
+            FlashBackingStore::new(Flash::take(sd), base_address, extra_base_address, sequence_threshold);
+        let adv_bearer = SoftdeviceAdvertisingBearer::new(sd);
+
+        let network = AdvertisingOnlyNetworkInterfaces::new(adv_bearer);
+
+        Self(NrfSoftdeviceDriver::new(
+            sd,
+            network,
+            rng,
+            backing_store,
+            config,
+        ))
+    }
+```
+
+After creating NrfSoftdeviceAdvertisingOnlyDriver the last line in main.rs is:
+```rust
+    let mut device: Device = Device::new(board.btn_a, board.btn_b, display,
+        speaker, battery, sensor);
+
+    let _ = driver.run(&mut device).await;
+```
+
+And we know that `driver.run` can be found in NrfSoftdeviceAdvertisingOnlyDriver:
+```rust
+  pub async fn run<'r, D: BluetoothMeshDevice>(&'r mut self,
+      device: &'r mut D,) -> Result<(), DriverError> {
+        self.0.run(device).await
+    }
+```
+Now, `Device` is a struct in main.rs which does not implement any traits so how
+can this actually be calling this run method?
+
+
 ```rust
     fn run<'r, D: BluetoothMeshDevice>(&'r mut self, device: &'r mut D) -> Self::RunFuture<'_, D> {
         async move {                                                            
@@ -1574,7 +1652,101 @@ Then `driver.run` will call the following function:
         }                                                                       
     } 
 ```
+So this is calling `InnerDriver::run`:
+```rust
+   async fn run<'r, D: BluetoothMeshDevice>(                                   
+        &'r mut self,                                                           
+        device: &'r mut D,                                                      
+    ) -> Result<(), DriverError> {                                               
+        loop {                                                                  
+            let mut composition: Composition<CompositionExtra> = device.composition();
+                                                                                
+            let mut foundation_device: FoundationDevice<B> = FoundationDevice::new(self.storage);
+                                                                                
+            let network_fut: impl Future<Output = Result<…>> = Self::run_network(&self.network);
+            ...
+```
+First notice that the loop. And Componsition contains information about the
+device (See Componsition Data).
 
+`Self::run_network` is method in InnerDriver:
+```rust
+fn run_network(network: &N) -> impl Future<Output = Result<(), NetworkError>> + '_ {
+        network.run()
+}
+```
+And recall that InnerDriver has a field named 'network` so this is calling
+the `run` function in `AdvertisingOnlyNetworkInterfaces`
+(btmesh-driver/src/interface/mod.rs):
+```rust
+
+  impl<B: AdvertisingBearer> NetworkInterfaces for AdvertisingOnlyNetworkInterfaces<B> {
+      type RunFuture<'m> = impl Future<Output=Result<(), NetworkError>> + 'm
+      where
+      Self: 'm;
+
+      fn run(&self) -> Self::RunFuture<'_> {
+          NeverEnding
+      }
+   }
+
+struct NeverEnding;
+impl Future for NeverEnding {
+    type Output = Result<(), NetworkError>;
+    fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
+        Poll::Pending
+    }
+}
+```
+So the above will return a future that allways returns Pending when polled.
+Next, back in `InnerDriver::run` we have:
+```rust
+            let network_fut = Self::run_network(&self.network);                    
+            let device_fut = select(                                               
+                Self::run_device(&mut foundation_device, FOUNDATION_INBOUND.receiver()),
+                Self::run_device(device, DEVICE_INBOUND.receiver()),               
+            );                                                                     
+            let driver_fut = self.run_driver(&mut composition);
+```
+Next we wait for one of the two futures passed to `select` to complete.
+So what does `run_device` do?
+```rust
+    fn run_device<D: BluetoothMeshDevice>(                                      
+        device: &mut D,                                                         
+        receiver: InboundChannelReceiver,                                          
+    ) -> impl Future<Output = Result<(), ()>> + '_ {                               
+        device.run(DeviceContext::new(receiver, OUTBOUND.sender()))                
+    } 
+```
+`device.run` will end up in...
+
+
+TODO: figure out how to debug this using the instructions below. Might require
+disabling LTO.
+Lets debug this by opening OpenOCD in one terminal::
+```console
+$ openocd -f interface/cmsis-dap.cfg -f target/nrf51.cfg
+Open On-Chip Debugger 0.11.0-g610f137 (2022-05-06-14:16)
+Licensed under GNU GPL v2
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : Using CMSIS-DAPv2 interface with VID:PID=0x0d28:0x0204, serial=9904360258824e45005680040000004b000000009796990b
+Info : CMSIS-DAP: SWD  Supported
+Info : CMSIS-DAP: FW Version = 0255
+Info : CMSIS-DAP: Serial# = 9904360258824e45005680040000004b000000009796990b
+Info : CMSIS-DAP: Interface Initialised (SWD)
+Info : SWCLK/TCK = 1 SWDIO/TMS = 1 TDI = 0 TDO = 0 nTRST = 0 nRESET = 1
+Info : CMSIS-DAP: Interface ready
+Info : clock speed 1000 kHz
+Info : SWD DPIDR 0x2ba01477
+Info : nrf51.cpu: hardware has 6 breakpoints, 4 watchpoints
+Info : starting gdb server for nrf51.cpu on 3333
+Info : Listening on port 3333 for gdb connections
+```
+And then attach using rust-gdb:
+```console
+$ arm-none-eabi-gdb --args target/thumbv7em-none-eabihf/release/eclipsecon-device
+```
 
 ### Composition Data
 Contains info about a node, like the elements it includes and the models it
