@@ -188,7 +188,7 @@ low complexity. It was designed to be an extensible framework for data exhange.
 The on-the-air wire protocol the upper protocol layers, and the application
 layers are different for BLE which makes it incompatible with Bluetooth classic.
 
-The bluetooth specification 4.0 and above specifcy two wireless technologies:
+The bluetooth specification 4.0 and above specify two wireless technologies:
 * Bluetooth Basic Rate/Enhanced Data Rate (BR/EDR) or classic Bluetooth.
 * Bluetooth Low Energy (BLE)
 
@@ -204,8 +204,8 @@ There are two was of communication, broadcasting or connections.
 With broadcasting data is sent out to any scanning device in listening range.
 This is one way communication and the sender is called the broadcaster and
 the listeners are called observers. The message that the broadcaster sends are
-called `advertising` packets and the observer repeatadly scans the preset
-frequenies to receive any of these advertising packets.
+called `advertising` packets and the observer repeatably scans the preset
+frequencies to receive any of these advertising packets.
 Broadcasting is the only way to send data to multiple devices at once.
 The advertising packet contains a 31 bit payload but it is possible to have an
 optional `Scan Response` to allow for 62 bytes.
@@ -214,7 +214,7 @@ optional `Scan Response` to allow for 62 bytes.
 Are a periodic permanent exchange of packets between two devices. Like in
 Bluetooth classic we have two roles, Central (master), and Peripheral (slave).
 A Central device will scan for `connectable advertising` packets on preset
-frequencies and one a connection is established the Central manages timing and
+frequencies and once a connection is established the Central manages timing and
 initiates the periodic data exchange.
 
 The Perhipheral sends connectable advertising packets periodically and accepts
@@ -364,7 +364,8 @@ These have a specific format in the BLE specification:
 [<Where is it used>_]<When is it used>_<What does it do>_[Version_]<How is it used>
 ```
 Notice that the `Where is it used` and `Version ` are optional. The fields are
-described below:
+described below.
+
 Where is it used:
 ```
 Is optional and the default is NONE:
@@ -399,8 +400,10 @@ Version:
 ```
 None = original version of the PDU
 EXT = extended version of the PDU
+```
 
 How is it used:
+```
 IND = An indication that does not require a reply
 REQ = A request that requires a response
 RSP = A response to a request.
