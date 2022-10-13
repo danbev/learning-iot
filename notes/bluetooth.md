@@ -11,7 +11,7 @@ The name `BlueTooth` I heard comes from a Danish king named Harald Blåtand
 Gormsen who united the tribes of Denmark into a single kingdom, and the logo
 is rune skrift of his initials H and B.
 
-One master/controler and up to 7 active slaves/peripherals in what is referred
+One master/controller and up to 7 active slaves/peripherals in what is referred
 to as a piconet. But a piconet can have up to 255 parked slaves.
 
 Baseband modes in the connected state:
@@ -19,7 +19,7 @@ Baseband modes in the connected state:
   The slave is actively listening for transmissions. Consumes most power.
 
 * sniff
-  The slave becomes active periodically which allows a method reduced power
+  The slave becomes active periodically which allows for reduced power
   consumption
 
 * hold
@@ -72,9 +72,6 @@ Transmits packets within the 2.4Ghz band. The master is the party that controls
 the Frequency Hopping Spread Spectrum (FHSS) and specifies the frequency
 based upon the masters bluetooth device address, and the timing based upon
 the masters clock.
-
-L2CAP can use the control layer to control layer which can interact with the
-link manager to perform actions.
 
 #### Link Manager
 These negotiate the properites of the connection using the Link Manager
