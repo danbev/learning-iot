@@ -776,7 +776,7 @@ can send a new value. For example write a Bool value of true will turn on
 LED3.
 
 ### Elements
-I an addressable entity within a node. Every node has at the very least one
+Is an addressable entity within a node. Every node has at the very least one
 element which is called the primary element, and the rest are called secondary
 elements. There are static and do not change for as long as the node is part
 of the network. I think it can change if the device gets unprovisioned and
@@ -786,10 +786,11 @@ then reprovisioned.
 Is a network allowing BLE Many-to-many communication. So it is based on BLE and
 uses something called managed flooding where messages/packets will get relayed
 by nodes in the network. This is managed in that there are ways to control how
-long the message can live, and remember/cache packets to avoid bouncing. 
+long the message can live, and nodes can remember/cache packets to avoid
+bouncing. 
 
 Devices in the mesh have difference roles. A `Node` is just a normal BLE device
-which broadcasts messages. The mesh also needs `Releay Nodes` which is what it
+which broadcasts messages. The mesh also needs `Relay Nodes` which is what it
 sounds like, a node that can receive a packet and then relay it in the network.
 The relay node needs to scan for packets continously and therefor requires a
 high amount of power so these nodes are mostly connected to a power source and
@@ -843,20 +844,19 @@ The provisionee needs to obtain/receive the following items:
 * Key Refresh flag
 
 #### Unicast Address
-Is assigned during provisioning and uniquely identify a single element of and
+Is assigned during provisioning and uniquely identifies a single element of a
 node. We send a message to an element of a node. This was actually not clear to
-be in the begining that it it actually elements and not nodes that we are
+be in the begining that it is actually elements and not nodes that we are
 addressing.
 
 #### Group Address
 Is used to identify a group of one or more elements. There are groups that are
-defined by the Bluetooth SIG for things like All-proxies, All-friends, and All-nodes.
-But other groups can be defined during by configuring application.
+defined by the Bluetooth SIG for things like All-proxies, All-friends, and
+All-nodes.  But other groups can be defined during by configuring application.
 
 #### Virtual Address
 Is an address that is assigned to one or more elements, and it can span multiple
 nodes.
-
 
 ### Connectionless Packet Switching
 Each packet contains the complete routing infomation in its header section, like
@@ -883,9 +883,9 @@ This is used for Audio frames.
 
 ## Security
 One thing to keep in mind when reading documentation related to BlueTooth
-classic and BlueTooth Low Energy. For versions 4.2 and beyond there is a type
-of connection called Secure Connections or LE Security which uses ECHF. Prior
-type of secure connection before this is called Legacy connection. 
+classic and BlueTooth Low Energy is that for versions 4.2 and beyond there is a
+type of connection called Secure Connections or LE Security which uses ECHF.
+Prior type of secure connection before this is called Legacy connection. 
 
 ```
 
@@ -944,9 +944,6 @@ GATT Client      <-------------------------           GATT Server
 BR/EDR Legacy Pairing uses E21 or E22 based on SAFER+.
 Secure Simple Pairing uses SHA-256, HMAC-SHA-256 and P-192 elliptic curve.
 LE Legacy Pairing used AES-CCM
-
-###
-
 
 ### Temporary Key (TK)
 This is a key used during pairing and its value depends on the pairing method
@@ -1081,18 +1078,16 @@ SMP, and L2CAP. The Host and the Controller communicate using the Host
 Controller Interface which can be done using UART, USB, Secure Digital (SD), or
 3-wire UART.
 
-If the Linux computer is going to host 
-
-A linux computer is going to host GAP/GATT applications then a daemon is
+If the Linux computer is going to host GAP/GATT applications then a daemon is
 required named `bluetoothd`. And if the linux computer is going to host an
 BLE mesh node then a daemon named `bluetooth-meshd` needs to be running.
 So its one or the other, a single linux computer cannot host both at the same
 time it seems. The daemon serializes and handles all the HCI communication.
 
 Now, applications on linux do not communicate directly with these daemons but
-instead usd `dbus` which is an IPC system on linux. So an application does not
-have to include any blueZ header files but is decoupled from it by using the
-IPC/messaging and the application instead used dbus apis.
+instead use `dbus` which is an IPC system on linux. So an application does not
+have to include any blueZ header files and is decoupled from it by using the
+IPC/messaging and the application instead uses dbus apis.
 ```
  +--------------------------------------------+
  |  +------+               +------+           |
@@ -1119,11 +1114,12 @@ IPC/messaging and the application instead used dbus apis.
  
 ```
 
-The blueZ api is contains in a number of text files which can be found here:
+The blueZ api contains in a number of text files which can be found here:
 https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc
 
 ### D-Bus
 TODO: extract this to a separate document if it gets too long.
+
 The central concept/component in dbus is the message bus and there are two types
 , the `system` and the `session` bus.
 There is a single instance of the system bus but there is one session bus per
@@ -1186,16 +1182,15 @@ In contast to BLE where devices connect directly to each other, in BLE-mesh
 devices use advertisements and scanning states to relay messages to each other.
 
 #### Layers:
-From bottom to to layers.
+From bottom to top layers.
 
 ##### Bluetooth Low Energy Layer
-Same as BLE and needs a BLE stack. Mesh used advertisments and scanning states
+Same as BLE and needs a BLE stack. Mesh uses advertisments and scanning states
 and the connected state when Proxy Nodes are used.
 
 ##### Bearer Layer
 Defines how different PDUs are handled. There is an Advertsing Bearer which
-handles adv and scanning states.
-There is also a GATT Bearer
+handles adv and scanning states. There is also a GATT Bearer
 
 ##### Lower Transport Layer
 This layer takes care of re-assembling packets from the bearer layer, and also
@@ -1237,7 +1232,7 @@ unprovisioned device which is also a new PDU called `provisioning invite` PDU.
 When the unprovisioned device receives the `provisioning invite` it will in turn
 send a `provision capabilities` PDU in response which include:
 * The number of elements that it has
-* The security algorightms it supports
+* The security algorithms it supports
 * Input/Ouput capabilites
   - Can the device display output to the user
   - Can the device receive an input from the user (like button or something)
@@ -1785,3 +1780,19 @@ a node, and check it to avoid/drop messages that have already been seen.
 
 ### Mesh Configuration Database format
 [mesh-configuration-database-profile-1-0](https://www.bluetooth.com/specifications/specs/mesh-configuration-database-profile-1-0)
+
+
+### Chrome
+To enable bluetooth in Chrome ensure that the bluetooth daemon is running (it
+might not be if you have been experimenting with ble mesh for example):
+```console
+$ sudo systemctl enable bluetooth
+$ sudo systemctl start bluetooth
+```
+Then in Chrome we have to enable bletooth permissions:
+```
+chrome://flags/#enable-web-bluetooth-new-permissions-backend
+```
+Then if you inspecte chrome://bluetooth-internals/#adapter hopefully things
+will be mostly green, at least `Initialized', `Present`, and `Powered`.
+
