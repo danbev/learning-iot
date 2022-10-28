@@ -40,12 +40,14 @@ performace cost.
 
 
 ### Drogue Iot digital twin
-Drogue IoT has an initial digital twin implementation. TODO: take a look at this.
+Drogue IoT has an initial digital twin implementation.
+TODO: take a look at this.
+
 Instead is doing the processing where the digital twin is, i.e it is to sending
 the data.
 
 
-TODO: Take a look at Borsh IoT offerings.
+TODO: Take a look at Bosch IoT offerings.
 
 
 
