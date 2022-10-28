@@ -27,9 +27,9 @@ making sure the data is sent to the device, which might take more that a single
 attempt which is something that the user would otherwise need to handle them
 self.
 
-## Web of Things
-TODO: 
-
+## Web of Things (WoT)
+[Documentation](https://www.w3.org/WoT/documentation/)
+TODO: Take a look at WoT. 
 
 ### Eclipse Ditto
 Is a digital twin framework written in Java using Akka.
