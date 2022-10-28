@@ -41,6 +41,7 @@ performace cost.
 
 ### Drogue Iot digital twin
 Drogue IoT has an initial digital twin implementation.
+
 TODO: take a look at this.
 
 Instead is doing the processing where the digital twin is, i.e it is to sending
