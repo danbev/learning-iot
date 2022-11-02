@@ -114,6 +114,7 @@ Running `probe-run --chip nrf52833_xxAA target/thumbv7em-none-eabihf/release/ecl
 0.120361 INFO  uuid: 96E438B02ED04673A2FA0D0665522774
 0.120452 INFO  ========================================================================
 ────────────────────────────────────────────────────────────────────────────────
+```
 
 Flash the softdevice using probe-rs-cli:
 ```console
