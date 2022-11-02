@@ -100,6 +100,12 @@ Adding extra erase range, 0x00026634 .. 0x00026fff
 auto erase enabled
 wrote 157236 bytes from file s140_nrf52_7.2.0_softdevice.hex in 7.881345s (19.483 KiB/s)
 ```
+Flash the softdevice using probe-rs-cli:
+```console
+$ probe-rs-cli erase --chip nRF52833_xxAA                                         
+$ probe-rs-cli download s140_nrf52_7.3.0_softdevice.hex --format Hex --chip nRF52833_xxAA
+```
+
 And now we should be able to run the eclipsecon-device:
 ```console
 Running `probe-run --chip nrf52833_xxAA target/thumbv7em-none-eabihf/release/eclipsecon-device`
@@ -116,8 +122,3 @@ Running `probe-run --chip nrf52833_xxAA target/thumbv7em-none-eabihf/release/ecl
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
-Flash the softdevice using probe-rs-cli:
-```console
-$ probe-rs-cli erase --chip nRF52833_xxAA                                         
-$ probe-rs-cli download s140_nrf52_7.3.0_softdevice.hex --format Hex --chip nRF52833_xxAA
-```
