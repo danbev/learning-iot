@@ -88,12 +88,9 @@ xPSR: 0x21000003 pc: 0x0003775a msp: 0x2001ffe0
 
 I'm an idiot, the device needs to be flashed with the nrf softdevice.
 
-Download the softdevice:
-```console
-$ wget https://raw.githubusercontent.com/NordicSemiconductor/nRF5-SDK-for-Mesh/master/bin/softdevice/s140_nrf52_7.2.0_softdevice.hex
-```
+Download the [softdevice](https://www.nordicsemi.com/Products/Development-software/S140/Download).
 
-Flash the softdevice:
+Flash the softdevice using gdb:
 ```console(gdb) monitor reset halt
 target halted due to debug-request, current mode: Thread 
 xPSR: 0x01000000 pc: 0xfffffffe msp: 0xfffffffc
@@ -117,3 +114,9 @@ Running `probe-run --chip nrf52833_xxAA target/thumbv7em-none-eabihf/release/ecl
 0.120361 INFO  uuid: 96E438B02ED04673A2FA0D0665522774
 0.120452 INFO  ========================================================================
 ────────────────────────────────────────────────────────────────────────────────
+
+Flash the softdevice using probe-rs-cli:
+```console
+$ probe-rs-cli erase --chip nRF52833_xxAA                                         
+$ probe-rs-cli download s140_nrf52_7.3.0_softdevice.hex --format Hex --chip nRF52833_xxAA
+```
