@@ -2422,7 +2422,7 @@ signal needs to be fixed for that time period.
 
 
 ### Analog to Digital Converter (ADC)
-So this is about converting an analog signal, which remember is a continuos
+So this is about converting an analog signal, which remember is a continous
 signal into a digital signal (two states off/on/high/low).
 
 ```
